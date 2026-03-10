@@ -31,8 +31,8 @@ class MedMinderApp extends StatelessWidget {
           seedColor: const Color(0xFF08007C),
         ),
       ),
-      //home: const SignInPage(),
-      /*routes: {
+      home: const SignInPage(),
+      routes: {
         '/signin': (context) => const SignInPage(),
         '/signup': (context) => const SignUpPage(),
         '/home': (context) => const HomePage(),
@@ -44,7 +44,7 @@ class MedMinderApp extends StatelessWidget {
         '/profile': (context) => const ProfilePage(),
         '/settings': (context) => const SettingsPage(),
         '/successLogin': (context) => const SuccessLoginPage(),
-      },*/
+      },
     );
   }
 }
