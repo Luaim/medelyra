@@ -22,12 +22,15 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/logo2.png
+    - assets/mainLogo.png
+    - assets/loginLogo.png
+    - assets/google.png
+    - assets/facebook.png
 
 flutter_native_splash:
   color: "#08007C"
-  image: assets/logo2.png
+  image: assets/mainLogo.png
 
   android_12:
     color: "#08007C"
-    image: assets/logo2.png
+    image: assets/mainLogo.png
