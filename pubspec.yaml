@@ -26,6 +26,7 @@ flutter:
     - assets/loginLogo.png
     - assets/google.png
     - assets/facebook.png
+    - assets/wellcome.png
 
 flutter_native_splash:
   color: "#08007C"
