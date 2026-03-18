@@ -19,6 +19,8 @@ class _HomePageState extends State<HomePage> {
     {'day': 'Wed', 'date': '12'},
     {'day': 'Thu', 'date': '13'},
     {'day': 'Fri', 'date': '14'},
+    {'day': 'Sat', 'date': '15'},
+    {'day': 'Sun', 'date': '16'},
   ];
 
   final List<Map<String, String>> medicines = [
