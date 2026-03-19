@@ -27,6 +27,11 @@ flutter:
     - assets/google.png
     - assets/facebook.png
     - assets/wellcome.png
+    - assets/pillReminder.png
+    - assets/appointmentReminder.png
+    - assets/reminderBottom.png
+    - assets/pillBottle.png
+    - assets/doctorAppointment.png
 
 flutter_native_splash:
   color: "#08007C"
