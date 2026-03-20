@@ -35,11 +35,13 @@ flutter:
     - assets/cpr.png
     - assets/choking.png
     - assets/bleeding.png
+    - assets/test.png
+
 
 flutter_native_splash:
   color: "#08007C"
-  image: assets/mainLogo.png
+  image: assets/test.png
 
   android_12:
     color: "#08007C"
-    image: assets/mainLogo.png
+    image: assets/test.png
