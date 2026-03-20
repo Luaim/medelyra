@@ -34,7 +34,7 @@ class _SignInPageState extends State<SignInPage> {
         child: Center(
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.07,
+              horizontal: screenWidth * 0.06,
               vertical: 20,
             ),
             child: ConstrainedBox(
@@ -42,24 +42,24 @@ class _SignInPageState extends State<SignInPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: smallScreen ? 15 : 30),
+                  SizedBox(height: smallScreen ? 5 : 5),
                   Image.asset(
                     'assets/loginLogo.png',
-                    width: screenWidth * 0.42,
-                    height: screenHeight * 0.14,
+                    width: screenWidth * 0.50,
+                    height: screenHeight * 0.20,
                     fit: BoxFit.contain,
                   ),
-                  SizedBox(height: smallScreen ? 12 : 20),
+                  SizedBox(height: smallScreen ? 7 : 7),
                   Text(
                     'Sign in',
                     style: TextStyle(
-                      fontSize: smallScreen ? 22 : 26,
+                      fontSize: smallScreen ? 22 : 22,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF2B2B2B),
                       fontFamily: 'serif',
                     ),
                   ),
-                  SizedBox(height: smallScreen ? 28 : 42),
+                  SizedBox(height: smallScreen ? 28 : 30),
                   _buildLabel('Email'),
                   const SizedBox(height: 8),
                   _buildTextField(
@@ -68,7 +68,7 @@ class _SignInPageState extends State<SignInPage> {
                     prefixIcon: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
                   ),
-                  SizedBox(height: smallScreen ? 18 : 22),
+                  SizedBox(height: smallScreen ? 18 : 20),
                   _buildLabel('Password'),
                   const SizedBox(height: 8),
                   _buildTextField(
@@ -94,15 +94,13 @@ class _SignInPageState extends State<SignInPage> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
-                      onTap: () {
-                        // TODO: forgot password page/action
-                      },
+                      onTap: () {},
                       child: const Text(
                         'Forget Password?',
                         style: TextStyle(
                           color: Color(0xFF9B1C1C),
                           fontWeight: FontWeight.w700,
-                          fontSize: 16,
+                          fontSize: 13,
                           fontFamily: 'serif',
                         ),
                       ),
@@ -111,7 +109,7 @@ class _SignInPageState extends State<SignInPage> {
                   SizedBox(height: smallScreen ? 18 : 26),
                   SizedBox(
                     width: double.infinity,
-                    height: 52,
+                    height: 50,
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pushReplacementNamed(context, '/home');
@@ -168,9 +166,7 @@ class _SignInPageState extends State<SignInPage> {
                     children: [
                       Expanded(
                         child: _socialButton(
-                          onTap: () {
-                            // TODO: Google sign in
-                          },
+                          onTap: () {},
                           imagePath: 'assets/google.png',
                           fallbackIcon: Icons.g_mobiledata,
                           text: 'Google',
@@ -179,9 +175,7 @@ class _SignInPageState extends State<SignInPage> {
                       const SizedBox(width: 18),
                       Expanded(
                         child: _socialButton(
-                          onTap: () {
-                            // TODO: Facebook sign in
-                          },
+                          onTap: () {},
                           imagePath: 'assets/facebook.png',
                           fallbackIcon: Icons.facebook,
                           text: 'Facebook',
@@ -189,14 +183,14 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: smallScreen ? 26 : 34),
+                  SizedBox(height: smallScreen ? 26 : 15),
                   Wrap(
                     alignment: WrapAlignment.center,
                     children: [
                       const Text(
                         "Don’t have account? ",
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF2B2B2B),
                           fontFamily: 'serif',
@@ -209,7 +203,7 @@ class _SignInPageState extends State<SignInPage> {
                         child: const Text(
                           'Sign Up',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF9B1C1C),
                             fontFamily: 'serif',
@@ -288,9 +282,11 @@ class _SignInPageState extends State<SignInPage> {
           ),
           suffixIcon: suffixIcon,
           border: InputBorder.none,
+
+          // email - password field size control
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 14,
-            vertical: 18,
+            vertical: 14,
           ),
         ),
       ),
@@ -309,7 +305,7 @@ class _SignInPageState extends State<SignInPage> {
         height: 54,
         decoration: BoxDecoration(
           color: const Color(0xFFDDF2F7),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(26),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.18),
@@ -323,8 +319,8 @@ class _SignInPageState extends State<SignInPage> {
           children: [
             Image.asset(
               imagePath,
-              width: 24,
-              height: 24,
+              width: 25,
+              height: 25,
               errorBuilder: (context, error, stackTrace) {
                 return Icon(
                   fallbackIcon,
@@ -340,9 +336,9 @@ class _SignInPageState extends State<SignInPage> {
               child: Text(
                 text,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
-                  color: Colors.grey.shade700,
+                  color: Color.fromARGB(255, 57, 57, 57),
                   fontFamily: 'serif',
                 ),
               ),
