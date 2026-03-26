@@ -226,7 +226,12 @@ class _SignUpPageState extends State<SignUpPage> {
                     Expanded(child: Divider()),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text("OR Continue with"),
+                      child: Text(
+                        "OR Continue with",
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 116, 115, 115),
+                        ),
+                      ),
                     ),
                     Expanded(child: Divider()),
                   ],
