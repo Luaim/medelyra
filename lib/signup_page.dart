@@ -33,253 +33,219 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final media = MediaQuery.of(context);
-    final size = media.size;
-    final screenWidth = size.width;
-    final screenHeight = size.height;
-    final smallScreen = screenHeight < 700;
+    final size = MediaQuery.of(context).size;
+    final h = size.height;
+    final w = size.width;
+
+    final isSmall = h < 700;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.07,
-              vertical: 20,
-            ),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 430),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: smallScreen ? 8 : 16),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        size: 34,
-                        color: Colors.black,
-                      ),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: w * 0.06,
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 430),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                /// TOP AREA (FIXED SPACING)
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.arrow_back, size: 28),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: isSmall ? 4 : 8),
+
+                /// LOGO (CLOSER TO TOP)
+                Image.asset(
+                  'assets/loginLogo.png',
+                  width: w * 0.40,
+                  height: h * 0.15,
+                ),
+
+                SizedBox(height: isSmall ? 6 : 12),
+
+                const Text(
+                  'Sign Up',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF2B2B2B),
+                    fontFamily: 'serif',
+                  ),
+                ),
+
+                SizedBox(height: isSmall ? 20 : 26),
+
+                /// INPUTS
+                _buildTextField(
+                  controller: userNameController,
+                  hintText: 'User Name',
+                  suffixIcon: const Icon(Icons.person_outline),
+                ),
+
+                const SizedBox(height: 14),
+
+                _buildTextField(
+                  controller: emailController,
+                  hintText: 'Email',
+                  keyboardType: TextInputType.emailAddress,
+                  suffixIcon: const Icon(Icons.email_outlined),
+                ),
+
+                const SizedBox(height: 14),
+
+                _buildTextField(
+                  controller: passwordController,
+                  hintText: 'Password',
+                  obscureText: obscurePassword,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        obscurePassword = !obscurePassword;
+                      });
+                    },
+                    icon: Icon(
+                      obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                     ),
                   ),
-                  SizedBox(height: smallScreen ? 6 : 10),
-                  Image.asset(
-                    'assets/loginLogo.png',
-                    width: screenWidth * 0.42,
-                    height: screenHeight * 0.14,
-                    fit: BoxFit.contain,
-                  ),
-                  SizedBox(height: smallScreen ? 10 : 18),
-                  Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      fontSize: smallScreen ? 22 : 26,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF2B2B2B),
-                      fontFamily: 'serif',
+                ),
+
+                const SizedBox(height: 14),
+
+                _buildTextField(
+                  controller: confirmPasswordController,
+                  hintText: 'Confirm Password',
+                  obscureText: obscureConfirmPassword,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        obscureConfirmPassword = !obscureConfirmPassword;
+                      });
+                    },
+                    icon: Icon(
+                      obscureConfirmPassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                     ),
                   ),
-                  SizedBox(height: smallScreen ? 24 : 34),
-                  _buildTextField(
-                    controller: userNameController,
-                    hintText: 'User Name',
-                    prefixSpace: true,
-                    suffixIcon: const Icon(
-                      Icons.person_outline,
-                      color: Colors.black87,
-                      size: 28,
-                    ),
-                  ),
-                  SizedBox(height: smallScreen ? 16 : 20),
-                  _buildTextField(
-                    controller: emailController,
-                    hintText: 'Email',
-                    keyboardType: TextInputType.emailAddress,
-                    prefixSpace: true,
-                    suffixIcon: const Icon(
-                      Icons.email_outlined,
-                      color: Colors.black87,
-                      size: 28,
-                    ),
-                  ),
-                  SizedBox(height: smallScreen ? 16 : 20),
-                  _buildTextField(
-                    controller: passwordController,
-                    hintText: 'Password',
-                    obscureText: obscurePassword,
-                    prefixSpace: true,
-                    suffixIcon: IconButton(
-                      onPressed: () {
+                ),
+
+                const SizedBox(height: 12),
+
+                /// TERMS
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
                         setState(() {
-                          obscurePassword = !obscurePassword;
+                          agreeTerms = !agreeTerms;
                         });
                       },
-                      icon: Icon(
-                        obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: Colors.black87,
-                        size: 28,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: smallScreen ? 16 : 20),
-                  _buildTextField(
-                    controller: confirmPasswordController,
-                    hintText: 'Confirm Password',
-                    obscureText: obscureConfirmPassword,
-                    prefixSpace: true,
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          obscureConfirmPassword = !obscureConfirmPassword;
-                        });
-                      },
-                      icon: Icon(
-                        obscureConfirmPassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: Colors.black87,
-                        size: 28,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: smallScreen ? 14 : 18),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            agreeTerms = !agreeTerms;
-                          });
-                        },
-                        child: Container(
-                          width: 22,
-                          height: 22,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(3),
-                            border: Border.all(
-                              color: const Color(0xFFC62828),
-                              width: 2,
-                            ),
+                      child: Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: const Color(0xFFC62828),
+                            width: 2,
                           ),
-                          child: agreeTerms
-                              ? const Icon(
-                                  Icons.check,
-                                  size: 16,
-                                  color: Color(0xFFC62828),
-                                )
-                              : null,
+                          borderRadius: BorderRadius.circular(4),
                         ),
+                        child: agreeTerms
+                            ? const Icon(Icons.check, size: 14)
+                            : null,
                       ),
-                      const SizedBox(width: 10),
-                      const Expanded(
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: RichText(
+                        text: const TextSpan(
+                          style: TextStyle(
+                            fontSize: 14,
+                          ),
                           children: [
-                            Text(
-                              'Agree With ',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFF2B2B2B),
-                                fontFamily: 'serif',
-                              ),
+                            TextSpan(
+                              text: 'Agree With ',
+                              style: TextStyle(color: Colors.black),
                             ),
-                            Text(
-                              'Terms & Condition',
+                            TextSpan(
+                              text: 'Terms & Condition',
                               style: TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFF3B50E0),
-                                fontFamily: 'serif',
+                                color: Color(0xFF001EBD),
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: smallScreen ? 20 : 28),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 54,
-                    child: ElevatedButton(
-                      onPressed: _handleSignUp,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3D84A8),
-                        foregroundColor: Colors.white,
-                        elevation: 4,
-                        shadowColor: Colors.black26,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: isSmall ? 18 : 24),
+
+                ///  SIGN UP BUTTON
+                SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: ElevatedButton(
+                    onPressed: _handleSignUp,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF387A97),
+                      foregroundColor: const Color.fromARGB(205, 255, 255, 255),
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
                       ),
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'serif',
-                        ),
+                    ),
+                    child: const Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  SizedBox(height: smallScreen ? 20 : 28),
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Divider(
-                          color: Color(0xFFD0D0D0),
-                          thickness: 1,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          'OR Continue with',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 16,
-                            fontFamily: 'serif',
-                          ),
-                        ),
-                      ),
-                      const Expanded(
-                        child: Divider(
-                          color: Color(0xFFD0D0D0),
-                          thickness: 1,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _socialCircleButton(
-                        onTap: () {},
-                        imagePath: 'assets/google.png',
-                        fallbackIcon: Icons.g_mobiledata,
-                      ),
-                      const SizedBox(width: 28),
-                      _socialCircleButton(
-                        onTap: () {},
-                        imagePath: 'assets/facebook.png',
-                        fallbackIcon: Icons.facebook,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: smallScreen ? 10 : 18),
-                ],
-              ),
+                ),
+
+                SizedBox(height: isSmall ? 16 : 22),
+
+                /// DIVIDER
+                const Row(
+                  children: [
+                    Expanded(child: Divider()),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text("OR Continue with"),
+                    ),
+                    Expanded(child: Divider()),
+                  ],
+                ),
+
+                SizedBox(height: isSmall ? 14 : 20),
+
+                /// SOCIAL
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _socialCircleButton('assets/google.png'),
+                    const SizedBox(width: 25),
+                    _socialCircleButton('assets/facebook.png'),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+              ],
             ),
           ),
         ),
@@ -287,86 +253,57 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
+  /// COMPACT TEXTFIELD
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
     TextInputType keyboardType = TextInputType.text,
     bool obscureText = false,
-    bool prefixSpace = false,
     Widget? suffixIcon,
   }) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFDDF2F7),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade400),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.18),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          )
         ],
-        border: Border.all(
-          color: const Color(0xFF6F6F6F),
-          width: 0.8,
-        ),
       ),
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
-        style: const TextStyle(
-          fontSize: 15,
-          color: Colors.black87,
-        ),
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(
-            color: Colors.grey.shade500,
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+        style: const TextStyle(fontSize: 14),
+        decoration: const InputDecoration(
+          isDense: true,
           border: InputBorder.none,
-          suffixIcon: suffixIcon,
           contentPadding: EdgeInsets.symmetric(
-            horizontal: prefixSpace ? 20 : 14,
-            vertical: 18,
+            horizontal: 16,
+            vertical: 12,
           ),
+        ).copyWith(
+          hintText: hintText,
+          suffixIcon: suffixIcon,
         ),
       ),
     );
   }
 
-  Widget _socialCircleButton({
-    required VoidCallback onTap,
-    required String imagePath,
-    required IconData fallbackIcon,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 58,
-        height: 58,
-        alignment: Alignment.center,
-        child: Image.asset(
-          imagePath,
-          width: 42,
-          height: 42,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            return CircleAvatar(
-              radius: 21,
-              backgroundColor: const Color(0xFFEAF6FA),
-              child: Icon(
-                fallbackIcon,
-                size: fallbackIcon == Icons.g_mobiledata ? 36 : 28,
-                color: fallbackIcon == Icons.facebook
-                    ? const Color(0xFF4267B2)
-                    : Colors.black87,
-              ),
-            );
-          },
-        ),
+  Widget _socialCircleButton(String path) {
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color(0xFFEAF6FA),
+      ),
+      child: Center(
+        child: Image.asset(path, width: 35),
       ),
     );
   }
