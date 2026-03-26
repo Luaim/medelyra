@@ -7,11 +7,13 @@ class SignInPage extends StatefulWidget {
   State<SignInPage> createState() => _SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageState extends State<SignInPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   bool obscurePassword = true;
+  bool isPressed = false;
 
   @override
   void dispose() {
@@ -23,197 +25,204 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final screenWidth = size.width;
-    final screenHeight = size.height;
-
-    final bool smallScreen = screenHeight < 700;
+    final h = size.height;
+    final w = size.width;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.06,
-              vertical: 20,
-            ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 430),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: smallScreen ? 5 : 5),
-                  Image.asset(
-                    'assets/loginLogo.png',
-                    width: screenWidth * 0.50,
-                    height: screenHeight * 0.20,
-                    fit: BoxFit.contain,
-                  ),
-                  SizedBox(height: smallScreen ? 7 : 7),
-                  Text(
-                    'Sign in',
-                    style: TextStyle(
-                      fontSize: smallScreen ? 22 : 22,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF2B2B2B),
-                      fontFamily: 'serif',
-                    ),
-                  ),
-                  SizedBox(height: smallScreen ? 28 : 30),
-                  _buildLabel('Email'),
-                  const SizedBox(height: 8),
-                  _buildTextField(
-                    controller: emailController,
-                    hintText: 'Enter your Email',
-                    prefixIcon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 20),
-                  _buildLabel('Password'),
-                  const SizedBox(height: 8),
-                  _buildTextField(
-                    controller: passwordController,
-                    hintText: '••••••••••••••••••',
-                    prefixIcon: Icons.lock_outline,
-                    obscureText: obscurePassword,
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          obscurePassword = !obscurePassword;
-                        });
-                      },
-                      icon: Icon(
-                        obscurePassword
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                        color: Colors.black87,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: w * 0.06),
+                child: Column(
+                  children: [
+                    /// 🔥 LOGO (BIGGER + HIGHER)
+                    Transform.translate(
+                      offset: const Offset(0, -10),
+                      child: Image.asset(
+                        'assets/loginLogo.png',
+                        width: w * 0.42,
+                        height: h * 0.14,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: const Text(
-                        'Forget Password?',
-                        style: TextStyle(
-                          color: Color(0xFF9B1C1C),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                          fontFamily: 'serif',
+
+                    const SizedBox(height: 6),
+
+                    const Text(
+                      'Sign In',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF2B2B2B),
+                        fontFamily: 'serif',
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    /// EMAIL
+                    _buildLabel('Email'),
+                    const SizedBox(height: 6),
+                    _buildTextField(
+                      controller: emailController,
+                      hintText: 'Enter your Email',
+                      prefixIcon: Icons.email_outlined,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// PASSWORD
+                    _buildLabel('Password'),
+                    const SizedBox(height: 6),
+                    _buildTextField(
+                      controller: passwordController,
+                      hintText: '••••••••••••',
+                      prefixIcon: Icons.lock_outline,
+                      obscureText: obscurePassword,
+                      suffixIcon: IconButton(
+                        splashRadius: 20,
+                        onPressed: () {
+                          setState(() {
+                            obscurePassword = !obscurePassword;
+                          });
+                        },
+                        icon: Icon(
+                          obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 26),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
+
+                    const SizedBox(height: 4),
+
+                    /// 🔧 FIXED FORGOT PASSWORD (NO BIG SPLASH)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 6),
+                          child: Text(
+                            'Forgot Password?',
+                            style: TextStyle(
+                              color: Color(0xFF9B1C1C),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    /// 🔥 SIGN IN BUTTON WITH PRESS EFFECT
+                    GestureDetector(
+                      onTapDown: (_) => setState(() => isPressed = true),
+                      onTapUp: (_) => setState(() => isPressed = false),
+                      onTapCancel: () => setState(() => isPressed = false),
+                      onTap: () {
                         Navigator.pushReplacementNamed(context, '/home');
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3D84A8),
-                        foregroundColor: Colors.white,
-                        elevation: 4,
-                        shadowColor: Colors.black26,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Text(
-                        'Sign In',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'serif',
+                      child: AnimatedScale(
+                        scale: isPressed ? 0.97 : 1,
+                        duration: const Duration(milliseconds: 100),
+                        child: Container(
+                          width: double.infinity,
+                          height: 46,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3D84A8),
+                            borderRadius: BorderRadius.circular(25),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'Sign In',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 26),
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Divider(
-                          color: Color(0xFFD0D0D0),
-                          thickness: 1,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          'OR Continue with',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 16,
-                            fontFamily: 'serif',
+
+                    const SizedBox(height: 20),
+
+                    /// DIVIDER
+                    const Row(
+                      children: [
+                        Expanded(child: Divider()),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            "OR Continue with",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 116, 115, 115),
+                            ),
                           ),
                         ),
-                      ),
-                      const Expanded(
-                        child: Divider(
-                          color: Color(0xFFD0D0D0),
-                          thickness: 1,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _socialButton(
-                          onTap: () {},
-                          imagePath: 'assets/google.png',
-                          fallbackIcon: Icons.g_mobiledata,
-                          text: 'Google',
-                        ),
-                      ),
-                      const SizedBox(width: 18),
-                      Expanded(
-                        child: _socialButton(
-                          onTap: () {},
-                          imagePath: 'assets/facebook.png',
-                          fallbackIcon: Icons.facebook,
-                          text: 'Facebook',
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: smallScreen ? 26 : 15),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    children: [
-                      const Text(
-                        "Don’t have account? ",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF2B2B2B),
-                          fontFamily: 'serif',
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/signup');
-                        },
-                        child: const Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF9B1C1C),
-                            fontFamily: 'serif',
+                        Expanded(child: Divider()),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// SOCIAL BUTTONS
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _socialButton(
+                            text: 'Google',
+                            imagePath: 'assets/google.png',
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: smallScreen ? 10 : 20),
-                ],
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _socialButton(
+                            text: 'Facebook',
+                            imagePath: 'assets/facebook.png',
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// SIGN UP (PRESS EFFECT)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Don’t have account? "),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/signup');
+                          },
+                          child: const Text(
+                            'Sign Up',
+                            style: TextStyle(
+                              color: Color(0xFF9B1C1C),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+                  ],
+                ),
               ),
             ),
           ),
@@ -227,12 +236,7 @@ class _SignInPageState extends State<SignInPage> {
       alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: const TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w500,
-          color: Color(0xFF3A3A3A),
-          fontFamily: 'serif',
-        ),
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
       ),
     );
   }
@@ -241,7 +245,6 @@ class _SignInPageState extends State<SignInPage> {
     required TextEditingController controller,
     required String hintText,
     required IconData prefixIcon,
-    TextInputType keyboardType = TextInputType.text,
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
@@ -251,101 +254,74 @@ class _SignInPageState extends State<SignInPage> {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.18),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(
-          color: const Color(0xFF6F6F6F),
-          width: 0.8,
-        ),
+        border: Border.all(color: Colors.grey.shade400),
       ),
       child: TextField(
         controller: controller,
-        keyboardType: keyboardType,
         obscureText: obscureText,
-        style: const TextStyle(
-          fontSize: 15,
-          color: Colors.black87,
-        ),
         decoration: InputDecoration(
+          isDense: true,
           hintText: hintText,
-          hintStyle: TextStyle(
-            color: Colors.grey.shade600,
-            fontSize: 14,
-          ),
-          prefixIcon: Icon(
-            prefixIcon,
-            color: Colors.black87,
-            size: 24,
-          ),
+          prefixIcon: Icon(prefixIcon),
           suffixIcon: suffixIcon,
           border: InputBorder.none,
-
-          // email - password field size control
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 14,
-          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
         ),
       ),
     );
   }
 
   Widget _socialButton({
-    required VoidCallback onTap,
-    required String imagePath,
-    required IconData fallbackIcon,
     required String text,
+    required String imagePath,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 54,
-        decoration: BoxDecoration(
-          color: const Color(0xFFDDF2F7),
-          borderRadius: BorderRadius.circular(26),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.18),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              imagePath,
-              width: 25,
-              height: 25,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(
-                  fallbackIcon,
-                  size: 28,
-                  color: fallbackIcon == Icons.facebook
-                      ? const Color(0xFF4267B2)
-                      : Colors.black87,
-                );
-              },
-            ),
-            const SizedBox(width: 10),
-            Flexible(
-              child: Text(
-                text,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: Color.fromARGB(255, 57, 57, 57),
-                  fontFamily: 'serif',
-                ),
+    bool pressed = false;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return GestureDetector(
+          onTapDown: (_) => setState(() => pressed = true),
+          onTapUp: (_) => setState(() => pressed = false),
+          onTapCancel: () => setState(() => pressed = false),
+          onTap: () {},
+          child: AnimatedScale(
+            scale: pressed ? 0.95 : 1,
+            duration: const Duration(milliseconds: 100),
+            child: Container(
+              height: 54,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(181, 169, 240, 250),
+                border:
+                    Border.all(color: const Color.fromARGB(170, 71, 71, 71)),
+                borderRadius: BorderRadius.circular(26),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.18),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(imagePath, width: 24),
+                  const SizedBox(width: 10),
+                  Text(
+                    text,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
