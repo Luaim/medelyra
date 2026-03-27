@@ -10,6 +10,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedDayIndex = 2;
+  bool showMedicines = true; // NEW
 
   final List<Map<String, String>> medicines = [
     {
@@ -24,6 +25,14 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
+  final List<Map<String, String>> appointments = [
+    {
+      'title': 'Clinic Visit',
+      'subtitle': 'Andah Clinic',
+      'time': '3:00 PM',
+    },
+  ];
+
   final List<Map<String, String>> weekDays = [
     {'day': 'Mon', 'date': '10'},
     {'day': 'Tue', 'date': '11'},
@@ -34,6 +43,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final items = showMedicines ? medicines : appointments;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       bottomNavigationBar: CustomBottomNavBar(
@@ -48,7 +59,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               const SizedBox(height: 12),
 
-              /// 📅 MONTH
+              ///  MONTH
               const Text(
                 'May 2024',
                 style: TextStyle(
@@ -60,7 +71,7 @@ class _HomePageState extends State<HomePage> {
 
               const SizedBox(height: 12),
 
-              /// 📆 DAYS
+              /// DAYS
               SizedBox(
                 height: 65,
                 child: ListView.builder(
@@ -110,7 +121,7 @@ class _HomePageState extends State<HomePage> {
 
               const SizedBox(height: 16),
 
-              /// 📊 PROGRESS
+              /// PROGRESS
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -130,10 +141,31 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
 
-              /// 📦 CARDS
-              ...medicines.map((e) => _card(e)),
+              /// TABS (NEW)
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    _tab('Medicines', showMedicines, () {
+                      setState(() => showMedicines = true);
+                    }),
+                    _tab('Appointment', !showMedicines, () {
+                      setState(() => showMedicines = false);
+                    }),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              /// CARDS
+              ...items.map((e) => _card(e)),
 
               const SizedBox(height: 20),
             ],
@@ -143,7 +175,36 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// 💊 CARD (FINAL CLEAN VERSION)
+  /// TAB
+  Widget _tab(String text, bool active, VoidCallback onTap) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: active
+                ? const Color.fromARGB(50, 88, 145, 250)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: active
+                    ? const Color.fromARGB(255, 88, 145, 250)
+                    : Colors.grey,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// CARD
   Widget _card(Map<String, String> item) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -161,45 +222,49 @@ class _HomePageState extends State<HomePage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// 🔹 ICON PLACEHOLDER (FOR FUTURE TYPES)
+          /// ICON PLACEHOLDER
           Container(
-            width: 60,
-            height: 60,
+            width: 65,
+            height: 65,
             decoration: BoxDecoration(
               color: const Color(0xFFEFF2FA),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(
-              Icons.medication_outlined,
-              color: Color.fromARGB(255, 123, 139, 160),
-            ),
+            child: const Icon(Icons.medication_outlined),
           ),
 
           const SizedBox(width: 12),
 
-          /// 📄 CONTENT
+          /// CONTENT
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// TIME
-                Text(
-                  item['time']!,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color.fromARGB(180, 253, 0, 0),
-                    fontWeight: FontWeight.w600,
+                /// TIME CAPSULE (NEW)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(87, 207, 207, 207),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    item['time']!,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color.fromARGB(255, 253, 0, 0),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
 
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
 
                 Text(
                   item['title']!,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF2D2D2D),
                   ),
                 ),
 
@@ -215,7 +280,7 @@ class _HomePageState extends State<HomePage> {
 
                 const SizedBox(height: 10),
 
-                /// PRIMARY BUTTON
+                /// BUTTON
                 SizedBox(
                   height: 36,
                   width: double.infinity,
@@ -223,36 +288,53 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(237, 88, 145, 250),
-                      foregroundColor: Colors.white,
-                      side: const BorderSide(
-                          color: Color.fromARGB(174, 64, 64, 64), width: 1),
-                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
+                        side: const BorderSide(
+                            color: Color.fromARGB(138, 0, 0, 0), width: 1),
                       ),
                     ),
-                    child: const Text('Mark as Taken'),
+                    child: const Text(
+                      'Mark as Taken',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
 
                 const SizedBox(height: 6),
 
-                /// SECONDARY ACTIONS
-                const Row(
+                /// INTERACTIVE ACTIONS
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Postpone',
-                      style: TextStyle(
-                        color: Color.fromARGB(178, 15, 0, 98), // soft orange
-                        fontWeight: FontWeight.w600,
+                    InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () {},
+                      child: const Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Text(
+                          'Postpone',
+                          style: TextStyle(
+                            color: Color.fromARGB(214, 15, 0, 98),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
-                    Text(
-                      'Skip',
-                      style: TextStyle(
-                        color: Color(0xFFEF5350), // soft red
-                        fontWeight: FontWeight.w600,
+                    InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () {},
+                      child: const Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Text(
+                          'Skip',
+                          style: TextStyle(
+                            color: Color(0xFFEF5350),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ],
