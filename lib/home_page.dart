@@ -10,7 +10,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedDayIndex = 2;
-  bool showMedicines = true; // NEW
+  bool showMedicines = true;
 
   final List<Map<String, String>> medicines = [
     {
