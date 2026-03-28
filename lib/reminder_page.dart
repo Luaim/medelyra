@@ -26,13 +26,10 @@ class ReminderPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final screenWidth = size.width;
-    final screenHeight = size.height;
-    final smallScreen = screenHeight < 700;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: const Color(0xFFF6F6F6),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 1,
         onTap: (index) => _onBottomTap(context, index),
@@ -40,8 +37,8 @@ class ReminderPage extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.05,
-            vertical: 18,
+            horizontal: screenWidth * 0.06,
+            vertical: 20,
           ),
           child: Center(
             child: ConstrainedBox(
@@ -49,55 +46,83 @@ class ReminderPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: smallScreen ? 20 : 30),
+                  /// TITLE
                   const Text(
-                    'Medicine & Appointment reminder',
+                    'Reminders',
                     style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF333333),
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF2D2D2D),
                     ),
                   ),
-                  SizedBox(height: smallScreen ? 24 : 30),
+
+                  const SizedBox(height: 6),
+
+                  const Text(
+                    'Manage your medicine and appointments',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+
+                  const SizedBox(height: 26),
+
+                  ///  CARD
                   _ReminderOptionCard(
                     title: 'Pill Reminder',
+                    subtitle: 'Track your daily medications',
                     imagePath: 'assets/pillReminder.png',
-                    fallbackIcon: Icons.access_time_filled_rounded,
+                    fallbackIcon: Icons.medication_rounded,
                     onPressed: () {
                       Navigator.pushNamed(context, '/pillReminder');
                     },
                   ),
-                  SizedBox(height: smallScreen ? 18 : 22),
+
+                  const SizedBox(height: 16),
+
+                  /// CARD
                   _ReminderOptionCard(
                     title: 'Appointment Reminder',
+                    subtitle: 'Never miss your doctor visits',
                     imagePath: 'assets/appointmentReminder.png',
                     fallbackIcon: Icons.calendar_month_rounded,
                     onPressed: () {
                       Navigator.pushNamed(context, '/appointmentReminder');
                     },
                   ),
-                  SizedBox(height: smallScreen ? 26 : 34),
-                  Center(
-                    child: Image.asset(
-                      'assets/reminderBottom.png',
-                      width: screenWidth * 0.58,
-                      height: screenHeight * 0.24,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => Container(
-                        width: screenWidth * 0.58,
-                        height: screenHeight * 0.24,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEAF1FF),
-                          borderRadius: BorderRadius.circular(24),
+
+                  const SizedBox(height: 24),
+
+                  /// HELPER SECTION
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAF2FF),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.lightbulb_outline,
+                          color: Color(0xFF3D84A8),
                         ),
-                        child: const Icon(
-                          Icons.schedule_send_rounded,
-                          size: 90,
-                          color: Color(0xFF7A8BE8),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Tip: Set reminders to stay consistent with your medication and appointments.',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF4A4A4A),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
+
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -110,12 +135,14 @@ class ReminderPage extends StatelessWidget {
 
 class _ReminderOptionCard extends StatelessWidget {
   final String title;
+  final String subtitle;
   final String imagePath;
   final IconData fallbackIcon;
   final VoidCallback onPressed;
 
   const _ReminderOptionCard({
     required this.title,
+    required this.subtitle,
     required this.imagePath,
     required this.fallbackIcon,
     required this.onPressed,
@@ -123,84 +150,83 @@ class _ReminderOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFCFF0F0),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: const Color(0xFF333333),
-          width: 1.4,
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEAF6F8),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 82,
-            height: 82,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEAF7F7),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(6),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => Icon(
-                  fallbackIcon,
-                  size: 46,
-                  color: const Color(0xFF315C9E),
-                ),
+        child: Row(
+          children: [
+            /// ICON
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
               ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF333333),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          SizedBox(
-            width: 96,
-            height: 44,
-            child: ElevatedButton(
-              onPressed: onPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF67C0D7),
-                foregroundColor: const Color(0xFF1E3A43),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  side: const BorderSide(
-                    color: Color(0xFF2A6E7E),
-                    width: 1,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => Icon(
+                    fallbackIcon,
+                    size: 32,
+                    color: const Color(0xFF3D84A8),
                   ),
                 ),
               ),
-              child: const Text(
-                'Add',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                ),
+            ),
+
+            const SizedBox(width: 14),
+
+            /// TEXT
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+
+            /// BUTTON
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3D84A8),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }
