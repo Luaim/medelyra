@@ -12,6 +12,26 @@ class _HomePageState extends State<HomePage> {
   int selectedDayIndex = 2;
   bool showMedicines = true;
 
+  void _onBottomTap(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, '/home');
+        break;
+      case 1:
+        Navigator.pushReplacementNamed(context, '/reminder');
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, '/finder');
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/sos');
+        break;
+      case 4:
+        Navigator.pushReplacementNamed(context, '/profile');
+        break;
+    }
+  }
+
   final List<Map<String, String>> medicines = [
     {
       'title': 'Vitamin D',
@@ -49,7 +69,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xFFF5F6FA),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 0,
-        onTap: (i) {},
+        onTap: (index) => _onBottomTap(context, index),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
