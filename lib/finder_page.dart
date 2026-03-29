@@ -36,6 +36,26 @@ class _FinderPageState extends State<FinderPage> {
 
   List<Map<String, dynamic>> filteredPlaces = [];
 
+  void _onBottomTap(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, '/home');
+        break;
+      case 1:
+        Navigator.pushReplacementNamed(context, '/reminder');
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, '/finder');
+        break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/sos');
+        break;
+      case 4:
+        Navigator.pushReplacementNamed(context, '/profile');
+        break;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -62,7 +82,7 @@ class _FinderPageState extends State<FinderPage> {
       backgroundColor: const Color(0xFFF6F6F6),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 2,
-        onTap: (i) {},
+        onTap: (i) => _onBottomTap(context, i),
       ),
       body: SafeArea(
         child: Padding(
