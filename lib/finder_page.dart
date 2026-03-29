@@ -19,8 +19,8 @@ class _FinderPageState extends State<FinderPage> {
       'rating': '4.7',
       'isOpen': true,
       'openText': 'Open now · Closes 10:00 PM',
-      'address': 'Jalan 18, Pusat Perdagangan Desa Jaya, Kuala Lumpur',
-      'icon': Icons.local_hospital_outlined,
+      'address': 'Jalan 18, Desa Jaya, Kuala Lumpur',
+      'icon': Icons.local_hospital,
     },
     {
       'name': 'Kajang Hospital',
@@ -30,27 +30,7 @@ class _FinderPageState extends State<FinderPage> {
       'isOpen': true,
       'openText': 'Open 24 hours',
       'address': 'Jalan Semenyih, Kajang',
-      'icon': Icons.apartment_rounded,
-    },
-    {
-      'name': 'Putrajaya Hospital',
-      'type': 'General Hospital',
-      'distance': '4.8 km away',
-      'rating': '4.3',
-      'isOpen': true,
-      'openText': 'Open 24 hours',
-      'address': 'Presint 7, Putrajaya',
-      'icon': Icons.local_hospital_rounded,
-    },
-    {
-      'name': 'CarePlus Pharmacy',
-      'type': 'Pharmacy',
-      'distance': '0.8 km away',
-      'rating': '4.8',
-      'isOpen': true,
-      'openText': 'Open now · Closes 11:00 PM',
-      'address': 'Block C, City Square',
-      'icon': Icons.medication_outlined,
+      'icon': Icons.apartment,
     },
   ];
 
@@ -62,237 +42,112 @@ class _FinderPageState extends State<FinderPage> {
     filteredPlaces = places;
   }
 
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
-  }
-
-  void _onBottomTap(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        Navigator.pushReplacementNamed(context, '/home');
-        break;
-      case 1:
-        Navigator.pushReplacementNamed(context, '/reminder');
-        break;
-      case 2:
-        Navigator.pushReplacementNamed(context, '/finder');
-        break;
-      case 3:
-        Navigator.pushReplacementNamed(context, '/sos');
-        break;
-      case 4:
-        Navigator.pushReplacementNamed(context, '/profile');
-        break;
-    }
-  }
-
   void _filterPlaces(String query) {
     setState(() {
-      if (query.trim().isEmpty) {
-        filteredPlaces = places;
-      } else {
-        filteredPlaces = places.where((place) {
-          final name = place['name'].toString().toLowerCase();
-          final type = place['type'].toString().toLowerCase();
-          final address = place['address'].toString().toLowerCase();
-          final q = query.toLowerCase();
-
-          return name.contains(q) || type.contains(q) || address.contains(q);
-        }).toList();
-      }
+      filteredPlaces = query.isEmpty
+          ? places
+          : places.where((p) {
+              final q = query.toLowerCase();
+              return p['name'].toLowerCase().contains(q) ||
+                  p['type'].toLowerCase().contains(q);
+            }).toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final screenWidth = size.width;
-    final screenHeight = size.height;
-    final smallScreen = screenHeight < 700;
+    final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: const Color(0xFFF6F6F6),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 2,
-        onTap: (index) => _onBottomTap(context, index),
+        onTap: (i) {},
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.045,
-            vertical: 16,
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 430),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: smallScreen ? 8 : 12),
-                  Row(
-                    children: [
-                      _topIconButton(Icons.tune_rounded),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _buildSearchBar(),
-                      ),
-                    ],
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: width * 0.06),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+
+              /// SEARCH
+              Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 6,
+                    )
+                  ],
+                ),
+                child: TextField(
+                  controller: searchController,
+                  onChanged: _filterPlaces,
+                  decoration: const InputDecoration(
+                    hintText: 'Search hospital, clinic...',
+                    prefixIcon: Icon(Icons.search),
+                    border: InputBorder.none,
                   ),
-                  SizedBox(height: smallScreen ? 18 : 22),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFFD8F2F2),
-                          Color(0xFFEFF9F9),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(22),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 52,
-                          height: 52,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF67C0D7),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.location_on_rounded,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Nearby clinics & pharmacies',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF333333),
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Find medical places close to your current location',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFF666666),
-                                  height: 1.3,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: smallScreen ? 16 : 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Available places',
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              ///  HEADER
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAF6F8),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.location_on, color: Color(0xFF3D84A8)),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Nearby clinics & pharmacies',
                         style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF333333),
-                        ),
-                      ),
-                      Text(
-                        '${filteredPlaces.length} found',
-                        style: const TextStyle(
-                          fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF6D6D6D),
                         ),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              /// TITLE
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Available places',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
                   ),
-                  SizedBox(height: smallScreen ? 14 : 18),
-                  ListView.separated(
-                    itemCount: filteredPlaces.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    separatorBuilder: (_, __) => const SizedBox(height: 14),
-                    itemBuilder: (context, index) {
-                      final place = filteredPlaces[index];
-                      return _PlaceCard(
-                        name: place['name'],
-                        type: place['type'],
-                        distance: place['distance'],
-                        rating: place['rating'],
-                        isOpen: place['isOpen'],
-                        openText: place['openText'],
-                        address: place['address'],
-                        icon: place['icon'],
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 12),
+                  Text('${filteredPlaces.length} found'),
                 ],
               ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _topIconButton(IconData icon) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: const Color(0xFFEAF6FA),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFD7E7ED),
-        ),
-      ),
-      child: Icon(
-        icon,
-        color: const Color(0xFF3D84A8),
-        size: 26,
-      ),
-    );
-  }
+              const SizedBox(height: 12),
 
-  Widget _buildSearchBar() {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF2F2F2),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(
-          color: const Color(0xFFD0D0D0),
-        ),
-      ),
-      child: TextField(
-        controller: searchController,
-        onChanged: _filterPlaces,
-        decoration: InputDecoration(
-          hintText: 'Search hospital, clinic, pharmacy',
-          hintStyle: TextStyle(
-            color: Colors.grey.shade600,
-            fontSize: 14,
+              /// LIST
+              Expanded(
+                child: ListView.builder(
+                  itemCount: filteredPlaces.length,
+                  itemBuilder: (context, index) {
+                    final place = filteredPlaces[index];
+                    return _PlaceCard(place: place);
+                  },
+                ),
+              ),
+            ],
           ),
-          prefixIcon: const Icon(
-            Icons.search_rounded,
-            color: Color(0xFF777777),
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 14),
         ),
       ),
     );
@@ -300,60 +155,41 @@ class _FinderPageState extends State<FinderPage> {
 }
 
 class _PlaceCard extends StatelessWidget {
-  final String name;
-  final String type;
-  final String distance;
-  final String rating;
-  final bool isOpen;
-  final String openText;
-  final String address;
-  final IconData icon;
+  final Map<String, dynamic> place;
 
-  const _PlaceCard({
-    required this.name,
-    required this.type,
-    required this.distance,
-    required this.rating,
-    required this.isOpen,
-    required this.openText,
-    required this.address,
-    required this.icon,
-  });
+  const _PlaceCard({required this.place});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFD9F3F1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFF98C9C5),
-        ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            blurRadius: 10,
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /// TOP
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 58,
-                height: 58,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.75),
-                  borderRadius: BorderRadius.circular(16),
+                  color: const Color(0xFFEAF2FF),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
-                  icon,
+                  place['icon'],
                   color: const Color(0xFF3D84A8),
-                  size: 30,
                 ),
               ),
               const SizedBox(width: 12),
@@ -362,84 +198,64 @@ class _PlaceCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name,
+                      place['name'],
                       style: const TextStyle(
-                        fontSize: 17,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF2E2E2E),
+                        fontSize: 16,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 2),
                     Text(
-                      type,
+                      place['type'],
                       style: const TextStyle(
+                        color: Colors.black54,
                         fontSize: 13,
-                        color: Color(0xFF5E5E5E),
-                        fontWeight: FontWeight.w500,
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 8,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        _infoChip(
-                          Icons.star_rounded,
-                          rating,
-                          const Color(0xFFFFB800),
-                        ),
-                        _infoChip(
-                          Icons.near_me_rounded,
-                          distance,
-                          const Color(0xFF3D84A8),
-                        ),
-                        _statusChip(isOpen, openText),
-                      ],
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+
+          const SizedBox(height: 10),
+
+          /// INFO
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                Icons.location_on_outlined,
-                size: 18,
-                color: Color(0xFF666666),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  address,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF666666),
-                    height: 1.3,
-                  ),
-                ),
-              ),
+              _chip('⭐ ${place['rating']}'),
+              const SizedBox(width: 8),
+              _chip(place['distance']),
             ],
           ),
+
+          const SizedBox(height: 8),
+
+          /// ADDRESS
+          Text(
+            place['address'],
+            style: const TextStyle(
+              color: Colors.black54,
+              fontSize: 13,
+            ),
+          ),
+
           const SizedBox(height: 14),
+
+          /// BUTTONS
           Row(
             children: [
               Expanded(
-                child: _actionButton(
-                  icon: Icons.language_rounded,
+                child: _outlineBtn(
                   text: 'Website',
-                  onTap: () {},
+                  icon: Icons.language,
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _actionButton(
-                  icon: Icons.directions_rounded,
+                child: _mainBtn(
                   text: 'Directions',
-                  onTap: () {},
+                  icon: Icons.directions,
                 ),
               ),
             ],
@@ -449,74 +265,51 @@ class _PlaceCard extends StatelessWidget {
     );
   }
 
-  Widget _infoChip(IconData icon, String text, Color iconColor) {
+  /// CHIP
+  Widget _chip(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.72),
-        borderRadius: BorderRadius.circular(18),
+        color: const Color(0xFFF1F3F6),
+        borderRadius: BorderRadius.circular(14),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 16,
-            color: iconColor,
-          ),
-          const SizedBox(width: 5),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF4A4A4A),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
+      child: Text(text, style: const TextStyle(fontSize: 12)),
     );
   }
 
-  Widget _statusChip(bool isOpen, String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: isOpen ? const Color(0xFFE6F7EA) : const Color(0xFFFFEEEE),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 12,
-          color: isOpen ? const Color(0xFF2E7D32) : const Color(0xFFC62828),
-          fontWeight: FontWeight.w600,
+  /// PRIMARY BUTTON
+  Widget _mainBtn({required String text, required IconData icon}) {
+    return SizedBox(
+      height: 42,
+      child: ElevatedButton.icon(
+        onPressed: () {},
+        icon: Icon(icon, size: 18),
+        label: Text(text),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF3D84A8),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
       ),
     );
   }
 
-  Widget _actionButton({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-  }) {
+  /// OUTLINE BUTTON
+  Widget _outlineBtn({required String text, required IconData icon}) {
     return SizedBox(
       height: 42,
-      child: ElevatedButton.icon(
-        onPressed: onTap,
+      child: OutlinedButton.icon(
+        onPressed: () {},
         icon: Icon(icon, size: 18),
         label: Text(text),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF67C0D7),
-          foregroundColor: const Color(0xFF17333B),
-          elevation: 0,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: const Color(0xFF3D84A8),
+          side: const BorderSide(color: Color(0xFF3D84A8)),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(
-              color: Color(0xFF2A6E7E),
-              width: 1,
-            ),
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
       ),
