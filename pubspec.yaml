@@ -29,7 +29,6 @@ flutter:
     - assets/wellcome.png
     - assets/pillReminder.png
     - assets/appointmentReminder.png
-    - assets/doctorAppointment.png
     - assets/cpr.png
     - assets/choking.png
     - assets/bleeding.png
