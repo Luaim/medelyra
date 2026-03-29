@@ -11,19 +11,23 @@ class PillReminderPage extends StatefulWidget {
 class _PillReminderPageState extends State<PillReminderPage> {
   final TextEditingController medicineNameController = TextEditingController();
 
-  String selectedMeal = 'After Breakfast';
-  String selectedDuration = '1 Month';
-  String selectedFrequency = 'Daily';
+  String selectedType = 'Pill';
+  String selectedPeriod = 'Morning';
+  String selectedDuration = '7 Days';
+  String selectedFrequency = 'Once Daily';
 
-  int selectedHour = 12;
-  int selectedMinute = 0;
-  String selectedPeriod = 'AM';
+  TimeOfDay selectedTime = TimeOfDay.now();
 
-  @override
-  void dispose() {
-    medicineNameController.dispose();
-    super.dispose();
-  }
+  final List<Map<String, dynamic>> medicineTypes = [
+    {'label': 'Pill', 'icon': Icons.medication},
+    {'label': 'Injection', 'icon': Icons.vaccines},
+    {'label': 'Cream', 'icon': Icons.spa},
+    {'label': 'Drop', 'icon': Icons.opacity},
+    {'label': 'Inhaler', 'icon': Icons.air},
+    {'label': 'Bandage', 'icon': Icons.healing},
+    {'label': 'Syrup', 'icon': Icons.local_drink},
+    {'label': 'Other', 'icon': Icons.medical_information},
+  ];
 
   void _onBottomTap(BuildContext context, int index) {
     switch (index) {
@@ -45,273 +49,219 @@ class _PillReminderPageState extends State<PillReminderPage> {
     }
   }
 
-  void _changeHour(bool increase) {
-    setState(() {
-      if (increase) {
-        selectedHour = selectedHour == 12 ? 1 : selectedHour + 1;
-      } else {
-        selectedHour = selectedHour == 1 ? 12 : selectedHour - 1;
-      }
-    });
-  }
-
-  void _changeMinute(bool increase) {
-    setState(() {
-      if (increase) {
-        selectedMinute = (selectedMinute + 1) % 60;
-      } else {
-        selectedMinute = (selectedMinute - 1 + 60) % 60;
-      }
-    });
-  }
-
-  void _changePeriod() {
-    setState(() {
-      selectedPeriod = selectedPeriod == 'AM' ? 'PM' : 'AM';
-    });
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
       context: context,
-      builder: (context) => const _SuccessDialog(
-        message: 'Medication Added Successfully',
-      ),
+      initialTime: selectedTime,
     );
+
+    if (picked != null) {
+      setState(() => selectedTime = picked);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final screenWidth = size.width;
-    final screenHeight = size.height;
-    final smallScreen = screenHeight < 700;
+    final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: const Color(0xFFF6F6F6),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 1,
-        onTap: (index) => _onBottomTap(context, index),
+        onTap: (i) => _onBottomTap(context, i),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.05,
-            vertical: 18,
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 430),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: smallScreen ? 10 : 14),
-                  const Center(
-                    child: Text(
-                      'New Reminder',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF222222),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: smallScreen ? 12 : 16),
-                  Center(
-                    child: Image.asset(
-                      'assets/pillBottle.png',
-                      width: screenWidth * 0.26,
-                      height: screenHeight * 0.14,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.medication_rounded,
-                        size: 90,
-                        color: Color(0xFF6F8EEB),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 24),
-                  const Text(
-                    'Medicine name',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Color(0xFF444444),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _customInput(
-                    child: TextField(
-                      controller: medicineNameController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter Medicine Name',
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 24),
-                  const Text(
-                    'Time & Schedule',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Color(0xFF444444),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _selectChip(
-                          text: 'After Breakfast',
-                          selected: selectedMeal == 'After Breakfast',
-                          onTap: () {
-                            setState(() {
-                              selectedMeal = 'After Breakfast';
-                            });
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _selectChip(
-                          text: 'After Dinner',
-                          selected: selectedMeal == 'After Dinner',
-                          onTap: () {
-                            setState(() {
-                              selectedMeal = 'After Dinner';
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Duration',
-                              style: TextStyle(
-                                fontSize: 17,
-                                color: Color(0xFF444444),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            _customInput(
-                              height: 46,
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.calendar_month_rounded),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    '1 Month',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Frequency',
-                              style: TextStyle(
-                                fontSize: 17,
-                                color: Color(0xFF444444),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            _customInput(
-                              height: 46,
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.access_time_filled_rounded),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Daily',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: smallScreen ? 20 : 26),
-                  const Text(
-                    'Time',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Color(0xFF444444),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  _timePickerCard(),
-                  SizedBox(height: smallScreen ? 24 : 30),
-                  Center(
-                    child: SizedBox(
-                      width: 180,
-                      height: 46,
-                      child: ElevatedButton.icon(
-                        onPressed: _showSuccessDialog,
-                        icon: const Icon(Icons.add_circle_outline_rounded),
-                        label: const Text('Add Reminder'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF2A5A5),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+          padding: EdgeInsets.symmetric(horizontal: width * 0.06),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+
+              const Center(
+                child: Text(
+                  'New Reminder',
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
+                ),
               ),
-            ),
+
+              const SizedBox(height: 20),
+
+              /// TYPE WITH LABEL
+              const Text('Medicine Type',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+
+              const SizedBox(height: 10),
+
+              Wrap(
+                spacing: 18,
+                runSpacing: 12,
+                children: medicineTypes.map((item) {
+                  final isSelected = selectedType == item['label'];
+
+                  return GestureDetector(
+                    onTap: () => setState(() => selectedType = item['label']),
+                    child: Container(
+                      width: 70,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected ? const Color(0xFF3D84A8) : Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            item['icon'],
+                            color: isSelected ? Colors.white : Colors.grey,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            item['label'],
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isSelected ? Colors.white : Colors.black54,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+
+              const SizedBox(height: 24),
+
+              /// NAME
+              const Text('Medicine Name',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+
+              const SizedBox(height: 8),
+
+              _input(
+                child: TextField(
+                  controller: medicineNameController,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter medicine name',
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// PERIOD
+              const Text('Time of Day',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+
+              const SizedBox(height: 10),
+
+              Row(
+                children: ['Morning', 'Afternoon', 'Night']
+                    .map((e) => Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: _chip(
+                              text: e,
+                              selected: selectedPeriod == e,
+                              onTap: () => setState(() => selectedPeriod = e),
+                            ),
+                          ),
+                        ))
+                    .toList(),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// TIME
+              const Text('Select Time',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+
+              const SizedBox(height: 10),
+
+              GestureDetector(
+                onTap: _pickTime,
+                child: _input(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(selectedTime.format(context)),
+                      const Icon(Icons.access_time),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// DURATION
+              const Text('Duration',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+
+              const SizedBox(height: 10),
+
+              _dropdown(['7 Days', '14 Days', '1 Month'], selectedDuration,
+                  (v) {
+                setState(() => selectedDuration = v);
+              }),
+
+              const SizedBox(height: 20),
+
+              /// FREQUENCY
+              const Text('Frequency',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+
+              const SizedBox(height: 10),
+
+              _dropdown(['Once Daily', 'Twice Daily', 'Every 8 Hours'],
+                  selectedFrequency, (v) {
+                setState(() => selectedFrequency = v);
+              }),
+
+              const SizedBox(height: 30),
+
+              /// BUTTON
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3D84A8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Add Reminder',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _customInput({required Widget child, double height = 50}) {
+  Widget _input({required Widget child}) {
     return Container(
-      height: height,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      height: 50,
       decoration: BoxDecoration(
-        color: const Color(0xFFF2F2F2),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFADADAD)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE0E0E0)),
       ),
-      alignment: Alignment.centerLeft,
       child: child,
     );
   }
 
-  Widget _selectChip({
+  Widget _chip({
     required String text,
     required bool selected,
     required VoidCallback onTap,
@@ -319,155 +269,34 @@ class _PillReminderPageState extends State<PillReminderPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 42,
+        height: 40,
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFEFEFEF) : const Color(0xFFF8F8F8),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: selected ? const Color(0xFFD5D5D5) : const Color(0xFFE5E5E5),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          color: selected ? const Color(0xFF3D84A8) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color.fromARGB(255, 255, 255, 255)),
         ),
         alignment: Alignment.center,
         child: Text(
           text,
-          style: const TextStyle(
-            fontSize: 15,
-            color: Color(0xFF444444),
-            fontWeight: FontWeight.w500,
+          style: TextStyle(
+            color: selected ? Colors.white : Colors.black54,
           ),
         ),
       ),
     );
   }
 
-  Widget _timePickerCard() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _timeArrow(
-                () => _changeHour(true), Icons.keyboard_arrow_up_rounded),
-            const SizedBox(width: 24),
-            _timeArrow(
-                () => _changeMinute(true), Icons.keyboard_arrow_up_rounded),
-            const SizedBox(width: 24),
-            _timeArrow(_changePeriod, Icons.keyboard_arrow_up_rounded),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _timeValue(selectedHour.toString().padLeft(2, '0')),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                ':',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
-              ),
-            ),
-            _timeValue(selectedMinute.toString().padLeft(2, '0')),
-            const SizedBox(width: 14),
-            _timeValue(selectedPeriod, width: 58),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _timeArrow(
-                () => _changeHour(false), Icons.keyboard_arrow_down_rounded),
-            const SizedBox(width: 24),
-            _timeArrow(
-                () => _changeMinute(false), Icons.keyboard_arrow_down_rounded),
-            const SizedBox(width: 24),
-            _timeArrow(_changePeriod, Icons.keyboard_arrow_down_rounded),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _timeArrow(VoidCallback onTap, IconData icon) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Icon(
-        icon,
-        size: 30,
-        color: const Color(0xFF666666),
-      ),
-    );
-  }
-
-  Widget _timeValue(String value, {double width = 54}) {
-    return SizedBox(
-      width: width,
-      child: Text(
-        value,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.w500,
-          color: Color(0xFF555555),
-        ),
-      ),
-    );
-  }
-}
-
-class _SuccessDialog extends StatelessWidget {
-  final String message;
-
-  const _SuccessDialog({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 26),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircleAvatar(
-              radius: 34,
-              backgroundColor: Color(0xFF47C84A),
-              child: Icon(
-                Icons.check,
-                size: 42,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 20,
-                color: Color(0xFF555555),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 18),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'OK',
-                style: TextStyle(fontSize: 17),
-              ),
-            ),
-          ],
+  Widget _dropdown(
+      List<String> items, String value, Function(String) onChanged) {
+    return _input(
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          items: items
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: (v) => onChanged(v!),
         ),
       ),
     );
