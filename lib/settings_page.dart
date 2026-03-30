@@ -75,11 +75,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: 'Change Password',
                   subtitle: 'Keep your account secure',
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Change password page coming soon'),
-                      ),
-                    );
+                    Navigator.pushNamed(context, '/edit_password');
                   },
                 ),
                 SizedBox(height: smallScreen ? 18 : 22),

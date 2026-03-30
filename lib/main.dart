@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medminder/edit_password_page.dart';
 import 'package:medminder/edit_profile_page.dart';
 import 'signin_page.dart';
 import 'signup_page.dart';
@@ -46,6 +47,7 @@ class MedMinderApp extends StatelessWidget {
         '/settings': (context) => const SettingsPage(),
         '/successLogin': (context) => const SuccessLoginPage(),
         '/edit_profile': (context) => const EditProfilePage(),
+        '/edit_password': (context) => const EditPasswordPage(),
       },
     );
   }
