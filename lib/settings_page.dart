@@ -66,11 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: 'Edit Profile',
                   subtitle: 'Update your personal information',
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Edit profile page coming soon'),
-                      ),
-                    );
+                    Navigator.pushNamed(context, '/edit_profile');
                   },
                 ),
                 const SizedBox(height: 12),
