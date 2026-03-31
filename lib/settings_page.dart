@@ -171,11 +171,97 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: 'About MedMinder',
                   subtitle: 'App version and information',
                   onTap: () {
-                    showAboutDialog(
+                    showDialog(
                       context: context,
-                      applicationName: 'MedMinder',
-                      applicationVersion: '1.0.0',
-                      applicationLegalese: 'Medical management mobile app',
+                      builder: (dialogContext) {
+                        return Dialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                /// HEADER
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFEAF6FA),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Icon(
+                                        Icons.medical_services,
+                                        color: Color(0xFF3D84A8),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'MedMinder',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          SizedBox(height: 2),
+                                          Text(
+                                            'Version 1.0.0',
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 16),
+
+                                /// DESCRIPTION
+                                const Text(
+                                  'Medical management mobile app',
+                                  textAlign: TextAlign.center,
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                /// ACTIONS
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(dialogContext);
+
+                                        showLicensePage(
+                                          context: context,
+                                          applicationName: 'MedMinder',
+                                          applicationVersion: '1.0.0',
+                                        );
+                                      },
+                                      child: const Text('View licenses'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(dialogContext),
+                                      child: const Text('Close'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
