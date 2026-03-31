@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -14,6 +15,20 @@ class _SettingsPageState extends State<SettingsPage> {
   bool darkMode = false;
 
   String selectedLanguage = 'English';
+  String appVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = info.version;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +260,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         showLicensePage(
                                           context: context,
                                           applicationName: 'MedMinder',
-                                          applicationVersion: '1.0.0',
+                                          applicationVersion: appVersion,
                                         );
                                       },
                                       child: const Text('View licenses'),
