@@ -82,7 +82,7 @@ class PrivacyPolicyPage extends StatelessWidget {
     );
   }
 
-  /// 🔥 SECTION WIDGET (CLEAN STYLE)
+  /// SECTION WIDGET
   Widget _section(String title, String content) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
