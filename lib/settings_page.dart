@@ -153,11 +153,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: 'Privacy Policy',
                   subtitle: 'Read how your data is handled',
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Privacy policy page coming soon'),
-                      ),
-                    );
+                    Navigator.pushNamed(context, '/privacy');
                   },
                 ),
                 const SizedBox(height: 12),
