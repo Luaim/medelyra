@@ -162,11 +162,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: 'Help & Support',
                   subtitle: 'Get help using the app',
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Help & support page coming soon'),
-                      ),
-                    );
+                    Navigator.pushNamed(context, '/help_support');
                   },
                 ),
                 const SizedBox(height: 12),
