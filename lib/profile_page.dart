@@ -152,11 +152,7 @@ class ProfilePage extends StatelessWidget {
                     title: 'Notifications',
                     subtitle: 'Control reminder and app alerts',
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Notifications page coming soon'),
-                        ),
-                      );
+                      Navigator.pushNamed(context, '/notification_settings');
                     },
                   ),
                   const SizedBox(height: 12),
