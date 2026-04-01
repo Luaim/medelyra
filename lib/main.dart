@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medminder/NotificationSettingsPage.dart';
 import 'package:medminder/edit_password_page.dart';
 import 'package:medminder/edit_profile_page.dart';
 import 'package:medminder/help_support_page.dart';
@@ -52,6 +53,7 @@ class MedMinderApp extends StatelessWidget {
         '/edit_password': (context) => const EditPasswordPage(),
         '/privacy': (context) => const PrivacyPolicyPage(),
         '/help_support': (context) => const HelpSupportPage(),
+        '/notification_settings': (context) => const NotificationSettingsPage(),
       },
     );
   }
