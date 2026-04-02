@@ -94,6 +94,44 @@ class ReminderPage extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/Managereminderspage');
+                    },
+                    borderRadius: BorderRadius.circular(18),
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.list_alt, color: Color(0xFF3D84A8)),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              "View My Reminders",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Icon(Icons.arrow_forward_ios, size: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
                   /// HELPER SECTION
                   Container(
                     padding: const EdgeInsets.all(14),
