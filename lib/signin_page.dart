@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -14,12 +15,181 @@ class _SignInPageState extends State<SignInPage>
 
   bool obscurePassword = true;
   bool isPressed = false;
+  bool isLoading = false;
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleSignIn() async {
+    if (isLoading) return;
+
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+
+    if (email.isEmpty) {
+      _showMessage('Please enter your email.');
+      return;
+    }
+
+    if (!_isValidEmail(email)) {
+      _showMessage('Please enter a valid email address.');
+      return;
+    }
+
+    if (password.isEmpty) {
+      _showMessage('Please enter your password.');
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      if (!mounted) return;
+
+      Navigator.pushReplacementNamed(
+        context,
+        '/home',
+      );
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String message;
+
+      switch (e.code) {
+        case 'invalid-credential':
+          message = 'Incorrect email or password.';
+          break;
+
+        case 'user-not-found':
+          message = 'No account was found with this email.';
+          break;
+
+        case 'wrong-password':
+          message = 'Incorrect password.';
+          break;
+
+        case 'invalid-email':
+          message = 'Please enter a valid email address.';
+          break;
+
+        case 'user-disabled':
+          message = 'This account has been disabled.';
+          break;
+
+        case 'too-many-requests':
+          message = 'Too many attempts. Please try again later.';
+          break;
+
+        case 'network-request-failed':
+          message = 'Please check your internet connection and try again.';
+          break;
+
+        default:
+          message = e.message ?? 'Unable to sign in.';
+      }
+
+      _showMessage(message);
+    } catch (e) {
+      if (!mounted) return;
+
+      _showMessage(
+        'Something went wrong. Please try again.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleForgotPassword() async {
+    final email = emailController.text.trim();
+
+    if (email.isEmpty) {
+      _showMessage(
+        'Enter your email first, then tap Forgot Password.',
+      );
+      return;
+    }
+
+    if (!_isValidEmail(email)) {
+      _showMessage('Please enter a valid email address.');
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: email,
+      );
+
+      if (!mounted) return;
+
+      _showMessage(
+        'Password reset email sent. Check your inbox.',
+      );
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String message;
+
+      switch (e.code) {
+        case 'invalid-email':
+          message = 'Please enter a valid email address.';
+          break;
+
+        case 'user-not-found':
+          message = 'No account was found with this email.';
+          break;
+
+        case 'network-request-failed':
+          message = 'Please check your internet connection and try again.';
+          break;
+
+        default:
+          message = e.message ?? 'Unable to send reset email.';
+      }
+
+      _showMessage(message);
+    } catch (e) {
+      if (!mounted) return;
+
+      _showMessage(
+        'Something went wrong. Please try again.',
+      );
+    }
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(
+      r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+    ).hasMatch(email);
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+        ),
+      );
   }
 
   @override
@@ -34,12 +204,16 @@ class _SignInPageState extends State<SignInPage>
         child: Center(
           child: SingleChildScrollView(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 430),
+              constraints: const BoxConstraints(
+                maxWidth: 430,
+              ),
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: w * 0.06),
+                padding: EdgeInsets.symmetric(
+                  horizontal: w * 0.06,
+                ),
                 child: Column(
                   children: [
-                    /// 🔥 LOGO (BIGGER + HIGHER)
+                    /// LOGO
                     Transform.translate(
                       offset: const Offset(0, -10),
                       child: Image.asset(
@@ -65,7 +239,9 @@ class _SignInPageState extends State<SignInPage>
 
                     /// EMAIL
                     _buildLabel('Email'),
+
                     const SizedBox(height: 6),
+
                     _buildTextField(
                       controller: emailController,
                       hintText: 'Enter your Email',
@@ -76,7 +252,9 @@ class _SignInPageState extends State<SignInPage>
 
                     /// PASSWORD
                     _buildLabel('Password'),
+
                     const SizedBox(height: 6),
+
                     _buildTextField(
                       controller: passwordController,
                       hintText: '••••••••••••',
@@ -99,13 +277,15 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 4),
 
-                    /// 🔧 FIXED FORGOT PASSWORD (NO BIG SPLASH)
+                    /// FORGOT PASSWORD
                     Align(
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: isLoading ? null : _handleForgotPassword,
                         child: const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 6),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 6,
+                          ),
                           child: Text(
                             'Forgot Password?',
                             style: TextStyle(
@@ -120,14 +300,31 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 18),
 
-                    /// 🔥 SIGN IN BUTTON WITH PRESS EFFECT
+                    /// SIGN IN BUTTON
                     GestureDetector(
-                      onTapDown: (_) => setState(() => isPressed = true),
-                      onTapUp: (_) => setState(() => isPressed = false),
-                      onTapCancel: () => setState(() => isPressed = false),
-                      onTap: () {
-                        Navigator.pushReplacementNamed(context, '/home');
-                      },
+                      onTapDown: isLoading
+                          ? null
+                          : (_) {
+                              setState(() {
+                                isPressed = true;
+                              });
+                            },
+                      onTapUp: isLoading
+                          ? null
+                          : (_) {
+                              setState(() {
+                                isPressed = false;
+                              });
+
+                              _handleSignIn();
+                            },
+                      onTapCancel: isLoading
+                          ? null
+                          : () {
+                              setState(() {
+                                isPressed = false;
+                              });
+                            },
                       child: AnimatedScale(
                         scale: isPressed ? 0.97 : 1,
                         duration: const Duration(milliseconds: 100),
@@ -146,14 +343,23 @@ class _SignInPageState extends State<SignInPage>
                             ],
                           ),
                           alignment: Alignment.center,
-                          child: const Text(
-                            'Sign In',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          child: isLoading
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
@@ -163,17 +369,28 @@ class _SignInPageState extends State<SignInPage>
                     /// DIVIDER
                     const Row(
                       children: [
-                        Expanded(child: Divider()),
+                        Expanded(
+                          child: Divider(),
+                        ),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                          ),
                           child: Text(
-                            "OR Continue with",
+                            'OR Continue with',
                             style: TextStyle(
-                              color: Color.fromARGB(255, 116, 115, 115),
+                              color: Color.fromARGB(
+                                255,
+                                116,
+                                115,
+                                115,
+                              ),
                             ),
                           ),
                         ),
-                        Expanded(child: Divider()),
+                        Expanded(
+                          child: Divider(),
+                        ),
                       ],
                     ),
 
@@ -200,14 +417,19 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 20),
 
-                    /// SIGN UP (PRESS EFFECT)
+                    /// SIGN UP
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Don’t have account? "),
+                        const Text(
+                          'Don’t have account? ',
+                        ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, '/signup');
+                            Navigator.pushNamed(
+                              context,
+                              '/signup',
+                            );
                           },
                           child: const Text(
                             'Sign Up',
@@ -236,7 +458,10 @@ class _SignInPageState extends State<SignInPage>
       alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
@@ -259,7 +484,9 @@ class _SignInPageState extends State<SignInPage>
             offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(color: Colors.grey.shade400),
+        border: Border.all(
+          color: Colors.grey.shade400,
+        ),
       ),
       child: TextField(
         controller: controller,
@@ -285,19 +512,44 @@ class _SignInPageState extends State<SignInPage>
     return StatefulBuilder(
       builder: (context, setState) {
         return GestureDetector(
-          onTapDown: (_) => setState(() => pressed = true),
-          onTapUp: (_) => setState(() => pressed = false),
-          onTapCancel: () => setState(() => pressed = false),
-          onTap: () {},
+          onTapDown: (_) {
+            setState(() {
+              pressed = true;
+            });
+          },
+          onTapUp: (_) {
+            setState(() {
+              pressed = false;
+            });
+
+            // Google/Facebook authentication will be
+            // implemented separately.
+          },
+          onTapCancel: () {
+            setState(() {
+              pressed = false;
+            });
+          },
           child: AnimatedScale(
             scale: pressed ? 0.95 : 1,
             duration: const Duration(milliseconds: 100),
             child: Container(
               height: 54,
               decoration: BoxDecoration(
-                color: const Color.fromARGB(181, 169, 240, 250),
-                border:
-                    Border.all(color: const Color.fromARGB(170, 71, 71, 71)),
+                color: const Color.fromARGB(
+                  181,
+                  169,
+                  240,
+                  250,
+                ),
+                border: Border.all(
+                  color: const Color.fromARGB(
+                    170,
+                    71,
+                    71,
+                    71,
+                  ),
+                ),
                 borderRadius: BorderRadius.circular(26),
                 boxShadow: [
                   BoxShadow(
@@ -310,11 +562,16 @@ class _SignInPageState extends State<SignInPage>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(imagePath, width: 24),
+                  Image.asset(
+                    imagePath,
+                    width: 24,
+                  ),
                   const SizedBox(width: 10),
                   Text(
                     text,
-                    style: const TextStyle(fontSize: 16),
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),

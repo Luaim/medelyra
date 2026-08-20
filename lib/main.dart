@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 import 'package:medminder/ManageRemindersPage.dart';
 import 'package:medminder/NotificationSettingsPage.dart';
 import 'package:medminder/edit_password_page.dart';
 import 'package:medminder/edit_profile_page.dart';
 import 'package:medminder/help_support_page.dart';
 import 'package:medminder/privacy_policy_page.dart';
+
 import 'signin_page.dart';
 import 'signup_page.dart';
 import 'home_page.dart';
@@ -17,7 +20,15 @@ import 'profile_page.dart';
 import 'settings_page.dart';
 import 'success_login_page.dart';
 
-void main() {
+import 'firebase_options.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MedMinderApp());
 }
 
