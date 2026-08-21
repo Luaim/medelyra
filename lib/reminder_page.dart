@@ -96,7 +96,7 @@ class ReminderPage extends StatelessWidget {
 
                   InkWell(
                     onTap: () {
-                      Navigator.pushNamed(context, '/Managereminderspage');
+                      Navigator.pushNamed(context, '/manageReminders');
                     },
                     borderRadius: BorderRadius.circular(18),
                     child: Container(

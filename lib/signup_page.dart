@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -96,6 +97,18 @@ class _SignUpPageState extends State<SignUpPage> {
         email: email,
         password: password,
       );
+
+      final user = userCredential.user;
+
+      if (user == null) {
+        throw Exception('Firebase user was not created.');
+      }
+
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'name': userName,
+        'email': email,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
       debugPrint(
         'SIGN UP SUCCESS: ${userCredential.user?.uid}',

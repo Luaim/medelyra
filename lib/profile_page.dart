@@ -1,204 +1,658 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'nav_bar.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Map<String, dynamic> _profileData = {};
+  bool _isLoading = true;
+
+  // ============================================================
+  // INIT
+  // ============================================================
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  // ============================================================
+  // LOAD PROFILE FROM FIRESTORE
+  // ============================================================
+
+  Future<void> _loadProfile() async {
+    try {
+      final user = _auth.currentUser;
+
+      if (user == null) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+        return;
+      }
+
+      final document = await _firestore.collection('users').doc(user.uid).get();
+
+      if (document.exists) {
+        _profileData = document.data() ?? {};
+      } else {
+        _profileData = {};
+      }
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('ERROR LOADING PROFILE: $e');
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not load your profile. Please try again.',
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  // ============================================================
+  // REFRESH PROFILE AFTER EDITING
+  // ============================================================
+
+  Future<void> _openEditProfile() async {
+    await Navigator.pushNamed(
+      context,
+      '/edit_profile',
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    await _loadProfile();
+  }
+
+  // ============================================================
+  // BOTTOM NAVIGATION
+  // ============================================================
 
   void _onBottomTap(BuildContext context, int index) {
     switch (index) {
       case 0:
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(
+          context,
+          '/home',
+        );
         break;
+
       case 1:
-        Navigator.pushReplacementNamed(context, '/reminder');
+        Navigator.pushReplacementNamed(
+          context,
+          '/reminder',
+        );
         break;
+
       case 2:
-        Navigator.pushReplacementNamed(context, '/finder');
+        Navigator.pushReplacementNamed(
+          context,
+          '/finder',
+        );
         break;
+
       case 3:
-        Navigator.pushReplacementNamed(context, '/sos');
+        Navigator.pushReplacementNamed(
+          context,
+          '/sos',
+        );
         break;
+
       case 4:
-        Navigator.pushReplacementNamed(context, '/profile');
         break;
     }
   }
 
+  // ============================================================
+  // GET STRING VALUE
+  // ============================================================
+
+  String _getString(
+    String field, {
+    String fallback = 'Not provided',
+  }) {
+    final value = _profileData[field];
+
+    if (value == null) {
+      return fallback;
+    }
+
+    final text = value.toString().trim();
+
+    if (text.isEmpty) {
+      return fallback;
+    }
+
+    return text;
+  }
+
+  // ============================================================
+  // GET EMERGENCY CONTACT
+  // ============================================================
+
+  String _getEmergencyContact() {
+    final name = _getString(
+      'emergencyContactName',
+      fallback: '',
+    );
+
+    final phone = _getString(
+      'emergencyContactPhone',
+      fallback: '',
+    );
+
+    // Both are empty
+    if (name.isEmpty && phone.isEmpty) {
+      return 'Not provided';
+    }
+
+    // Only name exists
+    if (name.isNotEmpty && phone.isEmpty) {
+      return name;
+    }
+
+    // Only phone exists
+    if (name.isEmpty && phone.isNotEmpty) {
+      return phone;
+    }
+
+    // Both exist
+    return '$name - $phone';
+  }
+
+  // ============================================================
+  // FORMAT DATE OF BIRTH
+  // ============================================================
+
+  String _getDateOfBirth() {
+    final value = _profileData['dateOfBirth'];
+
+    if (value == null) {
+      return 'Not provided';
+    }
+
+    try {
+      if (value is Timestamp) {
+        final date = value.toDate();
+
+        return '${date.day} '
+            '${_monthName(date.month)} '
+            '${date.year}';
+      }
+
+      if (value is DateTime) {
+        return '${value.day} '
+            '${_monthName(value.month)} '
+            '${value.year}';
+      }
+    } catch (e) {
+      debugPrint(
+        'DATE FORMAT ERROR: $e',
+      );
+    }
+
+    return 'Not provided';
+  }
+
+  // ============================================================
+  // MONTH NAME
+  // ============================================================
+
+  String _monthName(int month) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+
+    if (month < 1 || month > 12) {
+      return '';
+    }
+
+    return months[month - 1];
+  }
+
+  // ============================================================
+  // FORMAT ALLERGIES
+  // ============================================================
+
+  String _getAllergies() {
+    final value = _profileData['allergies'];
+
+    if (value == null || value is! List || value.isEmpty) {
+      return 'No known allergies';
+    }
+
+    final allergies = value
+        .map(
+          (item) => item.toString().trim(),
+        )
+        .where(
+          (item) => item.isNotEmpty,
+        )
+        .toList();
+
+    if (allergies.isEmpty) {
+      return 'No known allergies';
+    }
+
+    return allergies.join(', ');
+  }
+
+  // ============================================================
+  // LOGOUT
+  // ============================================================
+
+  Future<void> _logout() async {
+    try {
+      await _auth.signOut();
+
+      if (!mounted) return;
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/signin',
+        (route) => false,
+      );
+    } catch (e) {
+      debugPrint(
+        'LOGOUT ERROR: $e',
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Could not log out. Please try again.',
+          ),
+        ),
+      );
+    }
+  }
+
+  // ============================================================
+  // BUILD
+  // ============================================================
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+
     final screenWidth = size.width;
     final screenHeight = size.height;
+
     final smallScreen = screenHeight < 700;
+
+    final currentUser = _auth.currentUser;
+
+    // ------------------------------------------------------------
+    // REAL USER DATA
+    // ------------------------------------------------------------
+
+    final name = _getString(
+      'name',
+      fallback: currentUser?.displayName ?? 'MedMinder User',
+    );
+
+    final email = _getString(
+      'email',
+      fallback: currentUser?.email ?? 'Not provided',
+    );
+
+    final phone = _getString(
+      'phone',
+    );
+
+    final gender = _getString(
+      'gender',
+    );
+
+    final bloodGroup = _getString(
+      'bloodGroup',
+    );
+
+    final emergencyContact = _getEmergencyContact();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
+
+      // ==========================================================
+      // BOTTOM NAVIGATION
+      // ==========================================================
+
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 4,
-        onTap: (index) => _onBottomTap(context, index),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.045,
-            vertical: 16,
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 430),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: smallScreen ? 8 : 12),
-                  const Text(
-                    'Profile',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF222222),
-                    ),
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 22),
-                  _buildHeaderCard(),
-                  SizedBox(height: smallScreen ? 18 : 22),
-                  const Text(
-                    'Personal Information',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF333333),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildInfoCard(
-                    children: const [
-                      ProfileInfoTile(
-                        icon: Icons.person_outline,
-                        label: 'Full Name',
-                        value: 'Luaim Ahmed',
-                      ),
-                      ProfileInfoTile(
-                        icon: Icons.email_outlined,
-                        label: 'Email',
-                        value: 'luaim@example.com',
-                      ),
-                      ProfileInfoTile(
-                        icon: Icons.phone_outlined,
-                        label: 'Phone Number',
-                        value: '+60 12-345 6789',
-                      ),
-                      ProfileInfoTile(
-                        icon: Icons.calendar_month_outlined,
-                        label: 'Date of Birth',
-                        value: '12 May 2002',
-                      ),
-                      ProfileInfoTile(
-                        icon: Icons.wc_outlined,
-                        label: 'Gender',
-                        value: 'Male',
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 22),
-                  const Text(
-                    'Medical Information',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF333333),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildInfoCard(
-                    children: const [
-                      ProfileInfoTile(
-                        icon: Icons.bloodtype_outlined,
-                        label: 'Blood Group',
-                        value: 'O+',
-                      ),
-                      ProfileInfoTile(
-                        icon: Icons.contact_emergency_outlined,
-                        label: 'Emergency Contact',
-                        value: 'Ahmed Ali - +60 11-987 6543',
-                      ),
-                      ProfileInfoTile(
-                        icon: Icons.medical_information_outlined,
-                        label: 'Allergies',
-                        value: 'No known allergies',
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: smallScreen ? 18 : 22),
-                  const Text(
-                    'Quick Actions',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF333333),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _ActionTile(
-                    icon: Icons.settings_outlined,
-                    title: 'Settings',
-                    subtitle: 'Manage account preferences',
-                    onTap: () {
-                      Navigator.pushNamed(context, '/settings');
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  _ActionTile(
-                    icon: Icons.notifications_none_rounded,
-                    title: 'Notifications',
-                    subtitle: 'Control reminder and app alerts',
-                    onTap: () {
-                      Navigator.pushNamed(context, '/notification_settings');
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  _ActionTile(
-                    icon: Icons.history_edu_outlined,
-                    title: 'Medical History',
-                    subtitle: 'View health and appointment records',
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Medical history page coming soon'),
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(height: smallScreen ? 22 : 28),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/signin');
-                      },
-                      icon: const Icon(Icons.logout_rounded),
-                      label: const Text('Logout'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF4B1B1),
-                        foregroundColor: const Color(0xFF6E1E1E),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                ],
-              ),
-            ),
-          ),
+        onTap: (index) => _onBottomTap(
+          context,
+          index,
         ),
+      ),
+
+      // ==========================================================
+      // BODY
+      // ==========================================================
+
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFF3D84A8),
+                ),
+              )
+            : SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.045,
+                  vertical: 16,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: 430,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: smallScreen ? 8 : 12,
+                        ),
+
+                        // ==================================================
+                        // PAGE TITLE
+                        // ==================================================
+
+                        const Text(
+                          'Profile',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF222222),
+                          ),
+                        ),
+
+                        SizedBox(
+                          height: smallScreen ? 18 : 22,
+                        ),
+
+                        // ==================================================
+                        // HEADER
+                        // ==================================================
+
+                        _buildHeaderCard(
+                          name,
+                        ),
+
+                        SizedBox(
+                          height: smallScreen ? 18 : 22,
+                        ),
+
+                        // ==================================================
+                        // PERSONAL INFORMATION
+                        // ==================================================
+
+                        const Text(
+                          'Personal Information',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+
+                        const SizedBox(
+                          height: 12,
+                        ),
+
+                        _buildInfoCard(
+                          children: [
+                            ProfileInfoTile(
+                              icon: Icons.person_outline,
+                              label: 'Full Name',
+                              value: name,
+                            ),
+                            ProfileInfoTile(
+                              icon: Icons.email_outlined,
+                              label: 'Email',
+                              value: email,
+                            ),
+                            ProfileInfoTile(
+                              icon: Icons.phone_outlined,
+                              label: 'Phone Number',
+                              value: phone,
+                            ),
+                            ProfileInfoTile(
+                              icon: Icons.calendar_month_outlined,
+                              label: 'Date of Birth',
+                              value: _getDateOfBirth(),
+                            ),
+                            ProfileInfoTile(
+                              icon: Icons.wc_outlined,
+                              label: 'Gender',
+                              value: gender,
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(
+                          height: smallScreen ? 18 : 22,
+                        ),
+
+                        // ==================================================
+                        // MEDICAL INFORMATION
+                        // ==================================================
+
+                        const Text(
+                          'Medical Information',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+
+                        const SizedBox(
+                          height: 12,
+                        ),
+
+                        _buildInfoCard(
+                          children: [
+                            ProfileInfoTile(
+                              icon: Icons.bloodtype_outlined,
+                              label: 'Blood Group',
+                              value: bloodGroup,
+                            ),
+                            ProfileInfoTile(
+                              icon: Icons.contact_emergency_outlined,
+                              label: 'Emergency Contact',
+                              value: emergencyContact,
+                            ),
+                            ProfileInfoTile(
+                              icon: Icons.medical_information_outlined,
+                              label: 'Allergies',
+                              value: _getAllergies(),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(
+                          height: smallScreen ? 18 : 22,
+                        ),
+
+                        // ==================================================
+                        // QUICK ACTIONS
+                        // ==================================================
+
+                        const Text(
+                          'Quick Actions',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+
+                        const SizedBox(
+                          height: 12,
+                        ),
+
+                        // Edit Profile
+                        _ActionTile(
+                          icon: Icons.edit_outlined,
+                          title: 'Edit Profile',
+                          subtitle: 'Update your personal information',
+                          onTap: _openEditProfile,
+                        ),
+
+                        const SizedBox(
+                          height: 12,
+                        ),
+
+                        // Settings
+                        _ActionTile(
+                          icon: Icons.settings_outlined,
+                          title: 'Settings',
+                          subtitle: 'Manage account preferences',
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              '/settings',
+                            );
+                          },
+                        ),
+
+                        const SizedBox(
+                          height: 12,
+                        ),
+
+                        // Notifications
+                        _ActionTile(
+                          icon: Icons.notifications_none_rounded,
+                          title: 'Notifications',
+                          subtitle: 'Control reminder and app alerts',
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              '/notification_settings',
+                            );
+                          },
+                        ),
+
+                        const SizedBox(
+                          height: 12,
+                        ),
+
+                        // Medical History
+                        _ActionTile(
+                          icon: Icons.history_edu_outlined,
+                          title: 'Medical History',
+                          subtitle: 'View health and appointment records',
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Medical history page coming soon',
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+
+                        SizedBox(
+                          height: smallScreen ? 22 : 28,
+                        ),
+
+                        // ==================================================
+                        // LOGOUT
+                        // ==================================================
+
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton.icon(
+                            onPressed: _logout,
+                            icon: const Icon(
+                              Icons.logout_rounded,
+                            ),
+                            label: const Text(
+                              'Logout',
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(
+                                0xFFF4B1B1,
+                              ),
+                              foregroundColor: const Color(
+                                0xFF6E1E1E,
+                              ),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(
+                          height: 18,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
       ),
     );
   }
 
-  Widget _buildHeaderCard() {
+  // ============================================================
+  // HEADER CARD
+  // ============================================================
+
+  Widget _buildHeaderCard(
+    String name,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
@@ -214,7 +668,9 @@ class ProfilePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withOpacity(
+              0.06,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -222,6 +678,10 @@ class ProfilePage extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // ==========================================================
+          // GENERIC USER ICON
+          // ==========================================================
+
           Container(
             width: 84,
             height: 84,
@@ -229,33 +689,39 @@ class ProfilePage extends StatelessWidget {
               color: Colors.white.withOpacity(0.85),
               shape: BoxShape.circle,
             ),
-            child: ClipOval(
-              child: Image.asset(
-                'assets/profile.png',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(
-                  Icons.person,
-                  size: 48,
-                  color: Color(0xFF4D4D4D),
-                ),
-              ),
+            child: const Icon(
+              Icons.person,
+              size: 48,
+              color: Color(0xFF4D4D4D),
             ),
           ),
-          const SizedBox(width: 16),
-          const Expanded(
+
+          const SizedBox(
+            width: 16,
+          ),
+
+          // ==========================================================
+          // USER NAME
+          // ==========================================================
+
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Luaim Ahmed',
-                  style: TextStyle(
+                  name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF222222),
                   ),
                 ),
-                SizedBox(height: 6),
-                Text(
+                const SizedBox(
+                  height: 6,
+                ),
+                const Text(
                   'MedMinder User',
                   style: TextStyle(
                     fontSize: 15,
@@ -263,15 +729,19 @@ class ProfilePage extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 10),
-                Row(
+                const SizedBox(
+                  height: 10,
+                ),
+                const Row(
                   children: [
                     Icon(
                       Icons.verified_user_outlined,
                       size: 18,
                       color: Color(0xFF2F7B95),
                     ),
-                    SizedBox(width: 6),
+                    SizedBox(
+                      width: 6,
+                    ),
                     Text(
                       'Health profile active',
                       style: TextStyle(
@@ -290,25 +760,43 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard({required List<Widget> children}) {
+  // ============================================================
+  // INFO CARD
+  // ============================================================
+
+  Widget _buildInfoCard({
+    required List<Widget> children,
+  }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        vertical: 6,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE3E3E3)),
+        border: Border.all(
+          color: const Color(0xFFE3E3E3),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(
+              0.04,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Column(children: children),
+      child: Column(
+        children: children,
+      ),
     );
   }
 }
+
+// ================================================================
+// PROFILE INFO TILE
+// ================================================================
 
 class ProfileInfoTile extends StatelessWidget {
   final IconData icon;
@@ -323,14 +811,18 @@ class ProfileInfoTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return ListTile(
       leading: Container(
         width: 42,
         height: 42,
         decoration: BoxDecoration(
           color: const Color(0xFFEAF6FA),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(
+            12,
+          ),
         ),
         child: Icon(
           icon,
@@ -346,9 +838,13 @@ class ProfileInfoTile extends StatelessWidget {
         ),
       ),
       subtitle: Padding(
-        padding: const EdgeInsets.only(top: 3),
+        padding: const EdgeInsets.only(
+          top: 3,
+        ),
         child: Text(
           value,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
           style: const TextStyle(
             fontSize: 16,
             color: Color(0xFF222222),
@@ -359,6 +855,10 @@ class ProfileInfoTile extends StatelessWidget {
     );
   }
 }
+
+// ================================================================
+// ACTION TILE
+// ================================================================
 
 class _ActionTile extends StatelessWidget {
   final IconData icon;
@@ -374,7 +874,9 @@ class _ActionTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(20),
@@ -384,11 +886,17 @@ class _ActionTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFE3E3E3)),
+            borderRadius: BorderRadius.circular(
+              20,
+            ),
+            border: Border.all(
+              color: const Color(0xFFE3E3E3),
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withOpacity(
+                  0.03,
+                ),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -401,14 +909,18 @@ class _ActionTile extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   color: const Color(0xFFEAF6FA),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(
+                    14,
+                  ),
                 ),
                 child: Icon(
                   icon,
                   color: const Color(0xFF3D84A8),
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(
+                width: 14,
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -421,7 +933,9 @@ class _ActionTile extends StatelessWidget {
                         color: Color(0xFF2A2A2A),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(
+                      height: 4,
+                    ),
                     Text(
                       subtitle,
                       style: const TextStyle(
