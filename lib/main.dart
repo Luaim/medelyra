@@ -66,7 +66,7 @@ class MedMinderApp extends StatelessWidget {
         '/privacy': (context) => const PrivacyPolicyPage(),
         '/help_support': (context) => const HelpSupportPage(),
         '/notification_settings': (context) => const NotificationSettingsPage(),
-        '/ManageRemindersPage': (context) => const Managereminderspage(),
+        '/manageReminders': (context) => const Managereminderspage(),
       },
     );
   }

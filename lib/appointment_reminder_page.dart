@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'nav_bar.dart';
 
@@ -10,53 +12,75 @@ class AppointmentReminderPage extends StatefulWidget {
 }
 
 class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
+  final TextEditingController reasonController = TextEditingController();
+  final TextEditingController hospitalController = TextEditingController();
+
+  final Color primaryBlue = const Color(0xFF3D84A8);
+
+  String selectedType = 'General';
+
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
+
+  bool isSaving = false;
+
+  final List<Map<String, dynamic>> appointmentTypes = [
+    {
+      'label': 'General',
+      'icon': Icons.local_hospital,
+    },
+    {
+      'label': 'Eye',
+      'icon': Icons.remove_red_eye,
+    },
+    {
+      'label': 'Dental',
+      'icon': Icons.medical_services,
+    },
+    {
+      'label': 'Heart',
+      'icon': Icons.favorite,
+    },
+  ];
+
   void _onBottomTap(BuildContext context, int index) {
     switch (index) {
       case 0:
         Navigator.pushReplacementNamed(context, '/home');
         break;
+
       case 1:
         Navigator.pushReplacementNamed(context, '/reminder');
         break;
+
       case 2:
         Navigator.pushReplacementNamed(context, '/finder');
         break;
+
       case 3:
         Navigator.pushReplacementNamed(context, '/sos');
         break;
+
       case 4:
         Navigator.pushReplacementNamed(context, '/profile');
         break;
     }
   }
 
-  final TextEditingController reasonController = TextEditingController();
-
-  String selectedType = 'General';
-  String selectedHospital = 'Select Hospital';
-
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
-
-  final List<Map<String, dynamic>> appointmentTypes = [
-    {'label': 'General', 'icon': Icons.local_hospital},
-    {'label': 'Eye', 'icon': Icons.remove_red_eye},
-    {'label': 'Dental', 'icon': Icons.medical_services},
-    {'label': 'Heart', 'icon': Icons.favorite},
-  ];
-
-  final TextEditingController hospitalController = TextEditingController();
-
   Future<void> _pickDate() async {
+    final now = DateTime.now();
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2030),
+      initialDate: selectedDate.isBefore(now) ? now : selectedDate,
+      firstDate: DateTime(now.year, now.month, now.day),
+      lastDate: DateTime(2035),
     );
 
     if (picked != null) {
-      setState(() => selectedDate = picked);
+      setState(() {
+        selectedDate = picked;
+      });
     }
   }
 
@@ -67,8 +91,130 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
     );
 
     if (picked != null) {
-      setState(() => selectedTime = picked);
+      setState(() {
+        selectedTime = picked;
+      });
     }
+  }
+
+  DateTime _combineDateAndTime() {
+    return DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      selectedTime.hour,
+      selectedTime.minute,
+    );
+  }
+
+  Future<void> _saveAppointment() async {
+    if (isSaving) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      _showMessage(
+        'Please sign in before creating an appointment.',
+        isError: true,
+      );
+      return;
+    }
+
+    final hospital = hospitalController.text.trim();
+    final reason = reasonController.text.trim();
+
+    if (hospital.isEmpty) {
+      _showMessage(
+        'Please enter the hospital or clinic name.',
+        isError: true,
+      );
+      return;
+    }
+
+    final appointmentDateTime = _combineDateAndTime();
+
+    if (appointmentDateTime.isBefore(DateTime.now())) {
+      _showMessage(
+        'Please select a future date and time.',
+        isError: true,
+      );
+      return;
+    }
+
+    setState(() {
+      isSaving = true;
+    });
+
+    try {
+      await FirebaseFirestore.instance.collection('appointments').add({
+        'userId': user.uid,
+        'appointmentType': selectedType,
+        'hospital': hospital,
+        'dateTime': Timestamp.fromDate(appointmentDateTime),
+        'reason': reason,
+        'active': true,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      if (!mounted) return;
+
+      _showMessage(
+        'Appointment saved successfully.',
+        isError: false,
+      );
+
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (!mounted) return;
+
+      Navigator.pushReplacementNamed(context, '/reminder');
+    } on FirebaseException catch (e) {
+      if (!mounted) return;
+
+      _showMessage(
+        'Could not save appointment: ${e.message ?? e.code}',
+        isError: true,
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      _showMessage(
+        'Could not save appointment. Please try again.',
+        isError: true,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSaving = false;
+        });
+      }
+    }
+  }
+
+  void _showMessage(
+    String message, {
+    required bool isError,
+  }) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: isError ? Colors.red : primaryBlue,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+  }
+
+  @override
+  void dispose() {
+    reasonController.dispose();
+    hospitalController.dispose();
+    super.dispose();
   }
 
   @override
@@ -83,7 +229,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: width * 0.06),
+          padding: EdgeInsets.symmetric(
+            horizontal: width * 0.06,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -92,15 +240,26 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               const Center(
                 child: Text(
                   'New Appointment',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
 
               const SizedBox(height: 20),
 
-              /// TYPE WITH LABEL
-              const Text('Appointment Type',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              // ================================
+              // APPOINTMENT TYPE
+              // ================================
+
+              const Text(
+                'Appointment Type',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
 
               const SizedBox(height: 10),
 
@@ -108,18 +267,25 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                 spacing: 10,
                 runSpacing: 10,
                 children: appointmentTypes.map((item) {
-                  final isSelected = selectedType == item['label'];
+                  final bool isSelected = selectedType == item['label'];
 
                   return GestureDetector(
-                    onTap: () => setState(() => selectedType = item['label']),
+                    onTap: () {
+                      setState(() {
+                        selectedType = item['label'];
+                      });
+                    },
                     child: Container(
                       width: 80,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
-                        color:
-                            isSelected ? const Color(0xFF3D84A8) : Colors.white,
+                        color: isSelected ? primaryBlue : Colors.white,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0xFFE0E0E0)),
+                        border: Border.all(
+                          color: const Color(0xFFE0E0E0),
+                        ),
                       ),
                       child: Column(
                         children: [
@@ -134,7 +300,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                               fontSize: 12,
                               color: isSelected ? Colors.white : Colors.black54,
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -144,17 +310,26 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 24),
 
-              /// HOSPITAL
-              const Text('Hospital',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              // ================================
+              // HOSPITAL
+              // ================================
+
+              const Text(
+                'Hospital / Clinic',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
 
               const SizedBox(height: 8),
 
               _input(
                 child: TextField(
                   controller: hospitalController,
+                  textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(
-                    hintText: 'Enter hospital name...',
+                    hintText: 'Enter hospital or clinic name...',
                     border: InputBorder.none,
                   ),
                 ),
@@ -162,9 +337,17 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 20),
 
-              /// DATE
-              const Text('Select Date',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              // ================================
+              // DATE
+              // ================================
+
+              const Text(
+                'Select Date',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
 
               const SizedBox(height: 10),
 
@@ -175,8 +358,12 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                          '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'),
-                      const Icon(Icons.calendar_today),
+                        '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                      ),
+                      Icon(
+                        Icons.calendar_today,
+                        color: primaryBlue,
+                      ),
                     ],
                   ),
                 ),
@@ -184,9 +371,17 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 20),
 
-              /// TIME
-              const Text('Select Time',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              // ================================
+              // TIME
+              // ================================
+
+              const Text(
+                'Select Time',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
 
               const SizedBox(height: 10),
 
@@ -196,8 +391,13 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(selectedTime.format(context)),
-                      const Icon(Icons.access_time),
+                      Text(
+                        selectedTime.format(context),
+                      ),
+                      Icon(
+                        Icons.access_time,
+                        color: primaryBlue,
+                      ),
                     ],
                   ),
                 ),
@@ -205,18 +405,37 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 20),
 
-              /// REASON
-              const Text('Reason / Notes',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              // ================================
+              // REASON
+              // ================================
+
+              const Text(
+                'Reason / Notes',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
 
               const SizedBox(height: 8),
 
-              _input(
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFE0E0E0),
+                  ),
+                ),
                 child: TextField(
                   controller: reasonController,
-                  maxLines: 3,
+                  maxLines: 4,
                   decoration: const InputDecoration(
-                    hintText: 'Describe your appointment...',
+                    hintText: 'Example: Follow-up appointment...',
                     border: InputBorder.none,
                   ),
                 ),
@@ -224,22 +443,40 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 30),
 
-              /// BUTTON
+              // ================================
+              // SAVE BUTTON
+              // ================================
+
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: isSaving ? null : _saveAppointment,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3D84A8),
+                    backgroundColor: primaryBlue,
+                    disabledBackgroundColor: primaryBlue.withOpacity(0.6),
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Confirm Appointment',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: isSaving
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Confirm Appointment',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
 
@@ -251,14 +488,20 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
     );
   }
 
-  Widget _input({required Widget child}) {
+  Widget _input({
+    required Widget child,
+  }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+      ),
       height: 50,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
+        border: Border.all(
+          color: const Color(0xFFE0E0E0),
+        ),
       ),
       alignment: Alignment.centerLeft,
       child: child,
