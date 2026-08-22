@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'nav_bar.dart';
+import 'notification_service.dart';
 
 class PillReminderPage extends StatefulWidget {
   const PillReminderPage({super.key});
@@ -379,11 +380,79 @@ class _PillReminderPageState extends State<PillReminderPage> {
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
-      await FirebaseFirestore.instance
+      // ------------------------------------------------------------
+// SCHEDULE MEDICINE NOTIFICATIONS
+// ------------------------------------------------------------
+
+      Future<void> _scheduleMedicineNotifications({
+        required String medicineId,
+        required String medicineName,
+        required List<TimeOfDay> times,
+        required int? durationDays,
+      }) async {
+        // "As Needed" medicines have no fixed notification time.
+        if (times.isEmpty) {
+          return;
+        }
+
+        // For now, schedule up to 30 days for ongoing medicines.
+        // We can improve this later with a proper recurring system.
+        final daysToSchedule = durationDays ?? 30;
+
+        for (int day = 0; day < daysToSchedule; day++) {
+          final date = DateTime(
+            selectedStartDate.year,
+            selectedStartDate.month,
+            selectedStartDate.day,
+          ).add(Duration(days: day));
+
+          for (int timeIndex = 0; timeIndex < times.length; timeIndex++) {
+            final time = times[timeIndex];
+
+            final scheduledTime = DateTime(
+              date.year,
+              date.month,
+              date.day,
+              time.hour,
+              time.minute,
+            );
+
+            // Don't schedule notifications that are already in the past.
+            if (scheduledTime.isBefore(DateTime.now())) {
+              continue;
+            }
+
+            final notificationId =
+                '${medicineId}_${date.year}_${date.month}_${date.day}_$timeIndex'
+                        .hashCode &
+                    0x7fffffff;
+
+            await NotificationService.instance.scheduleMedicineNotification(
+              id: notificationId,
+              medicineName: medicineName,
+              scheduledTime: scheduledTime,
+            );
+          }
+        }
+      }
+
+      final medicineDoc = await FirebaseFirestore.instance
           .collection('medicines')
           .add(reminderData);
 
       if (!mounted) return;
+
+      // Schedule medicine notifications
+      // Request notification permissions
+      await NotificationService.instance.requestPermission();
+
+// Schedule medicine notifications
+      await _scheduleMedicineNotifications(
+        medicineId: medicineDoc.id,
+        medicineName: medicineName,
+        times: finalTimes,
+        durationDays: durationDays,
+      );
 
       _showMessage(
         'Medicine reminder added successfully.',

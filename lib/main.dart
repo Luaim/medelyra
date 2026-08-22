@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'notification_service.dart';
 
 import 'package:medminder/ManageRemindersPage.dart';
 import 'package:medminder/NotificationSettingsPage.dart';
@@ -28,6 +29,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await NotificationService.initialize();
 
   runApp(const MedMinderApp());
 }

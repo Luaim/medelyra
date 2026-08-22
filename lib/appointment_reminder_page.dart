@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'nav_bar.dart';
+import 'notification_service.dart';
 
 class AppointmentReminderPage extends StatefulWidget {
   const AppointmentReminderPage({super.key});
@@ -43,6 +45,10 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
     },
   ];
 
+  // ============================================================
+  // BOTTOM NAVIGATION
+  // ============================================================
+
   void _onBottomTap(BuildContext context, int index) {
     switch (index) {
       case 0:
@@ -67,13 +73,21 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
     }
   }
 
+  // ============================================================
+  // PICK DATE
+  // ============================================================
+
   Future<void> _pickDate() async {
     final now = DateTime.now();
 
     final picked = await showDatePicker(
       context: context,
       initialDate: selectedDate.isBefore(now) ? now : selectedDate,
-      firstDate: DateTime(now.year, now.month, now.day),
+      firstDate: DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ),
       lastDate: DateTime(2035),
     );
 
@@ -83,6 +97,10 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       });
     }
   }
+
+  // ============================================================
+  // PICK TIME
+  // ============================================================
 
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
@@ -97,6 +115,10 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
     }
   }
 
+  // ============================================================
+  // COMBINE DATE + TIME
+  // ============================================================
+
   DateTime _combineDateAndTime() {
     return DateTime(
       selectedDate.year,
@@ -106,6 +128,10 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       selectedTime.minute,
     );
   }
+
+  // ============================================================
+  // SAVE APPOINTMENT
+  // ============================================================
 
   Future<void> _saveAppointment() async {
     if (isSaving) return;
@@ -133,9 +159,28 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
     final appointmentDateTime = _combineDateAndTime();
 
+    // Appointment must be in the future.
     if (appointmentDateTime.isBefore(DateTime.now())) {
       _showMessage(
         'Please select a future date and time.',
+        isError: true,
+      );
+      return;
+    }
+
+    // ==========================================================
+    // REMINDER
+    // ==========================================================
+
+    const reminderBefore = Duration(hours: 1);
+
+    final notificationTime = appointmentDateTime.subtract(reminderBefore);
+
+    // The reminder itself must also be in the future.
+    if (notificationTime.isBefore(DateTime.now())) {
+      _showMessage(
+        'The appointment must be more than 1 hour from now '
+        'to receive the reminder.',
         isError: true,
       );
       return;
@@ -146,7 +191,31 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
     });
 
     try {
-      await FirebaseFirestore.instance.collection('appointments').add({
+      // ========================================================
+      // 1. REQUEST NOTIFICATION + EXACT ALARM PERMISSION
+      // ========================================================
+
+      final permissionGranted =
+          await NotificationService.instance.requestPermission();
+
+      if (!permissionGranted) {
+        if (!mounted) return;
+
+        _showMessage(
+          'Please allow notifications and exact alarms '
+          'for MedMinder in Android settings.',
+          isError: true,
+        );
+
+        return;
+      }
+
+      // ========================================================
+      // 2. SAVE APPOINTMENT TO FIRESTORE
+      // ========================================================
+
+      final appointmentDoc =
+          await FirebaseFirestore.instance.collection('appointments').add({
         'userId': user.uid,
         'appointmentType': selectedType,
         'hospital': hospital,
@@ -157,27 +226,62 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
+      // ========================================================
+      // 3. CREATE NOTIFICATION ID
+      // ========================================================
+
+      final notificationId = appointmentDoc.id.hashCode.abs();
+
+      // ========================================================
+      // 4. SCHEDULE NOTIFICATION
+      // ========================================================
+
+      await NotificationService.instance.scheduleAppointmentNotification(
+        id: notificationId,
+        appointmentType: '$selectedType appointment at $hospital',
+        appointmentTime: appointmentDateTime,
+        reminderBefore: reminderBefore,
+      );
+
+      // ========================================================
+      // SUCCESS
+      // ========================================================
+
       if (!mounted) return;
 
       _showMessage(
-        'Appointment saved successfully.',
+        'Appointment saved. Reminder set for 1 hour before.',
         isError: false,
       );
 
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(
+        const Duration(milliseconds: 700),
+      );
 
       if (!mounted) return;
 
-      Navigator.pushReplacementNamed(context, '/reminder');
+      Navigator.pushReplacementNamed(
+        context,
+        '/reminder',
+      );
     } on FirebaseException catch (e) {
       if (!mounted) return;
 
+      debugPrint(
+        'Save appointment Firebase error: $e',
+      );
+
       _showMessage(
-        'Could not save appointment: ${e.message ?? e.code}',
+        'Could not save appointment: '
+        '${e.message ?? e.code}',
         isError: true,
       );
     } catch (e) {
       if (!mounted) return;
+
+      debugPrint(
+        'Save appointment error: $e',
+      );
 
       _showMessage(
         'Could not save appointment. Please try again.',
@@ -191,6 +295,10 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       }
     }
   }
+
+  // ============================================================
+  // MESSAGE
+  // ============================================================
 
   void _showMessage(
     String message, {
@@ -210,12 +318,20 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       );
   }
 
+  // ============================================================
+  // DISPOSE
+  // ============================================================
+
   @override
   void dispose() {
     reasonController.dispose();
     hospitalController.dispose();
     super.dispose();
   }
+
+  // ============================================================
+  // BUILD
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
@@ -249,9 +365,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 20),
 
-              // ================================
+              // ==================================================
               // APPOINTMENT TYPE
-              // ================================
+              // ==================================================
 
               const Text(
                 'Appointment Type',
@@ -310,9 +426,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 24),
 
-              // ================================
+              // ==================================================
               // HOSPITAL
-              // ================================
+              // ==================================================
 
               const Text(
                 'Hospital / Clinic',
@@ -337,9 +453,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 20),
 
-              // ================================
+              // ==================================================
               // DATE
-              // ================================
+              // ==================================================
 
               const Text(
                 'Select Date',
@@ -358,7 +474,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                        '${selectedDate.day}/'
+                        '${selectedDate.month}/'
+                        '${selectedDate.year}',
                       ),
                       Icon(
                         Icons.calendar_today,
@@ -371,9 +489,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 20),
 
-              // ================================
+              // ==================================================
               // TIME
-              // ================================
+              // ==================================================
 
               const Text(
                 'Select Time',
@@ -405,9 +523,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 20),
 
-              // ================================
+              // ==================================================
               // REASON
-              // ================================
+              // ==================================================
 
               const Text(
                 'Reason / Notes',
@@ -443,9 +561,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               const SizedBox(height: 30),
 
-              // ================================
+              // ==================================================
               // SAVE BUTTON
-              // ================================
+              // ==================================================
 
               SizedBox(
                 width: double.infinity,
@@ -487,6 +605,10 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       ),
     );
   }
+
+  // ============================================================
+  // INPUT CONTAINER
+  // ============================================================
 
   Widget _input({
     required Widget child,
