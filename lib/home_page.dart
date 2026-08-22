@@ -24,10 +24,22 @@ class _HomePageState extends State<HomePage> {
 
   DateTime selectedDate = DateTime.now();
 
-  // We show 90 days:
-  // 30 days before today + today + 60 days after today.
+  // ============================================================
+// HOME DATE RANGE
+// ============================================================
+//
+// Keep the Home screen focused:
+//
+// 2 previous days
+// Today
+// 30 upcoming days
+//
+// This keeps today's reminders easy to find while still allowing
+// the user to scroll forward for upcoming appointments/medicines.
+//
+
   List<DateTime> availableDates = [];
-  int selectedDayIndex = 30;
+  int selectedDayIndex = 2;
 
   @override
   void initState() {
@@ -39,14 +51,19 @@ class _HomePageState extends State<HomePage> {
       DateTime.now().day,
     );
 
+    // 2 days before today + today + 30 future days
     availableDates = List.generate(
-      91,
-      (index) =>
-          today.subtract(const Duration(days: 30)).add(Duration(days: index)),
+      33,
+      (index) {
+        return today
+            .subtract(const Duration(days: 2))
+            .add(Duration(days: index));
+      },
     );
 
+    // Always open Home on today.
     selectedDate = today;
-    selectedDayIndex = 30;
+    selectedDayIndex = 2;
   }
 
   // ============================================================
@@ -138,6 +155,89 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return days[date.weekday - 1];
+  }
+
+  // ============================================================
+// MEDICINE TYPE ICON
+// ============================================================
+
+  IconData _medicineTypeIcon(dynamic type) {
+    final value = type?.toString().toLowerCase().trim();
+
+    // DEBUG:
+    debugPrint('MEDICINE TYPE FROM FIRESTORE: "$value"');
+
+    if (value == null || value.isEmpty) {
+      return Icons.medication_outlined;
+    }
+
+    // PILL / TABLET
+    if (value.contains('pill') || value.contains('tablet')) {
+      return Icons.medication_outlined;
+    }
+
+    // CAPSULE
+    if (value.contains('capsule')) {
+      return Icons.medication_liquid_outlined;
+    }
+
+    // SYRINGE / INJECTION
+    if (value.contains('syringe') || value.contains('injection')) {
+      return Icons.vaccines_outlined;
+    }
+
+    // LIQUID / SYRUP
+    if (value.contains('liquid') ||
+        value.contains('syrup') ||
+        value.contains('solution')) {
+      return Icons.local_drink_outlined;
+    }
+
+    // DROPS
+    if (value.contains('drop')) {
+      return Icons.visibility_outlined;
+    }
+
+    // CREAM / OINTMENT
+    if (value.contains('cream') || value.contains('ointment')) {
+      return Icons.sanitizer_outlined;
+    }
+
+    // INHALER
+    if (value.contains('inhaler')) {
+      return Icons.air_outlined;
+    }
+
+    // DEFAULT
+    return Icons.medication_outlined;
+  }
+
+// ============================================================
+// APPOINTMENT TYPE ICON
+// ============================================================
+
+  IconData _appointmentTypeIcon(dynamic type) {
+    final value = type?.toString().toLowerCase().trim();
+
+    switch (value) {
+      case 'general':
+        return Icons.local_hospital_outlined;
+
+      case 'eye':
+      case 'ophthalmology':
+        return Icons.remove_red_eye_outlined;
+
+      case 'dental':
+      case 'dentist':
+        return Icons.medical_services_outlined;
+
+      case 'heart':
+      case 'cardiology':
+        return Icons.favorite_outline;
+
+      default:
+        return Icons.calendar_today_outlined;
+    }
   }
 
   // ============================================================
@@ -837,9 +937,13 @@ class _HomePageState extends State<HomePage> {
                   color: const Color(0xFFEFF2FA),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
-                  Icons.medication_outlined,
-                  color: Color(0xFF3D84A8),
+                child: Icon(
+                  _medicineTypeIcon(
+                    item['type'] ??
+                        item['medicineType'] ??
+                        item['medicationType'],
+                  ),
+                  color: const Color(0xFF3D84A8),
                 ),
               ),
 
@@ -1338,7 +1442,7 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
-              Icons.calendar_today_outlined,
+              _appointmentTypeIcon(item['appointmentType']),
               color: completed ? green : primaryBlue,
             ),
           ),
