@@ -2,6 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
   NotificationService._();
@@ -83,6 +84,14 @@ class NotificationService {
   }
 
   // ============================================================
+  // LOAD NOTIFICATION SETTINGS
+  // ============================================================
+
+  Future<SharedPreferences> _getPreferences() async {
+    return SharedPreferences.getInstance();
+  }
+
+  // ============================================================
   // SCHEDULE MEDICINE NOTIFICATION
   // ============================================================
 
@@ -92,6 +101,19 @@ class NotificationService {
     required DateTime scheduledTime,
   }) async {
     await initialize();
+
+    final prefs = await _getPreferences();
+
+    // Master notification switch
+    final masterToggle = prefs.getBool('masterToggle') ?? true;
+
+    // Medicine notification switch
+    final medicineReminder = prefs.getBool('medicineReminder') ?? true;
+
+    // If notifications are disabled, don't schedule.
+    if (!masterToggle || !medicineReminder) {
+      return;
+    }
 
     final notificationTime = tz.TZDateTime.from(
       scheduledTime,
@@ -105,15 +127,27 @@ class NotificationService {
       return;
     }
 
-    const androidDetails = AndroidNotificationDetails(
+    // Sound setting
+    final medicineSound = prefs.getBool('medicineSound') ?? true;
+
+    // Vibration setting
+    final medicineVibration = prefs.getBool('medicineVibration') ?? true;
+
+    final androidDetails = AndroidNotificationDetails(
       'medicine_reminders',
       'Medicine Reminders',
       channelDescription: 'Notifications for medicine reminders',
       importance: Importance.high,
       priority: Priority.high,
+
+      // Sound
+      playSound: medicineSound,
+
+      // Vibration
+      enableVibration: medicineVibration,
     );
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
     );
 
@@ -139,6 +173,19 @@ class NotificationService {
   }) async {
     await initialize();
 
+    final prefs = await _getPreferences();
+
+    // Master notification switch
+    final masterToggle = prefs.getBool('masterToggle') ?? true;
+
+    // Appointment notification switch
+    final appointmentReminder = prefs.getBool('appointmentReminder') ?? true;
+
+    // If notifications are disabled, don't schedule.
+    if (!masterToggle || !appointmentReminder) {
+      return;
+    }
+
     final notificationTime = tz.TZDateTime.from(
       appointmentTime.subtract(reminderBefore),
       tz.local,
@@ -157,6 +204,8 @@ class NotificationService {
       channelDescription: 'Notifications for appointments',
       importance: Importance.high,
       priority: Priority.high,
+      playSound: true,
+      enableVibration: true,
     );
 
     const details = NotificationDetails(

@@ -384,7 +384,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
 // SCHEDULE MEDICINE NOTIFICATIONS
 // ------------------------------------------------------------
 
-      Future<void> _scheduleMedicineNotifications({
+      Future<void> scheduleMedicineNotifications({
         required String medicineId,
         required String medicineName,
         required List<TimeOfDay> times,
@@ -447,7 +447,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
       await NotificationService.instance.requestPermission();
 
 // Schedule medicine notifications
-      await _scheduleMedicineNotifications(
+      await scheduleMedicineNotifications(
         medicineId: medicineDoc.id,
         medicineName: medicineName,
         times: finalTimes,
