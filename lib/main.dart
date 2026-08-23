@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'notification_service.dart';
 
-import 'package:medminder/ManageRemindersPage.dart';
-import 'package:medminder/NotificationSettingsPage.dart';
+import 'package:medminder/manage_reminders_page.dart';
+import 'package:medminder/notification_settings_page.dart';
 import 'package:medminder/edit_password_page.dart';
 import 'package:medminder/edit_profile_page.dart';
 import 'package:medminder/help_support_page.dart';
@@ -26,10 +27,12 @@ import 'firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Initialize local notifications
   await NotificationService.initialize();
 
   runApp(const MedMinderApp());

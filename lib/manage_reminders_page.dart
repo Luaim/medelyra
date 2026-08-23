@@ -486,7 +486,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       ),
                       onTap: () async {
                         final pickedDate = await showDatePicker(
-                          context: context,
+                          context: dialogContext,
                           initialDate: appointmentDate,
                           firstDate: DateTime.now(),
                           lastDate: DateTime(2035),
@@ -494,14 +494,18 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
                         if (pickedDate == null) return;
 
+                        if (!dialogContext.mounted) return;
+
                         final pickedTime = await showTimePicker(
-                          context: context,
+                          context: dialogContext,
                           initialTime: TimeOfDay.fromDateTime(
                             appointmentDate,
                           ),
                         );
 
                         if (pickedTime == null) return;
+
+                        if (!dialogContext.mounted) return;
 
                         setDialogState(() {
                           appointmentDate = DateTime(
