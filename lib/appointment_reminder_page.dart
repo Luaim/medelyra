@@ -172,23 +172,23 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
     // REMINDER
     // ==========================================================
 
-    const reminderBefore = Duration(hours: 1);
+    // Read the user's appointment reminder preference.
+    final reminderBefore =
+        await NotificationService.instance.getAppointmentReminderDuration();
 
     final notificationTime = appointmentDateTime.subtract(reminderBefore);
 
-    // The reminder itself must also be in the future.
+// The reminder itself must also be in the future.
     if (notificationTime.isBefore(DateTime.now())) {
+      final reminderLabel = _formatReminderDuration(reminderBefore);
+
       _showMessage(
-        'The appointment must be more than 1 hour from now '
+        'The appointment must be more than $reminderLabel from now '
         'to receive the reminder.',
         isError: true,
       );
       return;
     }
-
-    setState(() {
-      isSaving = true;
-    });
 
     try {
       // ========================================================
@@ -294,6 +294,34 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
         });
       }
     }
+  }
+
+  // ============================================================
+// FORMAT REMINDER DURATION
+// ============================================================
+
+  String _formatReminderDuration(Duration duration) {
+    if (duration.inDays >= 1) {
+      return '1 day';
+    }
+
+    if (duration.inHours >= 1) {
+      final hours = duration.inHours;
+
+      if (hours == 1) {
+        return '1 hour';
+      }
+
+      return '$hours hours';
+    }
+
+    final minutes = duration.inMinutes;
+
+    if (minutes == 1) {
+      return '1 minute';
+    }
+
+    return '$minutes minutes';
   }
 
   // ============================================================

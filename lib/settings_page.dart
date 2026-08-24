@@ -9,9 +9,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool medicineReminder = true;
-  bool appointmentReminder = true;
-  bool emergencyAlerts = true;
   bool darkMode = false;
 
   String selectedLanguage = 'English';
@@ -91,44 +88,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   subtitle: 'Keep your account secure',
                   onTap: () {
                     Navigator.pushNamed(context, '/edit_password');
-                  },
-                ),
-                SizedBox(height: smallScreen ? 18 : 22),
-                _sectionTitle('Notifications'),
-                const SizedBox(height: 10),
-                _SwitchTile(
-                  icon: Icons.medication_outlined,
-                  title: 'Medicine Reminder',
-                  subtitle: 'Get alerts for your medicines',
-                  value: medicineReminder,
-                  onChanged: (value) {
-                    setState(() {
-                      medicineReminder = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 12),
-                _SwitchTile(
-                  icon: Icons.calendar_month_outlined,
-                  title: 'Appointment Reminder',
-                  subtitle: 'Get notified before appointments',
-                  value: appointmentReminder,
-                  onChanged: (value) {
-                    setState(() {
-                      appointmentReminder = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 12),
-                _SwitchTile(
-                  icon: Icons.emergency_outlined,
-                  title: 'Emergency Alerts',
-                  subtitle: 'Important SOS and urgent reminders',
-                  value: emergencyAlerts,
-                  onChanged: (value) {
-                    setState(() {
-                      emergencyAlerts = value;
-                    });
                   },
                 ),
                 SizedBox(height: smallScreen ? 18 : 22),

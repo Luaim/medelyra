@@ -23,7 +23,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   bool appointmentReminder = true;
 
   String reminderTime = "1 hour before";
-  String snoozeTime = "10 minutes";
 
   final Color primaryBlue = const Color(0xFF67C0D7);
 
@@ -54,8 +53,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       appointmentReminder = prefs.getBool('appointmentReminder') ?? true;
 
       reminderTime = prefs.getString('reminderTime') ?? "1 hour before";
-
-      snoozeTime = prefs.getString('snoozeTime') ?? "10 minutes";
     });
   }
 
@@ -245,39 +242,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           ),
 
           const SizedBox(height: 16),
-
-          // ======================================================
-          // SNOOZE
-          // ======================================================
-
-          _buildSectionTitle("Snooze"),
-
-          _buildCard(
-            child: _buildDropdownTile(
-              title: "Default Snooze Duration",
-              value: snoozeTime,
-              items: const [
-                "5 minutes",
-                "10 minutes",
-                "15 minutes",
-                "30 minutes",
-              ],
-              onChanged: masterToggle
-                  ? (value) async {
-                      if (value == null) return;
-
-                      setState(() {
-                        snoozeTime = value;
-                      });
-
-                      await _saveString(
-                        'snoozeTime',
-                        value,
-                      );
-                    }
-                  : null,
-            ),
-          ),
         ],
       ),
     );

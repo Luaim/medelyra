@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:medminder/emergency_guide_details_page.dart';
+import 'package:medminder/forgot_password_page.dart';
 
 import 'notification_service.dart';
 
@@ -73,6 +75,13 @@ class MedMinderApp extends StatelessWidget {
         '/help_support': (context) => const HelpSupportPage(),
         '/notification_settings': (context) => const NotificationSettingsPage(),
         '/manageReminders': (context) => const Managereminderspage(),
+        '/forgot-password': (context) => const ForgotPasswordPage(),
+        '/emergencyGuide': (context) {
+          final guideId = ModalRoute.of(context)!.settings.arguments as String;
+          return EmergencyGuideDetailsPage(
+            guideId: guideId,
+          );
+        },
       },
     );
   }
