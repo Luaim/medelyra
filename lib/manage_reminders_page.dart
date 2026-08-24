@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'nav_bar.dart';
+import 'notification_service.dart';
 
 class Managereminderspage extends StatefulWidget {
   const Managereminderspage({super.key});
@@ -197,6 +198,43 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
+      // ==========================================================
+      // APPOINTMENT NOTIFICATION
+      // ==========================================================
+
+      if (collection == 'appointments') {
+        final notificationId = id.hashCode.abs();
+
+        if (!value) {
+          // User turned the appointment reminder OFF.
+          await NotificationService.instance.cancel(
+            notificationId,
+          );
+        } else {
+          // User turned it back ON.
+          final data = Map<String, dynamic>.from(item['data']);
+
+          DateTime? appointmentTime;
+
+          if (data['dateTime'] is Timestamp) {
+            appointmentTime = (data['dateTime'] as Timestamp).toDate();
+          }
+
+          if (appointmentTime != null) {
+            final reminderBefore = await NotificationService.instance
+                .getAppointmentReminderDuration();
+
+            await NotificationService.instance.scheduleAppointmentNotification(
+              id: notificationId,
+              appointmentType: '${data['appointmentType'] ?? 'Appointment'} '
+                  'at ${data['hospital'] ?? ''}',
+              appointmentTime: appointmentTime,
+              reminderBefore: reminderBefore,
+            );
+          }
+        }
+      }
+
       if (!mounted) return;
 
       setState(() {
@@ -248,6 +286,13 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     if (confirmed != true) return;
 
     try {
+      // Cancel the local appointment notification first.
+      if (item['collection'] == 'appointments') {
+        await NotificationService.instance.cancelAppointmentNotification(
+          appointmentId: item['id'],
+        );
+      }
+
       await _firestore.collection(item['collection']).doc(item['id']).delete();
 
       if (!mounted) return;
@@ -557,6 +602,31 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         'dateTime': Timestamp.fromDate(appointmentDate),
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+// ==========================================================
+// RESCHEDULE APPOINTMENT NOTIFICATION
+// ==========================================================
+
+      final notificationId = item['id'].hashCode.abs();
+
+// Remove the old scheduled notification first.
+      await NotificationService.instance.cancelAppointmentNotification(
+        appointmentId: item['id'],
+      );
+
+// Only schedule if the appointment is still active.
+      if (item['active'] == true) {
+        final reminderBefore =
+            await NotificationService.instance.getAppointmentReminderDuration();
+
+        await NotificationService.instance.scheduleAppointmentNotification(
+          id: notificationId,
+          appointmentType: '$appointmentType appointment at '
+              '${hospitalController.text.trim()}',
+          appointmentTime: appointmentDate,
+          reminderBefore: reminderBefore,
+        );
+      }
 
       hospitalController.dispose();
       reasonController.dispose();

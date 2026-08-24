@@ -115,63 +115,6 @@ class _SignInPageState extends State<SignInPage>
     }
   }
 
-  Future<void> _handleForgotPassword() async {
-    final email = emailController.text.trim();
-
-    if (email.isEmpty) {
-      _showMessage(
-        'Enter your email first, then tap Forgot Password.',
-      );
-      return;
-    }
-
-    if (!_isValidEmail(email)) {
-      _showMessage('Please enter a valid email address.');
-      return;
-    }
-
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(
-        email: email,
-      );
-
-      if (!mounted) return;
-
-      _showMessage(
-        'Password reset email sent. Check your inbox.',
-      );
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-
-      String message;
-
-      switch (e.code) {
-        case 'invalid-email':
-          message = 'Please enter a valid email address.';
-          break;
-
-        case 'user-not-found':
-          message = 'No account was found with this email.';
-          break;
-
-        case 'network-request-failed':
-          message = 'Please check your internet connection and try again.';
-          break;
-
-        default:
-          message = e.message ?? 'Unable to send reset email.';
-      }
-
-      _showMessage(message);
-    } catch (e) {
-      if (!mounted) return;
-
-      _showMessage(
-        'Something went wrong. Please try again.',
-      );
-    }
-  }
-
   bool _isValidEmail(String email) {
     return RegExp(
       r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
@@ -281,7 +224,14 @@ class _SignInPageState extends State<SignInPage>
                     Align(
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
-                        onTap: isLoading ? null : _handleForgotPassword,
+                        onTap: isLoading
+                            ? null
+                            : () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/forgot-password',
+                                );
+                              },
                         child: const Padding(
                           padding: EdgeInsets.symmetric(
                             vertical: 6,

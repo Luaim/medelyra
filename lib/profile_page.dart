@@ -78,25 +78,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   // ============================================================
-  // REFRESH PROFILE AFTER EDITING
-  // ============================================================
-
-  Future<void> _openEditProfile() async {
-    await Navigator.pushNamed(
-      context,
-      '/edit_profile',
-    );
-
-    if (!mounted) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    await _loadProfile();
-  }
-
-  // ============================================================
   // BOTTOM NAVIGATION
   // ============================================================
 
@@ -536,18 +517,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           height: 12,
                         ),
 
-                        // Edit Profile
-                        _ActionTile(
-                          icon: Icons.edit_outlined,
-                          title: 'Edit Profile',
-                          subtitle: 'Update your personal information',
-                          onTap: _openEditProfile,
-                        ),
-
-                        const SizedBox(
-                          height: 12,
-                        ),
-
                         // Settings
                         _ActionTile(
                           icon: Icons.settings_outlined,
@@ -580,26 +549,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
                         const SizedBox(
                           height: 12,
-                        ),
-
-                        // Medical History
-                        _ActionTile(
-                          icon: Icons.history_edu_outlined,
-                          title: 'Medical History',
-                          subtitle: 'View health and appointment records',
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Medical history page coming soon',
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-
-                        SizedBox(
-                          height: smallScreen ? 22 : 28,
                         ),
 
                         // ==================================================

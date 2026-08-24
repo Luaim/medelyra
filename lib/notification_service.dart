@@ -21,13 +21,13 @@ class NotificationService {
   static Future<void> initialize() async {
     if (instance._initialized) return;
 
-    // Initialize timezone database
+    // Initialize timezone database.
     tz.initializeTimeZones();
 
-    // Get THIS DEVICE'S timezone
+    // Get THIS DEVICE'S timezone.
     final String timezoneInfo = await FlutterTimezone.getLocalTimezone();
 
-    // Use the device's local timezone
+    // Use the device's local timezone.
     tz.setLocalLocation(
       tz.getLocation(timezoneInfo),
     );
@@ -55,8 +55,8 @@ class NotificationService {
   void _onNotificationTapped(
     NotificationResponse response,
   ) {
-    // Later we can use the notification payload
-    // to open the correct medicine or appointment.
+    // Later we can use the payload to open
+    // the correct medicine or appointment.
   }
 
   // ============================================================
@@ -64,6 +64,8 @@ class NotificationService {
   // ============================================================
 
   Future<bool> requestPermission() async {
+    await initialize();
+
     final androidImplementation =
         _notifications.resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>();
@@ -72,11 +74,9 @@ class NotificationService {
       return false;
     }
 
-    // Notification permission
     final notificationGranted =
         await androidImplementation.requestNotificationsPermission();
 
-    // Exact alarm permission
     final exactAlarmGranted =
         await androidImplementation.requestExactAlarmsPermission();
 
@@ -84,11 +84,77 @@ class NotificationService {
   }
 
   // ============================================================
-  // LOAD NOTIFICATION SETTINGS
+  // SETTINGS
   // ============================================================
 
   Future<SharedPreferences> _getPreferences() async {
     return SharedPreferences.getInstance();
+  }
+
+  Future<bool> isMasterNotificationsEnabled() async {
+    final prefs = await _getPreferences();
+    return prefs.getBool('masterToggle') ?? true;
+  }
+
+  Future<bool> isMedicineReminderEnabled() async {
+    final prefs = await _getPreferences();
+    return prefs.getBool('medicineReminder') ?? true;
+  }
+
+  Future<bool> isMedicineSoundEnabled() async {
+    final prefs = await _getPreferences();
+    return prefs.getBool('medicineSound') ?? true;
+  }
+
+  Future<bool> isMedicineVibrationEnabled() async {
+    final prefs = await _getPreferences();
+    return prefs.getBool('medicineVibration') ?? true;
+  }
+
+  Future<bool> isAppointmentReminderEnabled() async {
+    final prefs = await _getPreferences();
+    return prefs.getBool('appointmentReminder') ?? true;
+  }
+
+  // ============================================================
+  // APPOINTMENT REMINDER TIME
+  // ============================================================
+
+  Future<Duration> getAppointmentReminderDuration() async {
+    final prefs = await _getPreferences();
+
+    final reminderTime = prefs.getString('reminderTime') ?? '1 hour before';
+
+    switch (reminderTime) {
+      case '30 minutes before':
+        return const Duration(minutes: 30);
+
+      case '1 hour before':
+        return const Duration(hours: 1);
+
+      case '2 hours before':
+        return const Duration(hours: 2);
+
+      case '1 day before':
+        return const Duration(days: 1);
+
+      default:
+        return const Duration(hours: 1);
+    }
+  }
+
+  // ============================================================
+  // MEDICINE NOTIFICATION ID
+  // ============================================================
+
+  int medicineNotificationId({
+    required String medicineId,
+    required DateTime date,
+    required int timeIndex,
+  }) {
+    return '${medicineId}_${date.year}_${date.month}_${date.day}_$timeIndex'
+            .hashCode &
+        0x7fffffff;
   }
 
   // ============================================================
@@ -104,13 +170,10 @@ class NotificationService {
 
     final prefs = await _getPreferences();
 
-    // Master notification switch
     final masterToggle = prefs.getBool('masterToggle') ?? true;
-
-    // Medicine notification switch
     final medicineReminder = prefs.getBool('medicineReminder') ?? true;
 
-    // If notifications are disabled, don't schedule.
+    // Do not schedule if medicine notifications are disabled.
     if (!masterToggle || !medicineReminder) {
       return;
     }
@@ -120,17 +183,14 @@ class NotificationService {
       tz.local,
     );
 
-    // Don't schedule notifications in the past
+    // Do not schedule notifications in the past.
     if (notificationTime.isBefore(
       tz.TZDateTime.now(tz.local),
     )) {
       return;
     }
 
-    // Sound setting
     final medicineSound = prefs.getBool('medicineSound') ?? true;
-
-    // Vibration setting
     final medicineVibration = prefs.getBool('medicineVibration') ?? true;
 
     final androidDetails = AndroidNotificationDetails(
@@ -139,11 +199,7 @@ class NotificationService {
       channelDescription: 'Notifications for medicine reminders',
       importance: Importance.high,
       priority: Priority.high,
-
-      // Sound
       playSound: medicineSound,
-
-      // Vibration
       enableVibration: medicineVibration,
     );
 
@@ -162,6 +218,48 @@ class NotificationService {
   }
 
   // ============================================================
+  // CANCEL MEDICINE NOTIFICATIONS
+  // ============================================================
+
+  Future<void> cancelMedicineNotifications({
+    required String medicineId,
+    required DateTime startDate,
+    required List<String> times,
+    required int? durationDays,
+  }) async {
+    await initialize();
+
+    if (times.isEmpty) {
+      return;
+    }
+
+    // Ongoing medicines currently schedule up to 30 days.
+    final daysToCancel = durationDays ?? 30;
+
+    final baseDate = DateTime(
+      startDate.year,
+      startDate.month,
+      startDate.day,
+    );
+
+    for (int day = 0; day < daysToCancel; day++) {
+      final date = baseDate.add(
+        Duration(days: day),
+      );
+
+      for (int timeIndex = 0; timeIndex < times.length; timeIndex++) {
+        final notificationId = medicineNotificationId(
+          medicineId: medicineId,
+          date: date,
+          timeIndex: timeIndex,
+        );
+
+        await _notifications.cancel(notificationId);
+      }
+    }
+  }
+
+  // ============================================================
   // SCHEDULE APPOINTMENT NOTIFICATION
   // ============================================================
 
@@ -175,13 +273,10 @@ class NotificationService {
 
     final prefs = await _getPreferences();
 
-    // Master notification switch
     final masterToggle = prefs.getBool('masterToggle') ?? true;
-
-    // Appointment notification switch
     final appointmentReminder = prefs.getBool('appointmentReminder') ?? true;
 
-    // If notifications are disabled, don't schedule.
+    // Do not schedule if appointment notifications are disabled.
     if (!masterToggle || !appointmentReminder) {
       return;
     }
@@ -191,24 +286,30 @@ class NotificationService {
       tz.local,
     );
 
-    // Don't schedule notifications in the past
+    // Do not schedule notifications in the past.
     if (notificationTime.isBefore(
       tz.TZDateTime.now(tz.local),
     )) {
       return;
     }
 
-    const androidDetails = AndroidNotificationDetails(
+    // Use the medicine sound/vibration settings for the
+    // notification behavior until separate appointment
+    // sound/vibration settings are added to the UI.
+    final soundEnabled = prefs.getBool('medicineSound') ?? true;
+    final vibrationEnabled = prefs.getBool('medicineVibration') ?? true;
+
+    final androidDetails = AndroidNotificationDetails(
       'appointment_reminders',
       'Appointment Reminders',
       channelDescription: 'Notifications for appointments',
       importance: Importance.high,
       priority: Priority.high,
-      playSound: true,
-      enableVibration: true,
+      playSound: soundEnabled,
+      enableVibration: vibrationEnabled,
     );
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
     );
 
@@ -230,6 +331,20 @@ class NotificationService {
     await initialize();
 
     await _notifications.cancel(id);
+  }
+
+  // ============================================================
+  // CANCEL APPOINTMENT NOTIFICATION
+  // ============================================================
+
+  Future<void> cancelAppointmentNotification({
+    required String appointmentId,
+  }) async {
+    await initialize();
+
+    final notificationId = appointmentId.hashCode.abs();
+
+    await _notifications.cancel(notificationId);
   }
 
   // ============================================================
