@@ -32,9 +32,9 @@ class _SosPageState extends State<SosPage> {
     super.dispose();
   }
 
-  // ============================================================
+  // ============================================================================
   // LOAD EMERGENCY GUIDES FROM FIRESTORE
-  // ============================================================
+  // ============================================================================
 
   Future<void> _loadGuides() async {
     setState(() {
@@ -77,9 +77,9 @@ class _SosPageState extends State<SosPage> {
     }
   }
 
-  // ============================================================
+  // ============================================================================
   // SEARCH
-  // ============================================================
+  // ============================================================================
 
   void _filterGuides(String query) {
     final searchText = query.trim().toLowerCase();
@@ -100,9 +100,9 @@ class _SosPageState extends State<SosPage> {
     });
   }
 
-  // ============================================================
+  // ============================================================================
   // FALLBACK IMAGE
-  // ============================================================
+  // ============================================================================
 
   String _fallbackImage(String id) {
     switch (id) {
@@ -120,9 +120,9 @@ class _SosPageState extends State<SosPage> {
     }
   }
 
-  // ============================================================
+  // ============================================================================
   // FALLBACK ICON
-  // ============================================================
+  // ============================================================================
 
   IconData _fallbackIcon(String id) {
     switch (id) {
@@ -140,9 +140,9 @@ class _SosPageState extends State<SosPage> {
     }
   }
 
-  // ============================================================
+  // ============================================================================
   // NAVIGATION
-  // ============================================================
+  // ============================================================================
 
   void _onBottomTap(BuildContext context, int index) {
     switch (index) {
@@ -168,9 +168,9 @@ class _SosPageState extends State<SosPage> {
     }
   }
 
-  // ============================================================
+  // ============================================================================
   // OPEN GUIDE DETAILS
-  // ============================================================
+  // ============================================================================
 
   void _openGuide(String guideId) {
     Navigator.push(
@@ -183,9 +183,9 @@ class _SosPageState extends State<SosPage> {
     );
   }
 
-  // ============================================================
+  // ============================================================================
   // BUILD
-  // ============================================================
+  // ============================================================================
 
   @override
   Widget build(BuildContext context) {
@@ -200,64 +200,94 @@ class _SosPageState extends State<SosPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-            horizontal: width * 0.05,
+            horizontal: width * 0.045,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
-              // ==================================================
-              // TITLE
-              // ==================================================
+              // ==============================================================
+              // PAGE TITLE
+              // ==============================================================
 
               const Text(
                 'Emergency guide',
                 style: TextStyle(
-                  fontSize: 26,
+                  fontSize: 27,
                   fontWeight: FontWeight.w700,
+                  color: Color(0xFF24232A),
                 ),
               ),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
 
-              // ==================================================
+              // ==============================================================
               // SEARCH BAR
-              // ==================================================
+              // ==============================================================
 
               Container(
-                height: 48,
+                height: 50,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(26),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 6,
+                      color: Colors.black.withOpacity(0.045),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
                 child: TextField(
                   controller: searchController,
                   onChanged: _filterGuides,
-                  decoration: const InputDecoration(
+                  textInputAction: TextInputAction.search,
+                  decoration: InputDecoration(
                     hintText: 'Search emergency help...',
-                    prefixIcon: Icon(Icons.search),
+                    hintStyle: const TextStyle(
+                      color: Color(0xFF6F6D75),
+                      fontSize: 16,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      color: Color(0xFF4D4B54),
+                      size: 25,
+                    ),
+                    suffixIcon: searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(
+                              Icons.close_rounded,
+                              color: Color(0xFF77757D),
+                            ),
+                            onPressed: () {
+                              searchController.clear();
+                              _filterGuides('');
+                            },
+                          )
+                        : null,
                     border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                    ),
                   ),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // ==================================================
-              // INFO BOX
-              // ==================================================
+              // ==============================================================
+              // INFORMATION BOX
+              // ==============================================================
 
               Container(
-                padding: const EdgeInsets.all(14),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 13,
+                ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFDECEC),
+                  color: const Color(0xFFFDECEE),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: const Row(
@@ -266,16 +296,20 @@ class _SosPageState extends State<SosPage> {
                       radius: 20,
                       backgroundColor: Color(0xFFE96B6B),
                       child: Icon(
-                        Icons.emergency,
+                        Icons.emergency_rounded,
                         color: Colors.white,
+                        size: 23,
                       ),
                     ),
-                    SizedBox(width: 10),
+                    SizedBox(width: 11),
                     Expanded(
                       child: Text(
                         'Quick first-aid help for common emergencies',
                         style: TextStyle(
+                          fontSize: 15,
                           fontWeight: FontWeight.w600,
+                          color: Color(0xFF29272D),
+                          height: 1.3,
                         ),
                       ),
                     ),
@@ -285,13 +319,13 @@ class _SosPageState extends State<SosPage> {
 
               const SizedBox(height: 18),
 
-              // ==================================================
+              // ==============================================================
               // CONTENT
-              // ==================================================
+              // ==============================================================
 
               if (isLoading)
                 const Padding(
-                  padding: EdgeInsets.only(top: 60),
+                  padding: EdgeInsets.only(top: 70),
                   child: Center(
                     child: CircularProgressIndicator(),
                   ),
@@ -308,7 +342,7 @@ class _SosPageState extends State<SosPage> {
                   itemCount: filteredGuides.length,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  separatorBuilder: (_, __) => const SizedBox(height: 14),
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final guide = filteredGuides[index];
 
@@ -324,6 +358,7 @@ class _SosPageState extends State<SosPage> {
 
                     return _EmergencyGuideCard(
                       title: guide['title'].toString(),
+                      description: guide['shortDescription'].toString(),
                       imagePath: imagePath,
                       fallbackIcon: _fallbackIcon(id),
                       onTap: () {
@@ -333,7 +368,7 @@ class _SosPageState extends State<SosPage> {
                   },
                 ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
             ],
           ),
         ),
@@ -365,15 +400,16 @@ class _ErrorCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         children: [
           const Icon(
-            Icons.error_outline,
+            Icons.error_outline_rounded,
             size: 48,
             color: Colors.redAccent,
           ),
@@ -383,6 +419,7 @@ class _ErrorCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
@@ -402,11 +439,18 @@ class _ErrorCard extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF3D84A8),
               foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 22,
+                vertical: 11,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            child: const Text('Try Again'),
+            child: const Text(
+              'Try Again',
+            ),
           ),
         ],
       ),
@@ -434,8 +478,9 @@ class _EmptySearchCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(0.035),
             blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -475,12 +520,14 @@ class _EmptySearchCard extends StatelessWidget {
 
 class _EmergencyGuideCard extends StatelessWidget {
   final String title;
+  final String description;
   final String imagePath;
   final IconData fallbackIcon;
   final VoidCallback onTap;
 
   const _EmergencyGuideCard({
     required this.title,
+    required this.description,
     required this.imagePath,
     required this.fallbackIcon,
     required this.onTap,
@@ -488,91 +535,189 @@ class _EmergencyGuideCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      elevation: 0,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        splashColor: const Color(0xFF3D84A8).withOpacity(0.08),
+        highlightColor: const Color(0xFF3D84A8).withOpacity(0.035),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // ==================================================
-          // IMAGE
-          // ==================================================
-
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEAF2FF),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(6),
-              child: imagePath.isNotEmpty
-                  ? Image.asset(
-                      imagePath,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) {
-                        return Icon(
-                          fallbackIcon,
-                          color: const Color(0xFF3D84A8),
-                        );
-                      },
-                    )
-                  : Icon(
-                      fallbackIcon,
-                      color: const Color(0xFF3D84A8),
-                    ),
-            ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.045),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // ==============================================================
+              // THUMBNAIL
+              // ==============================================================
 
-          const SizedBox(width: 12),
+              _GuideThumbnail(
+                imagePath: imagePath,
+                fallbackIcon: fallbackIcon,
+              ),
 
-          // ==================================================
-          // TEXT + BUTTON
-          // ==================================================
+              const SizedBox(width: 14),
 
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 36,
-                  child: ElevatedButton(
-                    onPressed: onTap,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3D84A8),
-                      foregroundColor: Colors.white,
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+              // ==============================================================
+              // TEXT
+              // ==============================================================
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF28262D),
+                        height: 1.18,
                       ),
                     ),
-                    child: const Text(
-                      'See how',
-                    ),
-                  ),
+                    if (description.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        description,
+
+                        // Keep the card clean.
+                        maxLines: 2,
+
+                        overflow: TextOverflow.ellipsis,
+
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF737078),
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(width: 5),
+
+              // ==============================================================
+              // CHEVRON
+              // ==============================================================
+
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 27,
+                color: Color(0xFF8A8990),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
+    );
+  }
+}
+
+// ============================================================================
+// GUIDE THUMBNAIL
+// ============================================================================
+
+class _GuideThumbnail extends StatelessWidget {
+  final String imagePath;
+  final IconData fallbackIcon;
+
+  const _GuideThumbnail({
+    required this.imagePath,
+    required this.fallbackIcon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 80,
+      height: 90,
+      decoration: BoxDecoration(
+        color: const Color(0xFFEAF2FF),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: imagePath.isEmpty
+          ? Center(
+              child: Icon(
+                fallbackIcon,
+                size: 34,
+                color: const Color(0xFF3D84A8),
+              ),
+            )
+          : imagePath.startsWith('http://') || imagePath.startsWith('https://')
+              ? Image.network(
+                  imagePath,
+
+                  // IMPORTANT:
+                  // Do NOT crop the portrait image.
+                  fit: BoxFit.contain,
+
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    }
+
+                    return const Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  },
+
+                  errorBuilder: (_, __, ___) {
+                    return Center(
+                      child: Icon(
+                        fallbackIcon,
+                        size: 34,
+                        color: const Color(0xFF3D84A8),
+                      ),
+                    );
+                  },
+                )
+              : Image.asset(
+                  imagePath,
+
+                  // IMPORTANT:
+                  // Do NOT crop the portrait image.
+                  fit: BoxFit.contain,
+
+                  errorBuilder: (_, __, ___) {
+                    return Center(
+                      child: Icon(
+                        fallbackIcon,
+                        size: 34,
+                        color: const Color(0xFF3D84A8),
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }
