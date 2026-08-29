@@ -12,7 +12,20 @@
           "package_name": "com.example.medminder"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "61571062947-2tak2cuiahfhvt4ghnvo8js57d12sj2m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.medminder",
+            "certificate_hash": "7389229b71f6943f26aef5b924c96e65330aad43"
+          }
+        },
+        {
+          "client_id": "61571062947-t6f0r3idagiuim4f16ntsd75q79alfp6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAamnN_S3IqYdHsd6jzEsA56tCR3HCYBfU"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "61571062947-t6f0r3idagiuim4f16ntsd75q79alfp6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "61571062947-uq5td7pclv9nos888n677con6d71ll1o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.medminder"
+              }
+            }
+          ]
         }
       }
     }
