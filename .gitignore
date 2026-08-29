@@ -45,3 +45,4 @@ app.*.map.json
 
 # API keys / secrets
 lib/google_api_key.dart
+/android/gradle.properties
