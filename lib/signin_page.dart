@@ -109,6 +109,10 @@ class _SignInPageState extends State<SignInPage>
     } catch (e) {
       if (!mounted) return;
 
+      debugPrint(
+        'MEDMINDER: Email sign-in error: $e',
+      );
+
       _showMessage(
         'Something went wrong. Please try again.',
       );
@@ -135,38 +139,27 @@ class _SignInPageState extends State<SignInPage>
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
 
-      // Open Google's account picker.
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
-      // User closed/cancelled the Google account picker.
+      // User cancelled Google account picker.
       if (googleUser == null) {
-        if (mounted) {
-          setState(() {
-            isGoogleLoading = false;
-          });
-        }
-
         return;
       }
 
-      // Get authentication information from Google.
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
-      // Create Firebase credential.
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // Sign in to Firebase with the Google credential.
       await FirebaseAuth.instance.signInWithCredential(
         credential,
       );
 
       if (!mounted) return;
 
-      // Google login succeeded.
       Navigator.pushReplacementNamed(
         context,
         '/home',
@@ -261,6 +254,9 @@ class _SignInPageState extends State<SignInPage>
     final h = size.height;
     final w = size.width;
 
+    final bool isSmall = h < 700;
+    final bool busy = isLoading || isGoogleLoading;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
       body: SafeArea(
@@ -291,6 +287,10 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 6),
 
+                    // =================================================================
+                    // TITLE
+                    // =================================================================
+
                     const Text(
                       'Sign In',
                       style: TextStyle(
@@ -301,7 +301,9 @@ class _SignInPageState extends State<SignInPage>
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    SizedBox(
+                      height: isSmall ? 22 : 28,
+                    ),
 
                     // =================================================================
                     // EMAIL
@@ -315,6 +317,7 @@ class _SignInPageState extends State<SignInPage>
                       controller: emailController,
                       hintText: 'Enter your Email',
                       prefixIcon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
                     ),
 
                     const SizedBox(height: 16),
@@ -329,16 +332,19 @@ class _SignInPageState extends State<SignInPage>
 
                     _buildTextField(
                       controller: passwordController,
-                      hintText: '••••••••••••',
+                      hintText: 'Enter your Password',
                       prefixIcon: Icons.lock_outline,
                       obscureText: obscurePassword,
+                      keyboardType: TextInputType.text,
                       suffixIcon: IconButton(
                         splashRadius: 20,
-                        onPressed: () {
-                          setState(() {
-                            obscurePassword = !obscurePassword;
-                          });
-                        },
+                        onPressed: busy
+                            ? null
+                            : () {
+                                setState(() {
+                                  obscurePassword = !obscurePassword;
+                                });
+                              },
                         icon: Icon(
                           obscurePassword
                               ? Icons.visibility_off_outlined
@@ -356,7 +362,7 @@ class _SignInPageState extends State<SignInPage>
                     Align(
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
-                        onTap: isLoading || isGoogleLoading
+                        onTap: busy
                             ? null
                             : () {
                                 Navigator.pushNamed(
@@ -380,21 +386,23 @@ class _SignInPageState extends State<SignInPage>
                       ),
                     ),
 
-                    const SizedBox(height: 18),
+                    SizedBox(
+                      height: isSmall ? 16 : 20,
+                    ),
 
                     // =================================================================
                     // SIGN IN BUTTON
                     // =================================================================
 
                     GestureDetector(
-                      onTapDown: isLoading || isGoogleLoading
+                      onTapDown: busy
                           ? null
                           : (_) {
                               setState(() {
                                 isPressed = true;
                               });
                             },
-                      onTapUp: isLoading || isGoogleLoading
+                      onTapUp: busy
                           ? null
                           : (_) {
                               setState(() {
@@ -403,7 +411,7 @@ class _SignInPageState extends State<SignInPage>
 
                               _handleSignIn();
                             },
-                      onTapCancel: isLoading || isGoogleLoading
+                      onTapCancel: busy
                           ? null
                           : () {
                               setState(() {
@@ -417,13 +425,13 @@ class _SignInPageState extends State<SignInPage>
                         ),
                         child: Container(
                           width: double.infinity,
-                          height: 46,
+                          height: 47,
                           decoration: BoxDecoration(
                             color: const Color(0xFF3D84A8),
                             borderRadius: BorderRadius.circular(25),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
+                                color: Colors.black.withOpacity(0.18),
                                 blurRadius: 6,
                                 offset: const Offset(0, 3),
                               ),
@@ -451,7 +459,9 @@ class _SignInPageState extends State<SignInPage>
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: isSmall ? 18 : 24,
+                    ),
 
                     // =================================================================
                     // DIVIDER
@@ -460,7 +470,9 @@ class _SignInPageState extends State<SignInPage>
                     const Row(
                       children: [
                         Expanded(
-                          child: Divider(),
+                          child: Divider(
+                            color: Colors.grey,
+                          ),
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(
@@ -469,54 +481,30 @@ class _SignInPageState extends State<SignInPage>
                           child: Text(
                             'OR Continue with',
                             style: TextStyle(
-                              color: Color.fromARGB(
-                                255,
-                                116,
-                                115,
-                                115,
-                              ),
+                              color: Color(0xFF747373),
+                              fontSize: 13,
                             ),
                           ),
                         ),
                         Expanded(
-                          child: Divider(),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // =================================================================
-                    // SOCIAL BUTTONS
-                    // =================================================================
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _socialButton(
-                            text: 'Google',
-                            imagePath: 'assets/google.png',
-                            onPressed: _handleGoogleSignIn,
-                            isLoading: isGoogleLoading,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _socialButton(
-                            text: 'Facebook',
-                            imagePath: 'assets/facebook.png',
-                            onPressed: () {
-                              _showMessage(
-                                'Facebook Sign-In is not configured yet.',
-                              );
-                            },
-                            isLoading: false,
+                          child: Divider(
+                            color: Colors.grey,
                           ),
                         ),
                       ],
                     ),
 
-                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: isSmall ? 14 : 18,
+                    ),
+
+                    // =================================================================
+                    // GOOGLE
+                    // =================================================================
+
+                    _googleButton(),
+
+                    const SizedBox(height: 18),
 
                     // =================================================================
                     // SIGN UP
@@ -526,10 +514,13 @@ class _SignInPageState extends State<SignInPage>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          'Don’t have account? ',
+                          'Don’t have an account? ',
+                          style: TextStyle(
+                            fontSize: 14,
+                          ),
                         ),
                         GestureDetector(
-                          onTap: isLoading || isGoogleLoading
+                          onTap: busy
                               ? null
                               : () {
                                   Navigator.pushNamed(
@@ -541,6 +532,7 @@ class _SignInPageState extends State<SignInPage>
                             'Sign Up',
                             style: TextStyle(
                               color: Color(0xFF9B1C1C),
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -548,7 +540,7 @@ class _SignInPageState extends State<SignInPage>
                       ],
                     ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -570,7 +562,8 @@ class _SignInPageState extends State<SignInPage>
         text,
         style: const TextStyle(
           fontSize: 15,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF2B2B2B),
         ),
       ),
     );
@@ -584,35 +577,56 @@ class _SignInPageState extends State<SignInPage>
     required TextEditingController controller,
     required String hintText,
     required IconData prefixIcon,
+    required TextInputType keyboardType,
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFDDF2F7),
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+    return SizedBox(
+      height: 47,
+      child: Container(
+        decoration: BoxDecoration(
+          // SAME COLOR AS SIGN UP PAGE
+          color: const Color(0xFFDDF2F7),
+
+          borderRadius: BorderRadius.circular(14),
+
+          border: Border.all(
+            color: Colors.grey.shade400,
           ),
-        ],
-        border: Border.all(
-          color: Colors.grey.shade400,
+
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.12),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        decoration: InputDecoration(
-          isDense: true,
-          hintText: hintText,
-          prefixIcon: Icon(prefixIcon),
-          suffixIcon: suffixIcon,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 12,
+        child: TextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          obscureText: obscureText,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Color(0xFF4A4A4A),
+          ),
+          decoration: InputDecoration(
+            isDense: true,
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 13,
+            ),
+            hintText: hintText,
+            hintStyle: const TextStyle(
+              color: Colors.grey,
+              fontSize: 14,
+            ),
+            prefixIcon: Icon(
+              prefixIcon,
+              color: const Color(0xFF555555),
+            ),
+            suffixIcon: suffixIcon,
           ),
         ),
       ),
@@ -620,108 +634,77 @@ class _SignInPageState extends State<SignInPage>
   }
 
   // ===========================================================================
-  // SOCIAL BUTTON
+  // GOOGLE BUTTON
   // ===========================================================================
 
-  Widget _socialButton({
-    required String text,
-    required String imagePath,
-    required VoidCallback onPressed,
-    required bool isLoading,
-  }) {
-    bool pressed = false;
+  Widget _googleButton() {
+    final bool disabled = isLoading || isGoogleLoading;
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        final bool disabled = isLoading || this.isLoading;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(26),
+        onTap: disabled ? null : _handleGoogleSignIn,
+        child: AnimatedOpacity(
+          duration: const Duration(
+            milliseconds: 150,
+          ),
+          opacity: disabled ? 0.6 : 1,
+          child: Container(
+            width: double.infinity,
+            height: 52,
+            decoration: BoxDecoration(
+              // SAME GOOGLE STYLE AS SIGN UP
+              color: Colors.white,
 
-        return GestureDetector(
-          onTapDown: disabled
-              ? null
-              : (_) {
-                  setState(() {
-                    pressed = true;
-                  });
-                },
-          onTapUp: disabled
-              ? null
-              : (_) {
-                  setState(() {
-                    pressed = false;
-                  });
+              borderRadius: BorderRadius.circular(26),
 
-                  onPressed();
-                },
-          onTapCancel: disabled
-              ? null
-              : () {
-                  setState(() {
-                    pressed = false;
-                  });
-                },
-          child: AnimatedScale(
-            scale: pressed ? 0.95 : 1,
-            duration: const Duration(
-              milliseconds: 100,
+              border: Border.all(
+                color: const Color(0xFFE0E0E0),
+                width: 1,
+              ),
+
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.10),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: Container(
-              height: 54,
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(
-                  181,
-                  169,
-                  240,
-                  250,
-                ),
-                border: Border.all(
-                  color: const Color.fromARGB(
-                    170,
-                    71,
-                    71,
-                    71,
-                  ),
-                ),
-                borderRadius: BorderRadius.circular(26),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.18),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: isLoading
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: Color(0xFF3D84A8),
-                        ),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            imagePath,
-                            width: 24,
-                            height: 24,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            text,
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
+            child: Center(
+              child: isGoogleLoading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Color(0xFF3D84A8),
                       ),
-              ),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/google.png',
+                          width: 23,
+                          height: 23,
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Continue with Google',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                      ],
+                    ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
