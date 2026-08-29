@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -16,6 +17,7 @@ class _SignInPageState extends State<SignInPage>
   bool obscurePassword = true;
   bool isPressed = false;
   bool isLoading = false;
+  bool isGoogleLoading = false;
 
   @override
   void dispose() {
@@ -24,8 +26,12 @@ class _SignInPageState extends State<SignInPage>
     super.dispose();
   }
 
+  // ===========================================================================
+  // EMAIL / PASSWORD SIGN IN
+  // ===========================================================================
+
   Future<void> _handleSignIn() async {
-    if (isLoading) return;
+    if (isLoading || isGoogleLoading) return;
 
     final email = emailController.text.trim();
     final password = passwordController.text;
@@ -115,11 +121,121 @@ class _SignInPageState extends State<SignInPage>
     }
   }
 
+  // ===========================================================================
+  // GOOGLE SIGN IN
+  // ===========================================================================
+
+  Future<void> _handleGoogleSignIn() async {
+    if (isLoading || isGoogleLoading) return;
+
+    setState(() {
+      isGoogleLoading = true;
+    });
+
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+
+      // Open Google's account picker.
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      // User closed/cancelled the Google account picker.
+      if (googleUser == null) {
+        if (mounted) {
+          setState(() {
+            isGoogleLoading = false;
+          });
+        }
+
+        return;
+      }
+
+      // Get authentication information from Google.
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Create Firebase credential.
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential.
+      await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+
+      if (!mounted) return;
+
+      // Google login succeeded.
+      Navigator.pushReplacementNamed(
+        context,
+        '/home',
+      );
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String message;
+
+      switch (e.code) {
+        case 'account-exists-with-different-credential':
+          message =
+              'An account already exists with this email using a different sign-in method.';
+          break;
+
+        case 'invalid-credential':
+          message =
+              'The Google sign-in credential is invalid. Please try again.';
+          break;
+
+        case 'operation-not-allowed':
+          message = 'Google Sign-In is not enabled in Firebase.';
+          break;
+
+        case 'user-disabled':
+          message = 'This account has been disabled.';
+          break;
+
+        case 'network-request-failed':
+          message = 'Please check your internet connection and try again.';
+          break;
+
+        default:
+          message = e.message ?? 'Unable to sign in with Google.';
+      }
+
+      _showMessage(message);
+    } catch (e) {
+      if (!mounted) return;
+
+      debugPrint(
+        'MEDMINDER: Google Sign-In error: $e',
+      );
+
+      _showMessage(
+        'Google Sign-In failed. Please try again.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isGoogleLoading = false;
+        });
+      }
+    }
+  }
+
+  // ===========================================================================
+  // EMAIL VALIDATION
+  // ===========================================================================
+
   bool _isValidEmail(String email) {
     return RegExp(
       r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
     ).hasMatch(email);
   }
+
+  // ===========================================================================
+  // MESSAGE
+  // ===========================================================================
 
   void _showMessage(String message) {
     if (!mounted) return;
@@ -134,6 +250,10 @@ class _SignInPageState extends State<SignInPage>
         ),
       );
   }
+
+  // ===========================================================================
+  // BUILD
+  // ===========================================================================
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +276,10 @@ class _SignInPageState extends State<SignInPage>
                 ),
                 child: Column(
                   children: [
-                    /// LOGO
+                    // =================================================================
+                    // LOGO
+                    // =================================================================
+
                     Transform.translate(
                       offset: const Offset(0, -10),
                       child: Image.asset(
@@ -180,7 +303,10 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 24),
 
-                    /// EMAIL
+                    // =================================================================
+                    // EMAIL
+                    // =================================================================
+
                     _buildLabel('Email'),
 
                     const SizedBox(height: 6),
@@ -193,7 +319,10 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 16),
 
-                    /// PASSWORD
+                    // =================================================================
+                    // PASSWORD
+                    // =================================================================
+
                     _buildLabel('Password'),
 
                     const SizedBox(height: 6),
@@ -220,11 +349,14 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 4),
 
-                    /// FORGOT PASSWORD
+                    // =================================================================
+                    // FORGOT PASSWORD
+                    // =================================================================
+
                     Align(
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
-                        onTap: isLoading
+                        onTap: isLoading || isGoogleLoading
                             ? null
                             : () {
                                 Navigator.pushNamed(
@@ -250,16 +382,19 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 18),
 
-                    /// SIGN IN BUTTON
+                    // =================================================================
+                    // SIGN IN BUTTON
+                    // =================================================================
+
                     GestureDetector(
-                      onTapDown: isLoading
+                      onTapDown: isLoading || isGoogleLoading
                           ? null
                           : (_) {
                               setState(() {
                                 isPressed = true;
                               });
                             },
-                      onTapUp: isLoading
+                      onTapUp: isLoading || isGoogleLoading
                           ? null
                           : (_) {
                               setState(() {
@@ -268,7 +403,7 @@ class _SignInPageState extends State<SignInPage>
 
                               _handleSignIn();
                             },
-                      onTapCancel: isLoading
+                      onTapCancel: isLoading || isGoogleLoading
                           ? null
                           : () {
                               setState(() {
@@ -277,7 +412,9 @@ class _SignInPageState extends State<SignInPage>
                             },
                       child: AnimatedScale(
                         scale: isPressed ? 0.97 : 1,
-                        duration: const Duration(milliseconds: 100),
+                        duration: const Duration(
+                          milliseconds: 100,
+                        ),
                         child: Container(
                           width: double.infinity,
                           height: 46,
@@ -316,7 +453,10 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 20),
 
-                    /// DIVIDER
+                    // =================================================================
+                    // DIVIDER
+                    // =================================================================
+
                     const Row(
                       children: [
                         Expanded(
@@ -346,13 +486,18 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 20),
 
-                    /// SOCIAL BUTTONS
+                    // =================================================================
+                    // SOCIAL BUTTONS
+                    // =================================================================
+
                     Row(
                       children: [
                         Expanded(
                           child: _socialButton(
                             text: 'Google',
                             imagePath: 'assets/google.png',
+                            onPressed: _handleGoogleSignIn,
+                            isLoading: isGoogleLoading,
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -360,6 +505,12 @@ class _SignInPageState extends State<SignInPage>
                           child: _socialButton(
                             text: 'Facebook',
                             imagePath: 'assets/facebook.png',
+                            onPressed: () {
+                              _showMessage(
+                                'Facebook Sign-In is not configured yet.',
+                              );
+                            },
+                            isLoading: false,
                           ),
                         ),
                       ],
@@ -367,7 +518,10 @@ class _SignInPageState extends State<SignInPage>
 
                     const SizedBox(height: 20),
 
-                    /// SIGN UP
+                    // =================================================================
+                    // SIGN UP
+                    // =================================================================
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -375,12 +529,14 @@ class _SignInPageState extends State<SignInPage>
                           'Don’t have account? ',
                         ),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              '/signup',
-                            );
-                          },
+                          onTap: isLoading || isGoogleLoading
+                              ? null
+                              : () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/signup',
+                                  );
+                                },
                           child: const Text(
                             'Sign Up',
                             style: TextStyle(
@@ -403,6 +559,10 @@ class _SignInPageState extends State<SignInPage>
     );
   }
 
+  // ===========================================================================
+  // LABEL
+  // ===========================================================================
+
   Widget _buildLabel(String text) {
     return Align(
       alignment: Alignment.centerLeft,
@@ -415,6 +575,10 @@ class _SignInPageState extends State<SignInPage>
       ),
     );
   }
+
+  // ===========================================================================
+  // TEXT FIELD
+  // ===========================================================================
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -447,42 +611,59 @@ class _SignInPageState extends State<SignInPage>
           prefixIcon: Icon(prefixIcon),
           suffixIcon: suffixIcon,
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 12,
+          ),
         ),
       ),
     );
   }
 
+  // ===========================================================================
+  // SOCIAL BUTTON
+  // ===========================================================================
+
   Widget _socialButton({
     required String text,
     required String imagePath,
+    required VoidCallback onPressed,
+    required bool isLoading,
   }) {
     bool pressed = false;
 
     return StatefulBuilder(
       builder: (context, setState) {
-        return GestureDetector(
-          onTapDown: (_) {
-            setState(() {
-              pressed = true;
-            });
-          },
-          onTapUp: (_) {
-            setState(() {
-              pressed = false;
-            });
+        final bool disabled = isLoading || this.isLoading;
 
-            // Google/Facebook authentication will be
-            // implemented separately.
-          },
-          onTapCancel: () {
-            setState(() {
-              pressed = false;
-            });
-          },
+        return GestureDetector(
+          onTapDown: disabled
+              ? null
+              : (_) {
+                  setState(() {
+                    pressed = true;
+                  });
+                },
+          onTapUp: disabled
+              ? null
+              : (_) {
+                  setState(() {
+                    pressed = false;
+                  });
+
+                  onPressed();
+                },
+          onTapCancel: disabled
+              ? null
+              : () {
+                  setState(() {
+                    pressed = false;
+                  });
+                },
           child: AnimatedScale(
             scale: pressed ? 0.95 : 1,
-            duration: const Duration(milliseconds: 100),
+            duration: const Duration(
+              milliseconds: 100,
+            ),
             child: Container(
               height: 54,
               decoration: BoxDecoration(
@@ -509,21 +690,33 @@ class _SignInPageState extends State<SignInPage>
                   ),
                 ],
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    imagePath,
-                    width: 24,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    text,
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
+              child: Center(
+                child: isLoading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Color(0xFF3D84A8),
+                        ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            imagePath,
+                            width: 24,
+                            height: 24,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            text,
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
               ),
             ),
           ),
