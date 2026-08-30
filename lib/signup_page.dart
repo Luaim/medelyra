@@ -203,6 +203,194 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   // ===========================================================================
+  // TERMS & CONDITIONS
+  // ===========================================================================
+
+  void _showTermsAndConditions() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.35),
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
+          ),
+          child: Container(
+            constraints: const BoxConstraints(
+              maxWidth: 430,
+              maxHeight: 620,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F6F8),
+              borderRadius: BorderRadius.circular(22),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.20),
+                  blurRadius: 15,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // ----------------------------------------------------------------
+                // HEADER
+                // ----------------------------------------------------------------
+
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    20,
+                    18,
+                    10,
+                    12,
+                  ),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Terms & Conditions',
+                          style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF292929),
+                            fontFamily: 'serif',
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                        },
+                        icon: const Icon(
+                          Icons.close,
+                          size: 24,
+                          color: Color(0xFF555555),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Divider(
+                  height: 1,
+                  color: Color(0xFFD0D0D0),
+                ),
+
+                // ----------------------------------------------------------------
+                // TERMS CONTENT
+                // ----------------------------------------------------------------
+
+                const Flexible(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      18,
+                      20,
+                      10,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _TermsSection(
+                          title: '1. Acceptance of Terms',
+                          text:
+                              'By creating a MedMinder account, you agree to these Terms & Conditions. If you do not agree with these terms, please do not create an account or use the application.',
+                        ),
+                        _TermsSection(
+                          title: '2. Use of MedMinder',
+                          text:
+                              'MedMinder is designed to help users manage and organize their medication-related information and reminders. You agree to use the application only for lawful purposes and in a responsible manner.',
+                        ),
+                        _TermsSection(
+                          title: '3. Medical Information',
+                          text:
+                              'MedMinder is not a replacement for a doctor, pharmacist, or other qualified healthcare professional. Information and reminders provided through the application should not be considered medical advice. Always follow instructions provided by your healthcare professional.',
+                        ),
+                        _TermsSection(
+                          title: '4. Your Account',
+                          text:
+                              'You are responsible for providing accurate information when creating your account and for keeping your account information secure. You are responsible for activity performed through your account.',
+                        ),
+                        _TermsSection(
+                          title: '5. User Information',
+                          text:
+                              'MedMinder may store information that you provide when using the application, such as your name, email address, and information necessary to provide the application services. Your information should be handled according to the application’s privacy practices.',
+                        ),
+                        _TermsSection(
+                          title: '6. Medication Reminders',
+                          text:
+                              'Medication reminders are provided as a convenience. You remain responsible for taking medications according to the instructions given by your healthcare professional. MedMinder should not be relied upon as the sole method for remembering or managing medication.',
+                        ),
+                        _TermsSection(
+                          title: '7. Application Availability',
+                          text:
+                              'We aim to keep MedMinder available and functioning correctly, but we cannot guarantee that the application will always be available, error-free, or uninterrupted.',
+                        ),
+                        _TermsSection(
+                          title: '8. Changes to These Terms',
+                          text:
+                              'These Terms & Conditions may be updated from time to time. Continued use of MedMinder after changes are made means that you accept the updated terms.',
+                        ),
+                        _TermsSection(
+                          title: '9. Contact',
+                          text:
+                              'If you have questions about these Terms & Conditions, please contact the MedMinder support team.',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // ----------------------------------------------------------------
+                // CLOSE BUTTON
+                // ----------------------------------------------------------------
+
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    20,
+                    8,
+                    20,
+                    18,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3D84A8),
+                        foregroundColor: Colors.white,
+                        elevation: 2,
+                        shadowColor: Colors.black.withOpacity(0.20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                      ),
+                      child: const Text(
+                        'Close',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ===========================================================================
   // GOOGLE SIGN UP
   // ===========================================================================
 
@@ -250,6 +438,10 @@ class _SignUpPageState extends State<SignUpPage> {
       if (user == null) {
         throw Exception('Google user was not created.');
       }
+
+      // -----------------------------------------------------------------------
+      // SAVE GOOGLE USER TO FIRESTORE
+      // -----------------------------------------------------------------------
 
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
         {
@@ -554,19 +746,22 @@ class _SignUpPageState extends State<SignUpPage> {
                   // TERMS & CONDITIONS
                   // =================================================================
 
-                  GestureDetector(
-                    onTap: busy
-                        ? null
-                        : () {
-                            setState(() {
-                              agreeTerms = !agreeTerms;
-                            });
-                          },
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Clean blue checkbox
-                        AnimatedContainer(
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // -------------------------------------------------------------
+                      // CHECKBOX
+                      // -------------------------------------------------------------
+
+                      GestureDetector(
+                        onTap: busy
+                            ? null
+                            : () {
+                                setState(() {
+                                  agreeTerms = !agreeTerms;
+                                });
+                              },
+                        child: AnimatedContainer(
                           duration: const Duration(
                             milliseconds: 150,
                           ),
@@ -593,37 +788,41 @@ class _SignUpPageState extends State<SignUpPage> {
                                 )
                               : null,
                         ),
+                      ),
 
-                        const SizedBox(width: 10),
+                      const SizedBox(width: 10),
 
-                        const Expanded(
-                          child: Text.rich(
-                            TextSpan(
-                              style: TextStyle(
-                                fontSize: 14,
-                                height: 1.2,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: 'Agree With ',
-                                  style: TextStyle(
-                                    color: Color(0xFF333333),
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'Terms & Conditions',
-                                  style: TextStyle(
-                                    color: Color(0xFF1239B5),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
+                      // -------------------------------------------------------------
+                      // AGREE WITH TEXT
+                      // -------------------------------------------------------------
+
+                      const Text(
+                        'Agree With ',
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 1.2,
+                          color: Color(0xFF333333),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+
+                      // -------------------------------------------------------------
+                      // TERMS BUTTON
+                      // -------------------------------------------------------------
+
+                      GestureDetector(
+                        onTap: busy ? null : _showTermsAndConditions,
+                        child: const Text(
+                          'Terms & Conditions',
+                          style: TextStyle(
+                            fontSize: 14,
+                            height: 1.2,
+                            color: Color(0xFF1239B5),
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
 
                   SizedBox(
@@ -642,8 +841,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF3D84A8),
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor:
-                            const Color(0xFF2F7FA5).withOpacity(0.55),
+                        disabledBackgroundColor: const Color(
+                          0xFF2F7FA5,
+                        ).withOpacity(0.55),
                         disabledForegroundColor: Colors.white,
                         elevation: 2,
                         shadowColor: Colors.black.withOpacity(0.20),
@@ -795,7 +995,6 @@ class _SignUpPageState extends State<SignUpPage> {
     return Container(
       height: 47,
       decoration: BoxDecoration(
-        // Light blue/gray like the screenshot
         color: const Color(0xFFEAF4F8),
         borderRadius: BorderRadius.circular(11),
         border: Border.all(
@@ -902,6 +1101,51 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// TERMS SECTION WIDGET
+// =============================================================================
+
+class _TermsSection extends StatelessWidget {
+  final String title;
+  final String text;
+
+  const _TermsSection({
+    required this.title,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        bottom: 18,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2B2B2B),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 13.5,
+              height: 1.45,
+              color: Color(0xFF555555),
+            ),
+          ),
+        ],
       ),
     );
   }
