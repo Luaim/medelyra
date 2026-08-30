@@ -9,23 +9,80 @@ class EditPasswordPage extends StatefulWidget {
 }
 
 class _EditPasswordPageState extends State<EditPasswordPage> {
-  final currentController = TextEditingController();
-  final newController = TextEditingController();
-  final confirmController = TextEditingController();
+  // ============================================================
+  // CONTROLLERS
+  // ============================================================
+
+  final TextEditingController currentController = TextEditingController();
+
+  final TextEditingController newController = TextEditingController();
+
+  final TextEditingController confirmController = TextEditingController();
+
+  // ============================================================
+  // VISIBILITY
+  // ============================================================
 
   bool showCurrent = false;
   bool showNew = false;
   bool showConfirm = false;
 
-  bool isLoading = false;
+  // ============================================================
+  // STATE
+  // ============================================================
 
+  bool isLoading = false;
   String? error;
+
+  // ============================================================
+  // FIREBASE
+  // ============================================================
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // ============================================================
+  // AUTHENTICATION CHECK
+  // ============================================================
+
+  /// Returns true when this Firebase account has a password
+  /// authentication provider.
+  ///
+  /// Google-only accounts will return false.
+  bool get hasPasswordProvider {
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      return false;
+    }
+
+    return user.providerData.any(
+      (provider) => provider.providerId == 'password',
+    );
+  }
+
+  /// Returns true when the account is using Google.
+  bool get isGoogleAccount {
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      return false;
+    }
+
+    return user.providerData.any(
+      (provider) => provider.providerId == 'google.com',
+    );
+  }
+
+  // ============================================================
+  // DISPOSE
+  // ============================================================
 
   @override
   void dispose() {
     currentController.dispose();
     newController.dispose();
     confirmController.dispose();
+
     super.dispose();
   }
 
@@ -36,9 +93,41 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
   Future<void> _save() async {
     if (isLoading) return;
 
-    final currentPassword = currentController.text.trim();
-    final newPassword = newController.text.trim();
-    final confirmPassword = confirmController.text.trim();
+    final user = _auth.currentUser;
+
+    // ------------------------------------------------------------
+    // CHECK USER
+    // ------------------------------------------------------------
+
+    if (user == null) {
+      setState(() {
+        error = 'Your session has expired. Please sign in again.';
+      });
+      return;
+    }
+
+    // ------------------------------------------------------------
+    // GOOGLE / NON-PASSWORD ACCOUNT
+    // ------------------------------------------------------------
+
+    if (!hasPasswordProvider) {
+      setState(() {
+        error = isGoogleAccount
+            ? 'This account uses Google Sign-In. Your password is managed by Google.'
+            : 'This account does not have a password that can be changed here.';
+      });
+      return;
+    }
+
+    // ------------------------------------------------------------
+    // GET VALUES
+    // ------------------------------------------------------------
+
+    // Do NOT trim passwords.
+    // Spaces can technically be part of a password.
+    final currentPassword = currentController.text;
+    final newPassword = newController.text;
+    final confirmPassword = confirmController.text;
 
     // ------------------------------------------------------------
     // VALIDATION
@@ -86,21 +175,16 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      setState(() {
-        error = 'Your session has expired. Please sign in again.';
-      });
-      return;
-    }
-
     if (user.email == null || user.email!.isEmpty) {
       setState(() {
-        error = 'Unable to update your password for this account.';
+        error = 'Unable to update the password for this account.';
       });
       return;
     }
+
+    // ------------------------------------------------------------
+    // START LOADING
+    // ------------------------------------------------------------
 
     setState(() {
       isLoading = true;
@@ -127,13 +211,17 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
 
       if (!mounted) return;
 
-      // Clear fields after successful update.
+      // ----------------------------------------------------------
+      // CLEAR FIELDS
+      // ----------------------------------------------------------
+
       currentController.clear();
       newController.clear();
       confirmController.clear();
 
       setState(() {
         isLoading = false;
+        error = null;
       });
 
       // ----------------------------------------------------------
@@ -152,8 +240,10 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
           ),
         );
 
-      // Give the user a moment to see the success message,
-      // then return to Settings.
+      // ----------------------------------------------------------
+      // RETURN TO SETTINGS
+      // ----------------------------------------------------------
+
       await Future.delayed(
         const Duration(milliseconds: 700),
       );
@@ -192,6 +282,10 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
           message = 'This account has been disabled.';
           break;
 
+        case 'user-not-found':
+          message = 'Your account could not be found. Please sign in again.';
+          break;
+
         default:
           message = e.message ?? 'Unable to update your password.';
       }
@@ -201,6 +295,8 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
         error = message;
       });
     } catch (e) {
+      debugPrint('PASSWORD UPDATE ERROR: $e');
+
       if (!mounted) return;
 
       setState(() {
@@ -218,161 +314,262 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
+    final googleOnlyAccount = isGoogleAccount && !hasPasswordProvider;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
+
+      // ==========================================================
+      // APP BAR
+      // ==========================================================
+
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF222222),
+        elevation: 0,
+        scrolledUnderElevation: 0,
         title: const Text(
           'Change Password',
           style: TextStyle(
-            fontWeight: FontWeight.w600,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF222222),
           ),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
         centerTitle: false,
       ),
+
+      // ==========================================================
+      // BODY
+      // ==========================================================
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-            horizontal: width * 0.05,
+            horizontal: width * 0.045,
+            vertical: 10,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-
-              // ==================================================
-              // TITLE
-              // ==================================================
-
-              const Text(
-                'Update your password',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 430,
               ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
 
-              const SizedBox(height: 6),
+                  // =================================================
+                  // HEADER
+                  // =================================================
 
-              const Text(
-                'Make sure your new password is secure',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ==================================================
-              // CURRENT PASSWORD
-              // ==================================================
-
-              _passwordField(
-                controller: currentController,
-                hint: 'Current Password',
-                show: showCurrent,
-                toggle: () {
-                  setState(() {
-                    showCurrent = !showCurrent;
-                  });
-                },
-              ),
-
-              // ==================================================
-              // NEW PASSWORD
-              // ==================================================
-
-              _passwordField(
-                controller: newController,
-                hint: 'New Password',
-                show: showNew,
-                toggle: () {
-                  setState(() {
-                    showNew = !showNew;
-                  });
-                },
-              ),
-
-              // ==================================================
-              // CONFIRM PASSWORD
-              // ==================================================
-
-              _passwordField(
-                controller: confirmController,
-                hint: 'Confirm New Password',
-                show: showConfirm,
-                toggle: () {
-                  setState(() {
-                    showConfirm = !showConfirm;
-                  });
-                },
-              ),
-
-              // ==================================================
-              // ERROR
-              // ==================================================
-
-              if (error != null) ...[
-                const SizedBox(height: 4),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
+                  const Text(
+                    'Update your password',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF292929),
+                    ),
                   ),
-                  child: Text(
-                    error!,
+
+                  const SizedBox(height: 5),
+
+                  Text(
+                    googleOnlyAccount
+                        ? 'Your account uses Google Sign-In'
+                        : 'Make sure your new password is secure',
                     style: const TextStyle(
-                      color: Colors.red,
                       fontSize: 14,
+                      color: Color(0xFF888888),
                     ),
                   ),
-                ),
-              ],
 
-              const SizedBox(height: 30),
+                  const SizedBox(height: 20),
 
-              // ==================================================
-              // UPDATE BUTTON
-              // ==================================================
+                  // =================================================
+                  // GOOGLE ACCOUNT MESSAGE
+                  // =================================================
 
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : _save,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3D84A8),
-                    disabledBackgroundColor:
-                        const Color(0xFF3D84A8).withOpacity(0.6),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: isLoading
-                      ? const SizedBox(
-                          width: 23,
-                          height: 23,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: Colors.white,
+                  if (googleOnlyAccount) ...[
+                    _GoogleAccountCard(),
+                    const SizedBox(height: 22),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF3D84A8),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
                           ),
-                        )
-                      : const Text(
-                          'Update Password',
+                        ),
+                        child: const Text(
+                          'Back to Settings',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                ),
-              ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ]
 
-              const SizedBox(height: 20),
-            ],
+                  // =================================================
+                  // NORMAL PASSWORD ACCOUNT
+                  // =================================================
+
+                  else ...[
+                    // CURRENT PASSWORD
+
+                    _passwordField(
+                      controller: currentController,
+                      hint: 'Current Password',
+                      show: showCurrent,
+                      toggle: () {
+                        setState(() {
+                          showCurrent = !showCurrent;
+                          error = null;
+                        });
+                      },
+                    ),
+
+                    // NEW PASSWORD
+
+                    _passwordField(
+                      controller: newController,
+                      hint: 'New Password',
+                      show: showNew,
+                      toggle: () {
+                        setState(() {
+                          showNew = !showNew;
+                          error = null;
+                        });
+                      },
+                    ),
+
+                    // CONFIRM PASSWORD
+
+                    _passwordField(
+                      controller: confirmController,
+                      hint: 'Confirm New Password',
+                      show: showConfirm,
+                      toggle: () {
+                        setState(() {
+                          showConfirm = !showConfirm;
+                          error = null;
+                        });
+                      },
+                    ),
+
+                    // =================================================
+                    // PASSWORD REQUIREMENT
+                    // =================================================
+
+                    const Padding(
+                      padding: EdgeInsets.only(
+                        left: 4,
+                        top: 0,
+                        bottom: 4,
+                      ),
+                      child: Text(
+                        'Password must contain at least 6 characters.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF888888),
+                        ),
+                      ),
+                    ),
+
+                    // =================================================
+                    // ERROR
+                    // =================================================
+
+                    if (error != null) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFEEEE),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              size: 19,
+                              color: Color(0xFFC94C4C),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                error!,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  height: 1.35,
+                                  color: Color(0xFF9B3A3A),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 28),
+
+                    // =================================================
+                    // UPDATE BUTTON
+                    // =================================================
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : _save,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF3D84A8),
+                          foregroundColor: Colors.white,
+                          disabledBackgroundColor: const Color(0xFF9BBFCC),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 23,
+                                height: 23,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Update Password',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -390,16 +587,19 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
     required VoidCallback toggle,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Container(
-        height: 50,
-        padding: const EdgeInsets.only(left: 12),
+        height: 52,
+        padding: const EdgeInsets.only(left: 14),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(0xFFE7E4E7),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withOpacity(0.035),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -410,21 +610,98 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
           obscureText: !show,
           enabled: !isLoading,
           textInputAction: TextInputAction.next,
+          onChanged: (_) {
+            if (error != null) {
+              setState(() {
+                error = null;
+              });
+            }
+          },
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(
-              color: Colors.grey,
+              fontSize: 16,
+              color: Color(0xFFA5A3A5),
+              fontWeight: FontWeight.w500,
             ),
             border: InputBorder.none,
+            isDense: true,
             suffixIcon: IconButton(
-              icon: Icon(
-                show ? Icons.visibility : Icons.visibility_off,
-                color: Colors.grey,
-              ),
               onPressed: isLoading ? null : toggle,
+              icon: Icon(
+                show
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
+                color: const Color(0xFF9B999B),
+                size: 22,
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ===========================================================================
+// GOOGLE ACCOUNT INFORMATION CARD
+// ===========================================================================
+
+class _GoogleAccountCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEAF6FA),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: const Color(0xFFD4EAF0),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.account_circle_outlined,
+              color: Color(0xFF3D84A8),
+              size: 25,
+            ),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Google Sign-In account',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF303030),
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  'Your password is managed by Google, so it cannot be changed from MedMinder.',
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: Color(0xFF666666),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
