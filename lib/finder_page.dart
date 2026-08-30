@@ -395,7 +395,6 @@ class _FinderPageState extends State<FinderPage> {
               PlaceField.OpeningHours,
               PlaceField.PhoneNumber,
               PlaceField.Rating,
-              PlaceField.Types,
               PlaceField.UserRatingsTotal,
               PlaceField.WebsiteUri,
             ],
@@ -652,7 +651,6 @@ class _FinderPageState extends State<FinderPage> {
               PlaceField.OpeningHours,
               PlaceField.PhoneNumber,
               PlaceField.Rating,
-              PlaceField.Types,
               PlaceField.UserRatingsTotal,
               PlaceField.WebsiteUri,
             ],
@@ -856,13 +854,6 @@ class _FinderPageState extends State<FinderPage> {
       return;
     }
 
-    // Correct Google Maps URL.
-    //
-    // The old code accidentally contained Markdown:
-    //
-    // [https://www.google.com/maps/...](https://...)
-    //
-    // That is NOT a valid URL.
     final String mapsUrl = 'https://www.google.com/maps/dir/?api=1'
         '&origin=${_currentPosition?.latitude},${_currentPosition?.longitude}'
         '&destination=${destination.lat},${destination.lng}';
