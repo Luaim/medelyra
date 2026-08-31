@@ -23,6 +23,69 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
   List<Map<String, dynamic>> reminders = [];
 
+  // ============================================================
+  // MEDICINE OPTIONS
+  // ============================================================
+
+  final List<Map<String, dynamic>> medicineTypes = [
+    {
+      'label': 'Pill',
+      'icon': Icons.medication_outlined,
+    },
+    {
+      'label': 'Injection',
+      'icon': Icons.vaccines_outlined,
+    },
+    {
+      'label': 'Cream',
+      'icon': Icons.spa_outlined,
+    },
+    {
+      'label': 'Drop',
+      'icon': Icons.opacity_outlined,
+    },
+    {
+      'label': 'Inhaler',
+      'icon': Icons.air_outlined,
+    },
+    {
+      'label': 'Bandage',
+      'icon': Icons.healing_outlined,
+    },
+    {
+      'label': 'Syrup',
+      'icon': Icons.local_drink_outlined,
+    },
+    {
+      'label': 'Other',
+      'icon': Icons.medical_information_outlined,
+    },
+  ];
+
+  final List<String> frequencyOptions = [
+    'Once Daily',
+    'Twice Daily',
+    '3 Times Daily',
+    '4 Times Daily',
+    'Every 8 Hours',
+    'Every 12 Hours',
+    'As Needed',
+    'Custom Schedule',
+  ];
+
+  final List<String> durationOptions = [
+    '1 Day',
+    '3 Days',
+    '7 Days',
+    '14 Days',
+    '1 Month',
+    'Ongoing',
+  ];
+
+  // ============================================================
+  // INIT
+  // ============================================================
+
   @override
   void initState() {
     super.initState();
@@ -37,10 +100,13 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     final user = _auth.currentUser;
 
     if (user == null) {
+      if (!mounted) return;
+
       setState(() {
         _loading = false;
         _errorMessage = 'Please sign in again.';
       });
+
       return;
     }
 
@@ -57,9 +123,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       final List<Map<String, dynamic>> loaded = [];
 
-      // ----------------------------------------------------------
+      // ==========================================================
       // MEDICINES
-      // ----------------------------------------------------------
+      // ==========================================================
 
       for (final doc in medicineSnapshot.docs) {
         final data = doc.data();
@@ -101,9 +167,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         });
       }
 
-      // ----------------------------------------------------------
+      // ==========================================================
       // APPOINTMENTS
-      // ----------------------------------------------------------
+      // ==========================================================
 
       for (final doc in appointmentSnapshot.docs) {
         final data = doc.data();
@@ -182,6 +248,152 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   }
 
   // ============================================================
+  // FORMAT TIME OF DAY
+  // ============================================================
+
+  String _formatTimeOfDay(TimeOfDay time) {
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
+
+    final minute = time.minute.toString().padLeft(2, '0');
+
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+
+    return '$hour:$minute $period';
+  }
+
+  // ============================================================
+  // PARSE STORED TIME
+  // ============================================================
+
+  TimeOfDay _parseStoredTime(String value) {
+    final parts = value.split(':');
+
+    if (parts.length != 2) {
+      return TimeOfDay.now();
+    }
+
+    final hour = int.tryParse(parts[0]) ?? 0;
+    final minute = int.tryParse(parts[1]) ?? 0;
+
+    return TimeOfDay(
+      hour: hour,
+      minute: minute,
+    );
+  }
+
+  // ============================================================
+  // TIME DATABASE FORMAT
+  // ============================================================
+
+  String _formatTimeForDatabase(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+
+    return '$hour:$minute';
+  }
+
+  // ============================================================
+  // ADD HOURS
+  // ============================================================
+
+  TimeOfDay _addHours(TimeOfDay time, int hours) {
+    final totalMinutes = time.hour * 60 + time.minute + hours * 60;
+
+    final normalizedMinutes = totalMinutes % (24 * 60);
+
+    return TimeOfDay(
+      hour: normalizedMinutes ~/ 60,
+      minute: normalizedMinutes % 60,
+    );
+  }
+
+  // ============================================================
+  // GET TIMES FOR FREQUENCY
+  // ============================================================
+
+  List<TimeOfDay> _timesForFrequency(
+    String frequency,
+    TimeOfDay startingTime,
+  ) {
+    switch (frequency) {
+      case 'Once Daily':
+        return [startingTime];
+
+      case 'Twice Daily':
+        return [
+          const TimeOfDay(hour: 8, minute: 0),
+          const TimeOfDay(hour: 20, minute: 0),
+        ];
+
+      case '3 Times Daily':
+        return [
+          const TimeOfDay(hour: 8, minute: 0),
+          const TimeOfDay(hour: 14, minute: 0),
+          const TimeOfDay(hour: 20, minute: 0),
+        ];
+
+      case '4 Times Daily':
+        return [
+          const TimeOfDay(hour: 8, minute: 0),
+          const TimeOfDay(hour: 12, minute: 0),
+          const TimeOfDay(hour: 16, minute: 0),
+          const TimeOfDay(hour: 20, minute: 0),
+        ];
+
+      case 'Every 8 Hours':
+        return [
+          startingTime,
+          _addHours(startingTime, 8),
+          _addHours(startingTime, 16),
+        ];
+
+      case 'Every 12 Hours':
+        return [
+          startingTime,
+          _addHours(startingTime, 12),
+        ];
+
+      case 'As Needed':
+        return [];
+
+      case 'Custom Schedule':
+        return [startingTime];
+
+      default:
+        return [startingTime];
+    }
+  }
+
+  // ============================================================
+  // DURATION
+  // ============================================================
+
+  int? _durationInDays(String duration) {
+    switch (duration) {
+      case '1 Day':
+        return 1;
+
+      case '3 Days':
+        return 3;
+
+      case '7 Days':
+        return 7;
+
+      case '14 Days':
+        return 14;
+
+      case '1 Month':
+        return 30;
+
+      case 'Ongoing':
+        return null;
+
+      default:
+        return 7;
+    }
+  }
+
+  // ============================================================
   // TOGGLE ACTIVE
   // ============================================================
 
@@ -206,12 +418,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         final notificationId = id.hashCode.abs();
 
         if (!value) {
-          // User turned the appointment reminder OFF.
           await NotificationService.instance.cancel(
             notificationId,
           );
         } else {
-          // User turned it back ON.
           final data = Map<String, dynamic>.from(item['data']);
 
           DateTime? appointmentTime;
@@ -262,7 +472,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Delete Reminder'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+          title: const Text(
+            'Delete Reminder',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           content: Text(
             'Are you sure you want to delete "${item['title']}"?',
           ),
@@ -275,7 +493,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
               onPressed: () => Navigator.pop(dialogContext, true),
               child: const Text(
                 'Delete',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(
+                  color: Colors.red,
+                ),
               ),
             ),
           ],
@@ -286,7 +506,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     if (confirmed != true) return;
 
     try {
-      // Cancel the local appointment notification first.
+      // Cancel appointment notification.
       if (item['collection'] == 'appointments') {
         await NotificationService.instance.cancelAppointmentNotification(
           appointmentId: item['id'],
@@ -320,10 +540,12 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   }
 
   // ============================================================
-  // EDIT
+  // EDIT ROUTER
   // ============================================================
 
-  Future<void> _editReminder(Map<String, dynamic> item) async {
+  Future<void> _editReminder(
+    Map<String, dynamic> item,
+  ) async {
     if (item['collection'] == 'medicines') {
       await _editMedicine(item);
     } else {
@@ -335,7 +557,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   // EDIT MEDICINE
   // ============================================================
 
-  Future<void> _editMedicine(Map<String, dynamic> item) async {
+  Future<void> _editMedicine(
+    Map<String, dynamic> item,
+  ) async {
     final data = Map<String, dynamic>.from(item['data']);
 
     final nameController = TextEditingController(
@@ -350,53 +574,395 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       text: (data['instructions'] ?? '').toString(),
     );
 
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Edit Medicine'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _dialogField(
-                  controller: nameController,
-                  label: 'Medicine Name',
-                ),
-                const SizedBox(height: 12),
-                _dialogField(
-                  controller: doseController,
-                  label: 'Dose',
-                ),
-                const SizedBox(height: 12),
-                _dialogField(
-                  controller: instructionsController,
-                  label: 'Instructions',
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (nameController.text.trim().isEmpty) {
-                  return;
-                }
+    String medicineType = (data['medicineType'] ?? 'Pill').toString();
 
-                Navigator.pop(dialogContext, true);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryBlue,
-                foregroundColor: Colors.white,
+    if (!medicineTypes.any(
+      (item) => item['label'] == medicineType,
+    )) {
+      medicineType = 'Other';
+    }
+
+    String frequency = (data['frequency'] ?? 'Once Daily').toString();
+
+    if (!frequencyOptions.contains(frequency)) {
+      frequency = 'Once Daily';
+    }
+
+    String duration = (data['duration'] ?? '7 Days').toString();
+
+    if (!durationOptions.contains(duration)) {
+      duration = '7 Days';
+    }
+
+    DateTime startDate = DateTime.now();
+
+    if (data['startDate'] is Timestamp) {
+      startDate = (data['startDate'] as Timestamp).toDate();
+    }
+
+    List<TimeOfDay> times = [];
+
+    if (data['times'] is List) {
+      final storedTimes = List<dynamic>.from(data['times']);
+
+      times = storedTimes
+          .map(
+            (e) => _parseStoredTime(e.toString()),
+          )
+          .toList();
+    }
+
+    if (times.isEmpty && frequency != 'As Needed') {
+      times = [TimeOfDay.now()];
+    }
+
+    final bool? result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (
+            context,
+            setDialogState,
+          ) {
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 24,
               ),
-              child: const Text('Save'),
-            ),
-          ],
+              child: Container(
+                constraints: const BoxConstraints(
+                  maxWidth: 430,
+                  maxHeight: 720,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9F7FC),
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                child: Column(
+                  children: [
+                    // ==================================================
+                    // HEADER
+                    // ==================================================
+
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        22,
+                        20,
+                        14,
+                        14,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: primaryBlue.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Icon(
+                              Icons.medication_outlined,
+                              color: primaryBlue,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              'Edit Medicine',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(
+                              dialogContext,
+                              false,
+                            ),
+                            icon: const Icon(
+                              Icons.close,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Divider(
+                      height: 1,
+                      color: Colors.grey.shade200,
+                    ),
+
+                    // ==================================================
+                    // CONTENT
+                    // ==================================================
+
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(
+                          22,
+                          18,
+                          22,
+                          20,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _dialogSectionTitle(
+                              'Basic Information',
+                            ),
+                            const SizedBox(height: 12),
+                            _modernTextField(
+                              controller: nameController,
+                              label: 'Medicine Name',
+                              hint: 'Enter medicine name',
+                              icon: Icons.medication_outlined,
+                            ),
+                            const SizedBox(height: 14),
+                            _modernDropdown(
+                              label: 'Medicine Type',
+                              icon: Icons.category_outlined,
+                              value: medicineType,
+                              items: medicineTypes
+                                  .map(
+                                    (e) => e['label'].toString(),
+                                  )
+                                  .toList(),
+                              onChanged: (value) {
+                                setDialogState(() {
+                                  medicineType = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 14),
+                            _modernTextField(
+                              controller: doseController,
+                              label: 'Dose / Amount',
+                              hint: 'Example: 1 tablet, 5 ml',
+                              icon: Icons.scale_outlined,
+                            ),
+                            const SizedBox(height: 22),
+                            _dialogSectionTitle(
+                              'Schedule',
+                            ),
+                            const SizedBox(height: 12),
+                            _modernDropdown(
+                              label: 'Frequency',
+                              icon: Icons.repeat,
+                              value: frequency,
+                              items: frequencyOptions,
+                              onChanged: (value) {
+                                setDialogState(() {
+                                  frequency = value;
+
+                                  if (value == 'As Needed') {
+                                    times = [];
+                                  } else {
+                                    final startingTime = times.isNotEmpty
+                                        ? times.first
+                                        : TimeOfDay.now();
+
+                                    times = _timesForFrequency(
+                                      value,
+                                      startingTime,
+                                    );
+                                  }
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 14),
+                            if (frequency != 'As Needed')
+                              _buildMedicineTimesEditor(
+                                context: context,
+                                frequency: frequency,
+                                times: times,
+                                setDialogState: setDialogState,
+                              )
+                            else
+                              _editInfoBox(
+                                'This medicine has no fixed reminder time.',
+                                icon: Icons.info_outline,
+                              ),
+                            const SizedBox(height: 14),
+                            _modernDateField(
+                              label: 'Start Date',
+                              date: startDate,
+                              onTap: () async {
+                                final now = DateTime.now();
+
+                                final firstDate = DateTime(
+                                  now.year,
+                                  now.month,
+                                  now.day,
+                                );
+
+                                final initialDate = startDate.isBefore(
+                                  firstDate,
+                                )
+                                    ? firstDate
+                                    : startDate;
+
+                                final picked = await showDatePicker(
+                                  context: dialogContext,
+                                  initialDate: initialDate,
+                                  firstDate: firstDate,
+                                  lastDate: DateTime(2035),
+                                );
+
+                                if (picked != null) {
+                                  setDialogState(() {
+                                    startDate = picked;
+                                  });
+                                }
+                              },
+                            ),
+                            const SizedBox(height: 14),
+                            _modernDropdown(
+                              label: 'Duration',
+                              icon: Icons.timelapse_outlined,
+                              value: duration,
+                              items: durationOptions,
+                              onChanged: (value) {
+                                setDialogState(() {
+                                  duration = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 22),
+                            _dialogSectionTitle(
+                              'Additional Information',
+                            ),
+                            const SizedBox(height: 12),
+                            _modernTextField(
+                              controller: instructionsController,
+                              label: 'Instructions (Optional)',
+                              hint: 'Example: Take after food',
+                              icon: Icons.notes_outlined,
+                              maxLines: 3,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // ==================================================
+                    // BOTTOM ACTIONS
+                    // ==================================================
+
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(
+                        22,
+                        12,
+                        22,
+                        18,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9F7FC),
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(28),
+                          bottomRight: Radius.circular(28),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 10,
+                            offset: const Offset(0, -3),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(
+                                dialogContext,
+                                false,
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size(
+                                  0,
+                                  50,
+                                ),
+                                side: BorderSide(
+                                  color: Colors.grey.shade300,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
+                                ),
+                              ),
+                              child: const Text(
+                                'Cancel',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (nameController.text.trim().isEmpty) {
+                                  _dialogError(
+                                    dialogContext,
+                                    'Please enter the medicine name.',
+                                  );
+                                  return;
+                                }
+
+                                if (doseController.text.trim().isEmpty) {
+                                  _dialogError(
+                                    dialogContext,
+                                    'Please enter the dose or amount.',
+                                  );
+                                  return;
+                                }
+
+                                if (frequency == 'Custom Schedule' &&
+                                    times.isEmpty) {
+                                  _dialogError(
+                                    dialogContext,
+                                    'Please add at least one reminder time.',
+                                  );
+                                  return;
+                                }
+
+                                Navigator.pop(
+                                  dialogContext,
+                                  true,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryBlue,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(
+                                  0,
+                                  50,
+                                ),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
+                                ),
+                              ),
+                              child: const Text(
+                                'Save Changes',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -409,12 +975,70 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     }
 
     try {
+      final finalTimes = frequency == 'As Needed' ? <TimeOfDay>[] : times;
+
+      final durationDays = _durationInDays(duration);
+
+      DateTime? endDate;
+
+      if (durationDays != null) {
+        endDate = DateTime(
+          startDate.year,
+          startDate.month,
+          startDate.day,
+        ).add(
+          Duration(days: durationDays - 1),
+        );
+      }
+
+      // ----------------------------------------------------------
+      // Cancel old medicine notifications.
+      // ----------------------------------------------------------
+
+      await _cancelMedicineNotifications(
+        medicineId: item['id'],
+        data: data,
+      );
+
+      // ----------------------------------------------------------
+      // Update Firestore.
+      // ----------------------------------------------------------
+
       await _firestore.collection('medicines').doc(item['id']).update({
         'medicineName': nameController.text.trim(),
+        'medicineType': medicineType,
         'dose': doseController.text.trim(),
         'instructions': instructionsController.text.trim(),
+        'frequency': frequency,
+        'times': finalTimes.map(_formatTimeForDatabase).toList(),
+        'duration': duration,
+        'durationDays': durationDays,
+        'startDate': Timestamp.fromDate(
+          DateTime(
+            startDate.year,
+            startDate.month,
+            startDate.day,
+          ),
+        ),
+        'endDate': endDate == null ? null : Timestamp.fromDate(endDate),
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+      // ----------------------------------------------------------
+      // Schedule new notifications if active.
+      // ----------------------------------------------------------
+
+      if (item['active'] == true) {
+        await NotificationService.instance.requestPermission();
+
+        await _scheduleMedicineNotifications(
+          medicineId: item['id'],
+          medicineName: nameController.text.trim(),
+          times: finalTimes,
+          durationDays: durationDays,
+          startDate: startDate,
+        );
+      }
 
       nameController.dispose();
       doseController.dispose();
@@ -426,7 +1050,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Medicine updated.'),
+          content: Text(
+            'Medicine updated successfully.',
+          ),
         ),
       );
     } catch (e) {
@@ -438,11 +1064,391 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Could not update medicine.'),
+          content: Text(
+            'Could not update medicine.',
+          ),
         ),
       );
 
-      debugPrint('Edit medicine error: $e');
+      debugPrint(
+        'Edit medicine error: $e',
+      );
+    }
+  }
+
+  // ============================================================
+  // MEDICINE TIME EDITOR
+  // ============================================================
+
+  Widget _buildMedicineTimesEditor({
+    required BuildContext context,
+    required String frequency,
+    required List<TimeOfDay> times,
+    required StateSetter setDialogState,
+  }) {
+    if (frequency == 'Every 8 Hours' || frequency == 'Every 12 Hours') {
+      final startingTime = times.isNotEmpty ? times.first : TimeOfDay.now();
+
+      final previewTimes = _timesForFrequency(
+        frequency,
+        startingTime,
+      );
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Reminder Time',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 7),
+          _timeSelector(
+            context: context,
+            time: startingTime,
+            onTap: () async {
+              final picked = await showTimePicker(
+                context: context,
+                initialTime: startingTime,
+              );
+
+              if (picked != null) {
+                setDialogState(() {
+                  times = _timesForFrequency(
+                    frequency,
+                    picked,
+                  );
+                });
+              }
+            },
+          ),
+          const SizedBox(height: 10),
+          _schedulePreviewSmall(
+            previewTimes,
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Reminder Times',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 7),
+        ...List.generate(
+          times.length,
+          (index) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 9),
+              child: _timeSelector(
+                context: context,
+                time: times[index],
+                showDelete: frequency == 'Custom Schedule',
+                onDelete: () {
+                  if (times.length <= 1) {
+                    return;
+                  }
+
+                  setDialogState(() {
+                    times.removeAt(index);
+                  });
+                },
+                onTap: () async {
+                  final picked = await showTimePicker(
+                    context: context,
+                    initialTime: times[index],
+                  );
+
+                  if (picked != null) {
+                    setDialogState(() {
+                      times[index] = picked;
+                    });
+                  }
+                },
+              ),
+            );
+          },
+        ),
+        if (frequency == 'Custom Schedule')
+          SizedBox(
+            width: double.infinity,
+            height: 44,
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                final picked = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay.now(),
+                );
+
+                if (picked != null) {
+                  setDialogState(() {
+                    times.add(picked);
+                  });
+                }
+              },
+              icon: Icon(
+                Icons.add,
+                color: primaryBlue,
+                size: 19,
+              ),
+              label: Text(
+                'Add Another Time',
+                style: TextStyle(
+                  color: primaryBlue,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: primaryBlue,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  // ============================================================
+  // TIME SELECTOR
+  // ============================================================
+
+  Widget _timeSelector({
+    required BuildContext context,
+    required TimeOfDay time,
+    required VoidCallback onTap,
+    bool showDelete = false,
+    VoidCallback? onDelete,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(13),
+      child: Container(
+        height: 50,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 13,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(
+            color: Colors.grey.shade300,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.access_time,
+              color: primaryBlue,
+              size: 20,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                _formatTimeOfDay(time),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            if (showDelete)
+              IconButton(
+                onPressed: onDelete,
+                icon: const Icon(
+                  Icons.close,
+                  size: 19,
+                  color: Colors.grey,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              )
+            else
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey.shade500,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // SCHEDULE PREVIEW
+  // ============================================================
+
+  Widget _schedulePreviewSmall(
+    List<TimeOfDay> times,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: primaryBlue.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.schedule_outlined,
+            color: primaryBlue,
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Wrap(
+              spacing: 7,
+              runSpacing: 7,
+              children: times.map(
+                (time) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(
+                        9,
+                      ),
+                    ),
+                    child: Text(
+                      _formatTimeOfDay(time),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                },
+              ).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // CANCEL MEDICINE NOTIFICATIONS
+  // ============================================================
+
+  Future<void> _cancelMedicineNotifications({
+    required String medicineId,
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      DateTime startDate = DateTime.now();
+
+      if (data['startDate'] is Timestamp) {
+        startDate = (data['startDate'] as Timestamp).toDate();
+      }
+
+      int daysToCancel = 30;
+
+      if (data['durationDays'] is int) {
+        daysToCancel = data['durationDays'] as int;
+      }
+
+      if (daysToCancel > 365) {
+        daysToCancel = 365;
+      }
+
+      final List<dynamic> oldTimes =
+          data['times'] is List ? List<dynamic>.from(data['times']) : [];
+
+      for (int day = 0; day < daysToCancel; day++) {
+        final date = DateTime(
+          startDate.year,
+          startDate.month,
+          startDate.day,
+        ).add(
+          Duration(days: day),
+        );
+
+        for (int timeIndex = 0; timeIndex < oldTimes.length; timeIndex++) {
+          final notificationId =
+              '${medicineId}_${date.year}_${date.month}_${date.day}_$timeIndex'
+                      .hashCode &
+                  0x7fffffff;
+
+          await NotificationService.instance.cancel(notificationId);
+        }
+      }
+    } catch (e) {
+      debugPrint(
+        'Cancel medicine notifications error: $e',
+      );
+    }
+  }
+
+  // ============================================================
+  // SCHEDULE MEDICINE NOTIFICATIONS
+  // ============================================================
+
+  Future<void> _scheduleMedicineNotifications({
+    required String medicineId,
+    required String medicineName,
+    required List<TimeOfDay> times,
+    required int? durationDays,
+    required DateTime startDate,
+  }) async {
+    if (times.isEmpty) {
+      return;
+    }
+
+    final daysToSchedule = durationDays ?? 30;
+
+    for (int day = 0; day < daysToSchedule; day++) {
+      final date = DateTime(
+        startDate.year,
+        startDate.month,
+        startDate.day,
+      ).add(
+        Duration(days: day),
+      );
+
+      for (int timeIndex = 0; timeIndex < times.length; timeIndex++) {
+        final time = times[timeIndex];
+
+        final scheduledTime = DateTime(
+          date.year,
+          date.month,
+          date.day,
+          time.hour,
+          time.minute,
+        );
+
+        if (scheduledTime.isBefore(
+          DateTime.now(),
+        )) {
+          continue;
+        }
+
+        final notificationId =
+            '${medicineId}_${date.year}_${date.month}_${date.day}_$timeIndex'
+                    .hashCode &
+                0x7fffffff;
+
+        await NotificationService.instance.scheduleMedicineNotification(
+          id: notificationId,
+          medicineName: medicineName,
+          scheduledTime: scheduledTime,
+        );
+      }
     }
   }
 
@@ -450,7 +1456,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   // EDIT APPOINTMENT
   // ============================================================
 
-  Future<void> _editAppointment(Map<String, dynamic> item) async {
+  Future<void> _editAppointment(
+    Map<String, dynamic> item,
+  ) async {
     final data = Map<String, dynamic>.from(item['data']);
 
     final hospitalController = TextEditingController(
@@ -463,125 +1471,363 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
     String appointmentType = (data['appointmentType'] ?? 'General').toString();
 
+    if (![
+      'General',
+      'Eye',
+      'Dental',
+      'Heart',
+    ].contains(appointmentType)) {
+      appointmentType = 'General';
+    }
+
     DateTime appointmentDate = DateTime.now();
 
     if (data['dateTime'] is Timestamp) {
       appointmentDate = (data['dateTime'] as Timestamp).toDate();
     }
 
-    final result = await showDialog<bool>(
+    final bool? result = await showDialog<bool>(
       context: context,
+      barrierDismissible: true,
       builder: (dialogContext) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Text('Edit Appointment'),
-              content: SingleChildScrollView(
+          builder: (
+            context,
+            setDialogState,
+          ) {
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 24,
+              ),
+              child: Container(
+                constraints: const BoxConstraints(
+                  maxWidth: 430,
+                  maxHeight: 650,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9F7FC),
+                  borderRadius: BorderRadius.circular(28),
+                ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    DropdownButtonFormField<String>(
-                      value: appointmentType,
-                      decoration: const InputDecoration(
-                        labelText: 'Appointment Type',
-                        border: OutlineInputBorder(),
+                    // ==================================================
+                    // HEADER
+                    // ==================================================
+
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        22,
+                        20,
+                        14,
+                        14,
                       ),
-                      items: const [
-                        'General',
-                        'Eye',
-                        'Dental',
-                        'Heart',
-                      ]
-                          .map(
-                            (type) => DropdownMenuItem(
-                              value: type,
-                              child: Text(type),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: primaryBlue.withOpacity(
+                                0.12,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                14,
+                              ),
                             ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setDialogState(() {
-                            appointmentType = value;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    _dialogField(
-                      controller: hospitalController,
-                      label: 'Hospital',
-                    ),
-                    const SizedBox(height: 12),
-                    _dialogField(
-                      controller: reasonController,
-                      label: 'Reason / Notes',
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 12),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(
-                        Icons.calendar_today_outlined,
-                        color: primaryBlue,
-                      ),
-                      title: const Text('Date & Time'),
-                      subtitle: Text(
-                        '${appointmentDate.day}/${appointmentDate.month}/${appointmentDate.year} • ${_formatTime(appointmentDate)}',
-                      ),
-                      onTap: () async {
-                        final pickedDate = await showDatePicker(
-                          context: dialogContext,
-                          initialDate: appointmentDate,
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2035),
-                        );
-
-                        if (pickedDate == null) return;
-
-                        if (!dialogContext.mounted) return;
-
-                        final pickedTime = await showTimePicker(
-                          context: dialogContext,
-                          initialTime: TimeOfDay.fromDateTime(
-                            appointmentDate,
+                            child: Icon(
+                              Icons.calendar_month_outlined,
+                              color: primaryBlue,
+                            ),
                           ),
-                        );
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          const Expanded(
+                            child: Text(
+                              'Edit Appointment',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(
+                              dialogContext,
+                              false,
+                            ),
+                            icon: const Icon(
+                              Icons.close,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                        if (pickedTime == null) return;
+                    Divider(
+                      height: 1,
+                      color: Colors.grey.shade200,
+                    ),
 
-                        if (!dialogContext.mounted) return;
+                    // ==================================================
+                    // CONTENT
+                    // ==================================================
 
-                        setDialogState(() {
-                          appointmentDate = DateTime(
-                            pickedDate.year,
-                            pickedDate.month,
-                            pickedDate.day,
-                            pickedTime.hour,
-                            pickedTime.minute,
-                          );
-                        });
-                      },
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(
+                          22,
+                          18,
+                          22,
+                          20,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _dialogSectionTitle(
+                              'Appointment Details',
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            _modernDropdown(
+                              label: 'Appointment Type',
+                              icon: Icons.local_hospital_outlined,
+                              value: appointmentType,
+                              items: const [
+                                'General',
+                                'Eye',
+                                'Dental',
+                                'Heart',
+                              ],
+                              onChanged: (value) {
+                                setDialogState(
+                                  () {
+                                    appointmentType = value;
+                                  },
+                                );
+                              },
+                            ),
+                            const SizedBox(
+                              height: 14,
+                            ),
+                            _modernTextField(
+                              controller: hospitalController,
+                              label: 'Hospital / Clinic',
+                              hint: 'Enter hospital or clinic name',
+                              icon: Icons.local_hospital_outlined,
+                            ),
+                            const SizedBox(
+                              height: 22,
+                            ),
+                            _dialogSectionTitle(
+                              'Date & Time',
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            _modernDateField(
+                              label: 'Appointment Date',
+                              date: appointmentDate,
+                              onTap: () async {
+                                final now = DateTime.now();
+
+                                final firstDate = DateTime(
+                                  now.year,
+                                  now.month,
+                                  now.day,
+                                );
+
+                                final initialDate = appointmentDate.isBefore(
+                                  firstDate,
+                                )
+                                    ? firstDate
+                                    : appointmentDate;
+
+                                final picked = await showDatePicker(
+                                  context: dialogContext,
+                                  initialDate: initialDate,
+                                  firstDate: firstDate,
+                                  lastDate: DateTime(
+                                    2035,
+                                  ),
+                                );
+
+                                if (picked != null) {
+                                  setDialogState(
+                                    () {
+                                      appointmentDate = DateTime(
+                                        picked.year,
+                                        picked.month,
+                                        picked.day,
+                                        appointmentDate.hour,
+                                        appointmentDate.minute,
+                                      );
+                                    },
+                                  );
+                                }
+                              },
+                            ),
+                            const SizedBox(
+                              height: 14,
+                            ),
+                            _timeSelector(
+                              context: context,
+                              time: TimeOfDay.fromDateTime(
+                                appointmentDate,
+                              ),
+                              onTap: () async {
+                                final picked = await showTimePicker(
+                                  context: dialogContext,
+                                  initialTime: TimeOfDay.fromDateTime(
+                                    appointmentDate,
+                                  ),
+                                );
+
+                                if (picked != null) {
+                                  setDialogState(
+                                    () {
+                                      appointmentDate = DateTime(
+                                        appointmentDate.year,
+                                        appointmentDate.month,
+                                        appointmentDate.day,
+                                        picked.hour,
+                                        picked.minute,
+                                      );
+                                    },
+                                  );
+                                }
+                              },
+                            ),
+                            const SizedBox(
+                              height: 22,
+                            ),
+                            _dialogSectionTitle(
+                              'Notes',
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            _modernTextField(
+                              controller: reasonController,
+                              label: 'Reason / Notes',
+                              hint: 'Example: Follow-up appointment',
+                              icon: Icons.notes_outlined,
+                              maxLines: 4,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // ==================================================
+                    // BOTTOM ACTIONS
+                    // ==================================================
+
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(
+                        22,
+                        12,
+                        22,
+                        18,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF9F7FC),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(
+                            28,
+                          ),
+                          bottomRight: Radius.circular(
+                            28,
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(
+                                dialogContext,
+                                false,
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size(
+                                  0,
+                                  50,
+                                ),
+                                side: BorderSide(
+                                  color: Colors.grey.shade300,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
+                                ),
+                              ),
+                              child: const Text(
+                                'Cancel',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (hospitalController.text.trim().isEmpty) {
+                                  _dialogError(
+                                    dialogContext,
+                                    'Please enter the hospital or clinic name.',
+                                  );
+                                  return;
+                                }
+
+                                if (appointmentDate.isBefore(
+                                  DateTime.now(),
+                                )) {
+                                  _dialogError(
+                                    dialogContext,
+                                    'Please select a future date and time.',
+                                  );
+                                  return;
+                                }
+
+                                Navigator.pop(
+                                  dialogContext,
+                                  true,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryBlue,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(
+                                  0,
+                                  50,
+                                ),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
+                                ),
+                              ),
+                              child: const Text(
+                                'Save Changes',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogContext, false),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(dialogContext, true);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryBlue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Save'),
-                ),
-              ],
             );
           },
         );
@@ -595,26 +1841,34 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     }
 
     try {
-      await _firestore.collection('appointments').doc(item['id']).update({
-        'appointmentType': appointmentType,
-        'hospital': hospitalController.text.trim(),
-        'reason': reasonController.text.trim(),
-        'dateTime': Timestamp.fromDate(appointmentDate),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-
-// ==========================================================
-// RESCHEDULE APPOINTMENT NOTIFICATION
-// ==========================================================
-
       final notificationId = item['id'].hashCode.abs();
 
-// Remove the old scheduled notification first.
+      // ----------------------------------------------------------
+      // Cancel old notification.
+      // ----------------------------------------------------------
+
       await NotificationService.instance.cancelAppointmentNotification(
         appointmentId: item['id'],
       );
 
-// Only schedule if the appointment is still active.
+      // ----------------------------------------------------------
+      // Update Firestore.
+      // ----------------------------------------------------------
+
+      await _firestore.collection('appointments').doc(item['id']).update({
+        'appointmentType': appointmentType,
+        'hospital': hospitalController.text.trim(),
+        'reason': reasonController.text.trim(),
+        'dateTime': Timestamp.fromDate(
+          appointmentDate,
+        ),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // ----------------------------------------------------------
+      // Schedule updated notification.
+      // ----------------------------------------------------------
+
       if (item['active'] == true) {
         final reminderBefore =
             await NotificationService.instance.getAppointmentReminderDuration();
@@ -637,7 +1891,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Appointment updated.'),
+          content: Text(
+            'Appointment updated successfully.',
+          ),
         ),
       );
     } catch (e) {
@@ -648,57 +1904,316 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Could not update appointment.'),
+          content: Text(
+            'Could not update appointment.',
+          ),
         ),
       );
 
-      debugPrint('Edit appointment error: $e');
+      debugPrint(
+        'Edit appointment error: $e',
+      );
     }
   }
 
   // ============================================================
-  // DIALOG FIELD
+  // DIALOG SECTION TITLE
   // ============================================================
 
-  Widget _dialogField({
-    required TextEditingController controller,
-    required String label,
-    int maxLines = 1,
-  }) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
+  Widget _dialogSectionTitle(
+    String title,
+  ) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: Colors.grey.shade700,
+        letterSpacing: 0.2,
       ),
     );
   }
 
   // ============================================================
-  // BOTTOM NAV
+  // MODERN TEXT FIELD
   // ============================================================
 
-  void _onBottomTap(BuildContext context, int index) {
+  Widget _modernTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    int maxLines = 1,
+  }) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        prefixIcon: Padding(
+          padding: EdgeInsets.only(
+            bottom: maxLines > 1 ? 45 : 0,
+          ),
+          child: Icon(
+            icon,
+            color: primaryBlue,
+            size: 20,
+          ),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(13),
+          borderSide: BorderSide(
+            color: Colors.grey.shade300,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(13),
+          borderSide: BorderSide(
+            color: Colors.grey.shade300,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(13),
+          borderSide: BorderSide(
+            color: primaryBlue,
+            width: 1.5,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // MODERN DROPDOWN
+  // ============================================================
+
+  Widget _modernDropdown({
+    required String label,
+    required IconData icon,
+    required String value,
+    required List<String> items,
+    required ValueChanged<String> onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(
+          icon,
+          color: primaryBlue,
+          size: 20,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 4,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(13),
+          borderSide: BorderSide(
+            color: Colors.grey.shade300,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(13),
+          borderSide: BorderSide(
+            color: Colors.grey.shade300,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(13),
+          borderSide: BorderSide(
+            color: primaryBlue,
+            width: 1.5,
+          ),
+        ),
+      ),
+      items: items.map(
+        (item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(
+              item,
+              overflow: TextOverflow.ellipsis,
+            ),
+          );
+        },
+      ).toList(),
+      onChanged: (value) {
+        if (value != null) {
+          onChanged(value);
+        }
+      },
+    );
+  }
+
+  // ============================================================
+  // MODERN DATE FIELD
+  // ============================================================
+
+  Widget _modernDateField({
+    required String label,
+    required DateTime date,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(13),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(
+            Icons.calendar_today_outlined,
+            color: primaryBlue,
+            size: 20,
+          ),
+          suffixIcon: Icon(
+            Icons.chevron_right,
+            color: Colors.grey.shade500,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 4,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(13),
+            borderSide: BorderSide(
+              color: Colors.grey.shade300,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(13),
+            borderSide: BorderSide(
+              color: Colors.grey.shade300,
+            ),
+          ),
+        ),
+        child: Text(
+          '${date.day}/${date.month}/${date.year}',
+          style: const TextStyle(
+            fontSize: 15,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // INFO BOX
+  // ============================================================
+
+  Widget _editInfoBox(
+    String text, {
+    required IconData icon,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: primaryBlue.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            color: primaryBlue,
+            size: 19,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: primaryBlue,
+                fontSize: 13,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // DIALOG ERROR
+  // ============================================================
+
+  void _dialogError(
+    BuildContext context,
+    String message,
+  ) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.redAccent,
+          margin: const EdgeInsets.all(12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      );
+  }
+
+  // ============================================================
+  // BOTTOM NAVIGATION
+  // ============================================================
+
+  void _onBottomTap(
+    BuildContext context,
+    int index,
+  ) {
     switch (index) {
       case 0:
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(
+          context,
+          '/home',
+        );
         break;
 
       case 1:
-        Navigator.pushReplacementNamed(context, '/reminder');
+        Navigator.pushReplacementNamed(
+          context,
+          '/reminder',
+        );
         break;
 
       case 2:
-        Navigator.pushReplacementNamed(context, '/finder');
+        Navigator.pushReplacementNamed(
+          context,
+          '/finder',
+        );
         break;
 
       case 3:
-        Navigator.pushReplacementNamed(context, '/sos');
+        Navigator.pushReplacementNamed(
+          context,
+          '/sos',
+        );
         break;
 
       case 4:
-        Navigator.pushReplacementNamed(context, '/profile');
+        Navigator.pushReplacementNamed(
+          context,
+          '/profile',
+        );
         break;
     }
   }
@@ -747,7 +2262,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                 if (_loading)
                   const Center(
                     child: Padding(
-                      padding: EdgeInsets.only(top: 40),
+                      padding: EdgeInsets.only(
+                        top: 40,
+                      ),
                       child: CircularProgressIndicator(),
                     ),
                   )
@@ -850,19 +2367,26 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   // CARD
   // ============================================================
 
-  Widget _card(Map<String, dynamic> item) {
+  Widget _card(
+    Map<String, dynamic> item,
+  ) {
     final bool isMedicine = item['type'] == 'pill';
+
     final bool active = item['active'] == true;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: const EdgeInsets.only(
+        bottom: 14,
+      ),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withOpacity(
+              0.03,
+            ),
             blurRadius: 8,
           ),
         ],
@@ -870,13 +2394,18 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ======================================================
           // ICON
+          // ======================================================
+
           Container(
             width: 60,
             height: 60,
             decoration: BoxDecoration(
               color: const Color(0xFFEFF2FA),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(
+                14,
+              ),
             ),
             child: Icon(
               isMedicine
@@ -888,20 +2417,29 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
           const SizedBox(width: 12),
 
+          // ======================================================
           // CONTENT
+          // ======================================================
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // TIME
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(87, 207, 207, 207),
-                    borderRadius: BorderRadius.circular(10),
+                    color: const Color.fromARGB(
+                      87,
+                      207,
+                      207,
+                      207,
+                    ),
+                    borderRadius: BorderRadius.circular(
+                      10,
+                    ),
                   ),
                   child: Text(
                     item['time'],
@@ -912,10 +2450,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 6),
-
-                // TITLE
                 Text(
                   item['title'],
                   style: const TextStyle(
@@ -923,10 +2458,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-
                 const SizedBox(height: 2),
-
-                // SUBTITLE
                 Text(
                   item['subtitle'],
                   style: const TextStyle(
@@ -934,10 +2466,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                     color: Colors.grey,
                   ),
                 ),
-
                 const SizedBox(height: 10),
-
-                // ACTIONS
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -945,12 +2474,18 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       children: [
                         _action(
                           'Edit',
-                          () => _editReminder(item),
+                          () => _editReminder(
+                            item,
+                          ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(
+                          width: 16,
+                        ),
                         _action(
                           'Delete',
-                          () => _delete(item),
+                          () => _delete(
+                            item,
+                          ),
                           isDelete: true,
                         ),
                       ],
@@ -958,7 +2493,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                     Switch(
                       value: active,
                       onChanged: (value) {
-                        _toggleReminder(item, value);
+                        _toggleReminder(
+                          item,
+                          value,
+                        );
                       },
                       activeColor: Colors.white,
                       activeTrackColor: primaryBlue,

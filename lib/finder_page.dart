@@ -214,7 +214,7 @@ class _FinderPageState extends State<FinderPage> {
 
     const double radiusKm = _nearbyRadiusKm;
 
-    final double latitudeDelta = radiusKm / 111.0;
+    const double latitudeDelta = radiusKm / 111.0;
 
     final double longitudeDelta =
         radiusKm / (111.0 * _cosineDegrees(position.latitude));

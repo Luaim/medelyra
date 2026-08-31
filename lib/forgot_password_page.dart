@@ -27,7 +27,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Future<void> _sendResetEmail() async {
     if (isLoading) return;
 
-    final email = emailController.text.trim();
+    final String email = emailController.text.trim();
+
+    // ------------------------------------------------------------
+    // VALIDATION
+    // ------------------------------------------------------------
 
     if (email.isEmpty) {
       _showMessage('Please enter your email.');
@@ -41,9 +45,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     setState(() {
       isLoading = true;
+      isPressed = false;
     });
 
     try {
+      // ----------------------------------------------------------
+      // Firebase sends the password reset email.
+      //
+      // IMPORTANT:
+      // This can also work for an account that originally used
+      // Google if a password provider is linked to that account.
+      // Firebase keeps both providers on the same account.
+      // ----------------------------------------------------------
+
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: email,
       );
@@ -56,6 +70,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
+      debugPrint(
+        'MEDMINDER: Password reset error: '
+        '${e.code} - ${e.message}',
+      );
+
       String message;
 
       switch (e.code) {
@@ -67,6 +86,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           message = 'No account was found with this email.';
           break;
 
+        case 'operation-not-allowed':
+          message = 'Password reset is currently unavailable. '
+              'Please contact support.';
+          break;
+
         case 'network-request-failed':
           message = 'Please check your internet connection and try again.';
           break;
@@ -76,11 +100,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           break;
 
         default:
-          message = e.message ?? 'Unable to send reset email.';
+          message = 'Unable to send reset email. Please try again.';
+          break;
       }
 
       _showMessage(message);
     } catch (e) {
+      debugPrint(
+        'MEDMINDER: Unexpected password reset error: $e',
+      );
+
       if (!mounted) return;
 
       _showMessage(
@@ -90,6 +119,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       if (mounted) {
         setState(() {
           isLoading = false;
+          isPressed = false;
         });
       }
     }
@@ -106,7 +136,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   // ============================================================
-  // MESSAGE
+  // ERROR / INFORMATION MESSAGE
   // ============================================================
 
   void _showMessage(String message) {
@@ -118,10 +148,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         SnackBar(
           content: Text(message),
           behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 4),
         ),
       );
   }
+
+  // ============================================================
+  // SUCCESS MESSAGE
+  // ============================================================
 
   void _showSuccessMessage(String message) {
     if (!mounted) return;
@@ -143,9 +177,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final h = size.height;
-    final w = size.width;
+    final Size size = MediaQuery.of(context).size;
+
+    final double h = size.height;
+    final double w = size.width;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
@@ -205,9 +240,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         // ==================================================
 
                         const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                          ),
                           child: Text(
-                            'Enter your email address and we will send you a link to reset your password.',
+                            'Enter your email address and we will send you '
+                            'a link to reset your password.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
@@ -220,12 +258,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         const SizedBox(height: 30),
 
                         // ==================================================
-                        // EMAIL
+                        // EMAIL LABEL
                         // ==================================================
 
                         _buildLabel('Email'),
 
                         const SizedBox(height: 6),
+
+                        // ==================================================
+                        // EMAIL FIELD
+                        // ==================================================
 
                         _buildTextField(
                           controller: emailController,
@@ -348,10 +390,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             // ======================================================
             // BACK ARROW
             // ======================================================
-            //
-            // This is now OUTSIDE the Column.
-            // It will no longer move the main content.
-            //
 
             Positioned(
               top: 4,
@@ -424,6 +462,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.done,
+        autocorrect: false,
         decoration: InputDecoration(
           isDense: true,
           hintText: hintText,
@@ -433,6 +473,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             vertical: 12,
           ),
         ),
+        onSubmitted: (_) {
+          _sendResetEmail();
+        },
       ),
     );
   }
