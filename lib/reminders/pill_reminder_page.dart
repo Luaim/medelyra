@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'nav_bar.dart';
-import 'notification_service.dart';
+import '../widgets/nav_bar.dart';
+import '../services/notification_service.dart';
 
 class PillReminderPage extends StatefulWidget {
   const PillReminderPage({super.key});

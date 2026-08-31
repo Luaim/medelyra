@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:medminder/emergency_guide_details_page.dart';
-import 'package:medminder/forgot_password_page.dart';
+import 'package:medminder/emergency/emergency_guide_details_page.dart';
+import 'package:medminder/auth/forgot_password_page.dart';
 
-import 'notification_service.dart';
+import 'services/notification_service.dart';
 
-import 'package:medminder/manage_reminders_page.dart';
-import 'package:medminder/notification_settings_page.dart';
-import 'package:medminder/edit_password_page.dart';
-import 'package:medminder/edit_profile_page.dart';
-import 'package:medminder/help_support_page.dart';
-import 'package:medminder/privacy_policy_page.dart';
+import 'package:medminder/reminders/manage_reminders_page.dart';
+import 'package:medminder/profile/notification_settings_page.dart';
+import 'package:medminder/settings/edit_password_page.dart';
+import 'package:medminder/settings/edit_profile_page.dart';
+import 'package:medminder/settings/help_support_page.dart';
+import 'package:medminder/settings/privacy_policy_page.dart';
 
-import 'signin_page.dart';
-import 'signup_page.dart';
-import 'home_page.dart';
-import 'reminder_page.dart';
-import 'pill_reminder_page.dart';
-import 'appointment_reminder_page.dart';
-import 'finder_page.dart';
-import 'sos_page.dart';
-import 'profile_page.dart';
-import 'settings_page.dart';
-import 'success_login_page.dart';
+import 'auth/signin_page.dart';
+import 'auth/signup_page.dart';
+import 'home/home_page.dart';
+import 'reminders/reminder_page.dart';
+import 'reminders/pill_reminder_page.dart';
+import 'reminders/appointment_reminder_page.dart';
+import 'emergency/finder_page.dart';
+import 'emergency/sos_page.dart';
+import 'profile/profile_page.dart';
+import 'profile/settings_page.dart';
+import 'auth/success_login_page.dart';
 
 import 'firebase_options.dart';
 

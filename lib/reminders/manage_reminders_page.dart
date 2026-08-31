@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'nav_bar.dart';
-import 'notification_service.dart';
+import '../widgets/nav_bar.dart';
+import '../services/notification_service.dart';
 
 class Managereminderspage extends StatefulWidget {
   const Managereminderspage({super.key});

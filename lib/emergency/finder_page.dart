@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart';
 import 'package:geolocator/geolocator.dart';
 
-import 'google_api_key.dart';
-import 'nav_bar.dart';
+import '../google_api_key.dart';
+import '../widgets/nav_bar.dart';
 
 class FinderPage extends StatefulWidget {
   const FinderPage({super.key});
