@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'nav_bar.dart';
+import '../widgets/nav_bar.dart';
 
 class ReminderPage extends StatelessWidget {
   const ReminderPage({super.key});
