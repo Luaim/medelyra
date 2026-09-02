@@ -314,7 +314,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final name = _getString(
       'name',
-      fallback: currentUser?.displayName ?? 'MedMinder User',
+      fallback: currentUser?.displayName ?? 'Medelyra User',
     );
 
     final email = _getString(
@@ -671,7 +671,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 6,
                 ),
                 const Text(
-                  'MedMinder User',
+                  'Medelyra User',
                   style: TextStyle(
                     fontSize: 15,
                     color: Color(0xFF4D4D4D),

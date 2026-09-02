@@ -71,7 +71,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       if (!mounted) return;
 
       debugPrint(
-        'MEDMINDER: Password reset error: '
+        'MEDELYRA: Password reset error: '
         '${e.code} - ${e.message}',
       );
 
@@ -107,7 +107,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       _showMessage(message);
     } catch (e) {
       debugPrint(
-        'MEDMINDER: Unexpected password reset error: $e',
+        'MEDELYRA: Unexpected password reset error: $e',
       );
 
       if (!mounted) return;

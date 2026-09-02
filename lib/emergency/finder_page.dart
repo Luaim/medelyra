@@ -145,7 +145,7 @@ class _FinderPageState extends State<FinderPage> {
       // Get GPS location
       // -----------------------------------------------------------------------
 
-      debugPrint('MEDMINDER: Requesting GPS location...');
+      debugPrint('Medelyra: Requesting GPS location...');
 
       Position position;
 
@@ -157,7 +157,7 @@ class _FinderPageState extends State<FinderPage> {
           ),
         );
       } on TimeoutException {
-        debugPrint('MEDMINDER: GPS timeout. Trying last known location...');
+        debugPrint('Medelyra: GPS timeout. Trying last known location...');
 
         final Position? lastPosition = await Geolocator.getLastKnownPosition();
 
@@ -169,7 +169,7 @@ class _FinderPageState extends State<FinderPage> {
       }
 
       debugPrint(
-        'MEDMINDER: LOCATION SUCCESS '
+        'Medelyra: LOCATION SUCCESS '
         '${position.latitude}, ${position.longitude}',
       );
 
@@ -187,7 +187,7 @@ class _FinderPageState extends State<FinderPage> {
 
       await _loadNearbyPlaces();
     } catch (e) {
-      debugPrint('MEDMINDER: LOCATION ERROR: $e');
+      debugPrint('Medelyra: LOCATION ERROR: $e');
 
       if (!mounted) return;
 
@@ -279,7 +279,7 @@ class _FinderPageState extends State<FinderPage> {
 
     if (position == null) {
       debugPrint(
-        'MEDMINDER: Cannot search places because location is null.',
+        'Medelyra: Cannot search places because location is null.',
       );
       return;
     }
@@ -300,12 +300,12 @@ class _FinderPageState extends State<FinderPage> {
       final LatLngBounds bounds = _nearbyBounds(position);
 
       debugPrint(
-        'MEDMINDER: Searching around '
+        'Medelyra: Searching around '
         '${position.latitude}, ${position.longitude}',
       );
 
       debugPrint(
-        'MEDMINDER: Nearby radius: $_nearbyRadiusKm km',
+        'Medelyra: Nearby radius: $_nearbyRadiusKm km',
       );
 
       // -----------------------------------------------------------------------
@@ -345,7 +345,7 @@ class _FinderPageState extends State<FinderPage> {
       for (final String query in searches) {
         try {
           debugPrint(
-            'MEDMINDER: Searching "$query"...',
+            'Medelyra: Searching "$query"...',
           );
 
           final FindAutocompletePredictionsResponse response =
@@ -356,7 +356,7 @@ class _FinderPageState extends State<FinderPage> {
           );
 
           debugPrint(
-            'MEDMINDER: "$query" returned '
+            'Medelyra: "$query" returned '
             '${response.predictions.length} predictions.',
           );
 
@@ -366,13 +366,13 @@ class _FinderPageState extends State<FinderPage> {
           }
         } catch (e) {
           debugPrint(
-            'MEDMINDER: Search failed for "$query": $e',
+            'Medelyra: Search failed for "$query": $e',
           );
         }
       }
 
       debugPrint(
-        'MEDMINDER: Total unique predictions: '
+        'Medelyra: Total unique predictions: '
         '${predictions.length}',
       );
 
@@ -425,7 +425,7 @@ class _FinderPageState extends State<FinderPage> {
 
           if (distance > _nearbyRadiusKm * 1000) {
             debugPrint(
-              'MEDMINDER: Ignoring far place '
+              'Medelyra: Ignoring far place '
               '${place.name} '
               '(${(distance / 1000).toStringAsFixed(1)} km)',
             );
@@ -436,7 +436,7 @@ class _FinderPageState extends State<FinderPage> {
           loadedPlaces.add(place);
         } catch (e) {
           debugPrint(
-            'MEDMINDER: Could not fetch place '
+            'Medelyra: Could not fetch place '
             '${prediction.placeId}: $e',
           );
         }
@@ -467,7 +467,7 @@ class _FinderPageState extends State<FinderPage> {
       });
 
       debugPrint(
-        'MEDMINDER: Final nearby medical places: '
+        'Medelyra: Final nearby medical places: '
         '${finalPlaces.length}',
       );
 
@@ -481,7 +481,7 @@ class _FinderPageState extends State<FinderPage> {
       });
     } catch (e) {
       debugPrint(
-        'MEDMINDER: PLACES ERROR: $e',
+        'Medelyra: PLACES ERROR: $e',
       );
 
       if (!mounted) return;
@@ -621,7 +621,7 @@ class _FinderPageState extends State<FinderPage> {
       final LatLngBounds bounds = _nearbyBounds(position);
 
       debugPrint(
-        'MEDMINDER: User search "$q"',
+        'Medelyra: User search "$q"',
       );
 
       final FindAutocompletePredictionsResponse response =
@@ -632,7 +632,7 @@ class _FinderPageState extends State<FinderPage> {
       );
 
       debugPrint(
-        'MEDMINDER: Search returned '
+        'Medelyra: Search returned '
         '${response.predictions.length} predictions.',
       );
 
@@ -683,7 +683,7 @@ class _FinderPageState extends State<FinderPage> {
           uniqueResults[id] = place;
         } catch (e) {
           debugPrint(
-            'MEDMINDER: Search detail error: $e',
+            'Medelyra: Search detail error: $e',
           );
         }
       }
@@ -709,7 +709,7 @@ class _FinderPageState extends State<FinderPage> {
       });
     } catch (e) {
       debugPrint(
-        'MEDMINDER: SEARCH ERROR: $e',
+        'Medelyra: SEARCH ERROR: $e',
       );
 
       if (!mounted) return;

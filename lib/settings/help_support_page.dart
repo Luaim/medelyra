@@ -20,7 +20,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
 
   final List<Map<String, dynamic>> faqs = [
     {
-      'q': 'How do I create a MedMinder account?',
+      'q': 'How do I create a Medelyra account?',
       'a':
           'You can create an account using your email and password or continue with Google. You must agree to the Terms & Conditions before creating an account.',
       'icon': Icons.person_add_alt_1_outlined,
@@ -28,13 +28,13 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
     {
       'q': 'How do I add a medicine reminder?',
       'a':
-          'Open the medication or reminder section of MedMinder, choose the option to add a reminder, enter the required medication and schedule information, then save it.',
+          'Open the medication or reminder section of Medelyra, choose the option to add a reminder, enter the required medication and schedule information, then save it.',
       'icon': Icons.medication_outlined,
     },
     {
       'q': 'Will I receive medication reminders?',
       'a':
-          'MedMinder can provide reminders based on the medication schedules you create. Make sure notifications are enabled for MedMinder in your device settings.',
+          'Medelyra can provide reminders based on the medication schedules you create. Make sure notifications are enabled for Medelyra in your device settings.',
       'icon': Icons.notifications_none_outlined,
     },
     {
@@ -46,7 +46,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
     {
       'q': 'How do I add an emergency contact?',
       'a':
-          'Open your profile and add your emergency contact information. The emergency contact information you provide is stored as part of your MedMinder profile.',
+          'Open your profile and add your emergency contact information. The emergency contact information you provide is stored as part of your Medelyra profile.',
       'icon': Icons.contact_emergency_outlined,
     },
     {
@@ -155,7 +155,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                             ),
                             SizedBox(height: 4),
                             Text(
-                              'Quick answers to help you use MedMinder.',
+                              'Quick answers to help you use Medelyra.',
                               style: TextStyle(
                                 fontSize: 13,
                                 color: secondaryText,
@@ -223,7 +223,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                     child: Column(
                       children: [
                         Text(
-                          'MedMinder',
+                          'Medelyra',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -529,7 +529,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
           const SizedBox(height: 13),
 
           const Text(
-            'If you cannot find what you are looking for, you can contact the MedMinder support team.',
+            'If you cannot find what you are looking for, you can contact the Medelyra support team.',
             style: TextStyle(
               fontSize: 13.5,
               height: 1.45,
@@ -566,7 +566,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                 const SizedBox(width: 10),
                 const Expanded(
                   child: Text(
-                    'support@medminder.app',
+                    'support@medelyra.app',
                     style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w500,
@@ -638,7 +638,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
   void _copySupportEmail() {
     Clipboard.setData(
       const ClipboardData(
-        text: 'support@medminder.app',
+        text: 'support@medelyra.app',
       ),
     );
 
@@ -709,7 +709,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                 // -----------------------------------------------------------
 
                 const Text(
-                  'Contact MedMinder Support',
+                  'Contact Medelyra Support',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 19,
@@ -747,7 +747,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
-                    'support@medminder.app',
+                    'support@medelyra.app',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -770,7 +770,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                     onPressed: () {
                       Clipboard.setData(
                         const ClipboardData(
-                          text: 'support@medminder.app',
+                          text: 'support@medelyra.app',
                         ),
                       );
 

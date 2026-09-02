@@ -110,7 +110,7 @@ class _SignInPageState extends State<SignInPage>
       if (!mounted) return;
 
       debugPrint(
-        'MEDMINDER: Email sign-in error: $e',
+        'MEDELYRA: Email sign-in error: $e',
       );
 
       _showMessage(
@@ -201,7 +201,7 @@ class _SignInPageState extends State<SignInPage>
       if (!mounted) return;
 
       debugPrint(
-        'MEDMINDER: Google Sign-In error: $e',
+        'MEDELYRA: Google Sign-In error: $e',
       );
 
       _showMessage(
