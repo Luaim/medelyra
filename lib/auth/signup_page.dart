@@ -614,8 +614,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   // =================================================================
 
                   Image.asset(
-                    'assets/loginLogo.png',
-                    width: w * 0.40,
+                    'assets/medelyraLogo.png',
+                    width: w * 0.44,
                     height: h * 0.15,
                   ),
 

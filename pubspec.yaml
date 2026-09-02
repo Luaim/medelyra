@@ -45,20 +45,19 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/mainLogo.png
-    - assets/loginLogo.png
     - assets/google.png
     - assets/facebook.png
     - assets/wellcome.png
     - assets/pillReminder.png
     - assets/appointmentReminder.png
-    - assets/splash_icon.png
+    - assets/medelyraLogo.png
+    - assets/medelyraIcon.png
 
 
 flutter_native_splash:
   color: "#08007C"
-  image: assets/splash_icon.png
+  image: assets/medelyraIcon.png
 
   android_12:
     color: "#08007C"
-    image: assets/splash_icon.png
+    image: assets/medelyraIcon.png
