@@ -65,7 +65,7 @@ class _SuccessLoginPageState extends State<SuccessLoginPage>
 
                     /// TITLE
                     Text(
-                      'Welcome to MedMinder!',
+                      'Welcome to Medelyra!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: smallScreen ? 20 : 24,

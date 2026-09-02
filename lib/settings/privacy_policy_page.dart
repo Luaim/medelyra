@@ -96,7 +96,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                         SizedBox(height: 12),
                         Text(
                           'Your privacy matters to us. This policy explains '
-                          'what information MedMinder collects, how it is used, '
+                          'what information Medelyra collects, how it is used, '
                           'and how you can control your information.',
                           style: TextStyle(
                             fontSize: 14,
@@ -114,9 +114,8 @@ class PrivacyPolicyPage extends StatelessWidget {
 
                   _section(
                     number: '01',
-                    title: 'What MedMinder Collects',
-                    intro:
-                        'Depending on how you use the application, MedMinder '
+                    title: 'What Medelyra Collects',
+                    intro: 'Depending on how you use the application, Medelyra '
                         'may store information that you choose to provide.',
                     bullets: const [
                       'Your name and email address',
@@ -135,11 +134,10 @@ class PrivacyPolicyPage extends StatelessWidget {
                   _section(
                     number: '02',
                     title: 'How We Use Your Information',
-                    intro:
-                        'The information you provide helps MedMinder provide '
+                    intro: 'The information you provide helps Medelyra provide '
                         'its core features and keep your account working.',
                     bullets: const [
-                      'Create and manage your MedMinder account',
+                      'Create and manage your Medelyra account',
                       'Store and display your medication information',
                       'Provide medication reminders and schedules',
                       'Store and display emergency contact information',
@@ -157,13 +155,12 @@ class PrivacyPolicyPage extends StatelessWidget {
                   _section(
                     number: '03',
                     title: 'Medication & Health Information',
-                    intro:
-                        'MedMinder allows you to enter medication, reminder, '
+                    intro: 'Medelyra allows you to enter medication, reminder, '
                         'and other health-related information.',
                     paragraphs: const [
                       'This information is provided voluntarily by you and is '
                           'used to support the features of the application.',
-                      'MedMinder is not a doctor, pharmacist, hospital, or '
+                      'Medelyra is not a doctor, pharmacist, hospital, or '
                           'healthcare provider. The application does not replace '
                           'professional medical advice, diagnosis, or treatment.',
                       'Always follow the instructions provided by your qualified '
@@ -178,12 +175,11 @@ class PrivacyPolicyPage extends StatelessWidget {
                   _section(
                     number: '04',
                     title: 'Emergency Contacts',
-                    intro:
-                        'MedMinder allows you to optionally add an emergency '
+                    intro: 'Medelyra allows you to optionally add an emergency '
                         'contact to your profile.',
                     paragraphs: const [
                       'The emergency contact information you provide is stored '
-                          'so that MedMinder can support its related profile '
+                          'so that Medelyra can support its related profile '
                           'and emergency-contact features.',
                       'Please make sure you have the appropriate permission '
                           'before adding another person’s information to the app.',
@@ -197,8 +193,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   _section(
                     number: '05',
                     title: 'Data Storage & Security',
-                    intro:
-                        'MedMinder uses Firebase services to support account '
+                    intro: 'Medelyra uses Firebase services to support account '
                         'authentication and application data storage.',
                     paragraphs: const [
                       'Information associated with your account may be stored '
@@ -218,7 +213,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   _section(
                     number: '06',
                     title: 'Third-Party Services',
-                    intro: 'MedMinder may use trusted third-party services to '
+                    intro: 'Medelyra may use trusted third-party services to '
                         'provide certain application features.',
                     bullets: const [
                       'Firebase for authentication and data storage',
@@ -239,11 +234,11 @@ class PrivacyPolicyPage extends StatelessWidget {
                     title: 'Google Sign-In',
                     intro:
                         'Google Sign-In is an optional way to create or access '
-                        'your MedMinder account.',
+                        'your Medelyra account.',
                     paragraphs: const [
                       'When you choose Google Sign-In, Google may provide '
                           'information such as your name and email address to '
-                          'MedMinder as part of the authentication process.',
+                          'Medelyra as part of the authentication process.',
                       'You can use email and password authentication instead '
                           'if you do not want to use Google Sign-In.',
                     ],
@@ -257,7 +252,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                     number: '08',
                     title: 'Your Privacy Choices',
                     intro: 'You have control over the information you provide '
-                        'through MedMinder.',
+                        'through Medelyra.',
                     bullets: const [
                       'Review your profile information',
                       'Update information stored in your profile',
@@ -277,7 +272,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                     number: '09',
                     title: 'Data Retention',
                     intro: 'We retain information for as long as necessary to '
-                        'provide MedMinder and maintain its features.',
+                        'provide Medelyra and maintain its features.',
                     paragraphs: const [
                       'When you request account deletion, information associated '
                           'with your account will be deleted according to the '
@@ -295,7 +290,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                     number: '10',
                     title: 'Children’s Privacy',
                     paragraphs: const [
-                      'MedMinder is not intended to knowingly collect personal '
+                      'Medelyra is not intended to knowingly collect personal '
                           'information from children without appropriate '
                           'authorization.',
                       'If you believe that a child has provided personal '
@@ -313,7 +308,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                     title: 'Changes to This Policy',
                     paragraphs: const [
                       'This Privacy Policy may be updated from time to time as '
-                          'MedMinder develops new features or privacy requirements '
+                          'Medelyra develops new features or privacy requirements '
                           'change.',
                       'When significant changes are made, the updated policy '
                           'will be made available through the application.',
@@ -329,7 +324,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                     title: 'Contact Us',
                     intro: 'If you have questions, concerns, or requests about '
                         'this Privacy Policy or your information, contact us at:',
-                    email: 'support@medminder.app',
+                    email: 'support@Medelyra.app',
                   ),
 
                   // ===========================================================
@@ -357,7 +352,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                         Expanded(
                           child: Text(
                             'This Privacy Policy is intended to explain how '
-                            'MedMinder handles information within the application.',
+                            'Medelyra handles information within the application.',
                             style: TextStyle(
                               fontSize: 13,
                               height: 1.45,

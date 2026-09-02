@@ -203,7 +203,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
         _showMessage(
           'Please allow notifications and exact alarms '
-          'for MedMinder in Android settings.',
+          'for Medelyra in Android settings.',
           isError: true,
         );
 

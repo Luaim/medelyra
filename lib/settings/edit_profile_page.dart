@@ -820,7 +820,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Update your information to keep your MedMinder profile accurate.',
+                  'Update your information to keep your Medelyra profile accurate.',
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
@@ -1288,7 +1288,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Your profile information is securely stored and used to personalize your MedMinder experience.',
+              'Your profile information is securely stored and used to personalize your Medelyra experience.',
               style: TextStyle(
                 fontSize: 11.5,
                 height: 1.4,

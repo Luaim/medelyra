@@ -691,7 +691,7 @@ class _GoogleAccountCard extends StatelessWidget {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  'Your password is managed by Google, so it cannot be changed from MedMinder.',
+                  'Your password is managed by Google, so it cannot be changed from Medelyra.',
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.4,

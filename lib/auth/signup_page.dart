@@ -298,17 +298,17 @@ class _SignUpPageState extends State<SignUpPage> {
                         _TermsSection(
                           title: '1. Acceptance of Terms',
                           text:
-                              'By creating a MedMinder account, you agree to these Terms & Conditions. If you do not agree with these terms, please do not create an account or use the application.',
+                              'By creating a Medelyra account, you agree to these Terms & Conditions. If you do not agree with these terms, please do not create an account or use the application.',
                         ),
                         _TermsSection(
-                          title: '2. Use of MedMinder',
+                          title: '2. Use of Medelyra',
                           text:
-                              'MedMinder is designed to help users manage and organize their medication-related information and reminders. You agree to use the application only for lawful purposes and in a responsible manner.',
+                              'Medelyra is designed to help users manage and organize their medication-related information and reminders. You agree to use the application only for lawful purposes and in a responsible manner.',
                         ),
                         _TermsSection(
                           title: '3. Medical Information',
                           text:
-                              'MedMinder is not a replacement for a doctor, pharmacist, or other qualified healthcare professional. Information and reminders provided through the application should not be considered medical advice. Always follow instructions provided by your healthcare professional.',
+                              'Medelyra is not a replacement for a doctor, pharmacist, or other qualified healthcare professional. Information and reminders provided through the application should not be considered medical advice. Always follow instructions provided by your healthcare professional.',
                         ),
                         _TermsSection(
                           title: '4. Your Account',
@@ -318,27 +318,27 @@ class _SignUpPageState extends State<SignUpPage> {
                         _TermsSection(
                           title: '5. User Information',
                           text:
-                              'MedMinder may store information that you provide when using the application, such as your name, email address, and information necessary to provide the application services. Your information should be handled according to the application’s privacy practices.',
+                              'Medelyra may store information that you provide when using the application, such as your name, email address, and information necessary to provide the application services. Your information should be handled according to the application’s privacy practices.',
                         ),
                         _TermsSection(
                           title: '6. Medication Reminders',
                           text:
-                              'Medication reminders are provided as a convenience. You remain responsible for taking medications according to the instructions given by your healthcare professional. MedMinder should not be relied upon as the sole method for remembering or managing medication.',
+                              'Medication reminders are provided as a convenience. You remain responsible for taking medications according to the instructions given by your healthcare professional. Medelyra should not be relied upon as the sole method for remembering or managing medication.',
                         ),
                         _TermsSection(
                           title: '7. Application Availability',
                           text:
-                              'We aim to keep MedMinder available and functioning correctly, but we cannot guarantee that the application will always be available, error-free, or uninterrupted.',
+                              'We aim to keep Medelyra available and functioning correctly, but we cannot guarantee that the application will always be available, error-free, or uninterrupted.',
                         ),
                         _TermsSection(
                           title: '8. Changes to These Terms',
                           text:
-                              'These Terms & Conditions may be updated from time to time. Continued use of MedMinder after changes are made means that you accept the updated terms.',
+                              'These Terms & Conditions may be updated from time to time. Continued use of Medelyra after changes are made means that you accept the updated terms.',
                         ),
                         _TermsSection(
                           title: '9. Contact',
                           text:
-                              'If you have questions about these Terms & Conditions, please contact the MedMinder support team.',
+                              'If you have questions about these Terms & Conditions, please contact the Medelyra support team.',
                         ),
                       ],
                     ),

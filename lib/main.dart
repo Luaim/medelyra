@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:medminder/emergency/emergency_guide_details_page.dart';
-import 'package:medminder/auth/forgot_password_page.dart';
+import 'package:medelyra/auth/forgot_password_page.dart';
+import 'package:medelyra/emergency/emergency_guide_details_page.dart';
+import 'package:medelyra/profile/notification_settings_page.dart';
+import 'package:medelyra/reminders/manage_reminders_page.dart';
+import 'package:medelyra/settings/edit_password_page.dart';
+import 'package:medelyra/settings/edit_profile_page.dart';
+import 'package:medelyra/settings/help_support_page.dart';
+import 'package:medelyra/settings/privacy_policy_page.dart';
 
 import 'services/notification_service.dart';
-
-import 'package:medminder/reminders/manage_reminders_page.dart';
-import 'package:medminder/profile/notification_settings_page.dart';
-import 'package:medminder/settings/edit_password_page.dart';
-import 'package:medminder/settings/edit_profile_page.dart';
-import 'package:medminder/settings/help_support_page.dart';
-import 'package:medminder/settings/privacy_policy_page.dart';
 
 import 'auth/signin_page.dart';
 import 'auth/signup_page.dart';
@@ -37,17 +36,17 @@ Future<void> main() async {
   // Initialize local notifications
   await NotificationService.initialize();
 
-  runApp(const MedMinderApp());
+  runApp(const MedelyraApp());
 }
 
-class MedMinderApp extends StatelessWidget {
-  const MedMinderApp({super.key});
+class MedelyraApp extends StatelessWidget {
+  const MedelyraApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'MedMinder',
+      title: 'Medelyra',
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,

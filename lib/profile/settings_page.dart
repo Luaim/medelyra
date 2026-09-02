@@ -148,7 +148,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
           content: const Text(
-            'Are you sure you want to log out of your MedMinder account?',
+            'Are you sure you want to log out of your Medelyra account?',
             style: TextStyle(
               fontSize: 15,
               height: 1.45,
@@ -298,7 +298,7 @@ class _SettingsPageState extends State<SettingsPage> {
         if (!mounted) return;
 
         _showMessage(
-          'Your MedMinder account has been permanently deleted.',
+          'Your Medelyra account has been permanently deleted.',
         );
       });
     } on FirebaseAuthException catch (e, stackTrace) {
@@ -641,7 +641,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
           content: const Text(
-            'Deleting your MedMinder account is permanent.\n\n'
+            'Deleting your Medelyra account is permanent.\n\n'
             'Your account and the information stored with your profile will be deleted and cannot be recovered.',
             style: TextStyle(
               fontSize: 15,
@@ -719,7 +719,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           content: const Text(
             'This is your final confirmation.\n\n'
-            'Your MedMinder account will be permanently deleted. This action cannot be undone.',
+            'Your Medelyra account will be permanently deleted. This action cannot be undone.',
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
@@ -980,7 +980,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 _SettingsTile(
                   icon: Icons.info_outline_rounded,
-                  title: 'About MedMinder',
+                  title: 'About Medelyra',
                   subtitle: 'App version and information',
                   onTap: busy
                       ? () {}
@@ -1132,7 +1132,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   // ===========================================================================
-  // ABOUT MEDMINDER
+  // ABOUT MEDELYRA
   // ===========================================================================
 
   void _showAboutDialog() {
@@ -1193,7 +1193,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 // =============================================================
 
                 const Text(
-                  'MedMinder',
+                  'Medelyra',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -1235,7 +1235,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   child: const Text(
-                    'MedMinder is a medication management and reminder app '
+                    'Medelyra is a medication management and reminder app '
                     'designed to help users organize their medications, '
                     'reminders, schedules, and health-related information.',
                     textAlign: TextAlign.center,
@@ -1260,7 +1260,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     showLicensePage(
                       context: context,
-                      applicationName: 'MedMinder',
+                      applicationName: 'Medelyra',
                       applicationVersion:
                           appVersion.isEmpty ? '1.0.0' : appVersion,
                     );
@@ -1297,7 +1297,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                               SizedBox(height: 2),
                               Text(
-                                'View licenses for software used by MedMinder',
+                                'View licenses for software used by Medelyra',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Color(0xFF777777),

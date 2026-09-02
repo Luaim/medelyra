@@ -1,4 +1,4 @@
-name: medminder
+name: medelyra
 description: "A new Flutter project."
 publish_to: 'none'
 
@@ -52,16 +52,13 @@ flutter:
     - assets/wellcome.png
     - assets/pillReminder.png
     - assets/appointmentReminder.png
-    - assets/cpr.png
-    - assets/choking.png
-    - assets/bleeding.png
-    - assets/test.png
+    - assets/splash_icon.png
 
 
 flutter_native_splash:
   color: "#08007C"
-  image: assets/test.png
+  image: assets/splash_icon.png
 
   android_12:
     color: "#08007C"
-    image: assets/test.png
+    image: assets/splash_icon.png
