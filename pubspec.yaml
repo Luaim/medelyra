@@ -40,6 +40,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^4.0.0
   flutter_native_splash: ^2.4.1
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
@@ -52,12 +53,22 @@ flutter:
     - assets/appointmentReminder.png
     - assets/medelyraLogo.png
     - assets/medelyraIcon.png
+    - assets/medelyraIconSplash.png
+    - assets/medelyraIconLauncher.png 
 
 
 flutter_native_splash:
-  color: "#08007C"
+  color: "#FAF9FC"
   image: assets/medelyraIcon.png
 
   android_12:
-    color: "#08007C"
-    image: assets/medelyraIcon.png
+    color: "#FAF9FC"
+    image: assets/medelyraSplashFull.png
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/medelyraIconLauncher.png"
+  adaptive_icon_background: "#FAF9FC"
+  adaptive_icon_foreground: "assets/medelyraIconLauncher.png"
