@@ -50,7 +50,6 @@ flutter:
   assets:
     - assets/google.png
     - assets/facebook.png
-    - assets/wellcome.png
     - assets/pillReminder.png
     - assets/appointmentReminder.png
     - assets/medelyraLogo.png

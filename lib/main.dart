@@ -25,7 +25,6 @@ import 'emergency/finder_page.dart';
 import 'emergency/sos_page.dart';
 import 'profile/profile_page.dart';
 import 'profile/settings_page.dart';
-import 'auth/success_login_page.dart';
 
 import 'onboarding/onboarding_page.dart';
 import 'firebase_options.dart';
@@ -114,7 +113,6 @@ class MedelyraApp extends StatelessWidget {
         '/sos': (context) => const SosPage(),
         '/profile': (context) => const ProfilePage(),
         '/settings': (context) => const SettingsPage(),
-        '/successLogin': (context) => const SuccessLoginPage(),
         '/edit_profile': (context) => const EditProfilePage(),
         '/edit_password': (context) => const EditPasswordPage(),
         '/privacy': (context) => const PrivacyPolicyPage(),

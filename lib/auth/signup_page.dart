@@ -141,7 +141,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
       Navigator.pushReplacementNamed(
         context,
-        '/successLogin',
+        '/home',
       );
     } on FirebaseAuthException catch (e, stackTrace) {
       debugPrint('FIREBASE SIGN UP ERROR');
@@ -461,7 +461,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
       Navigator.pushReplacementNamed(
         context,
-        '/successLogin',
+        '/home',
       );
     } on FirebaseAuthException catch (e, stackTrace) {
       debugPrint('GOOGLE SIGN UP FIREBASE ERROR');
