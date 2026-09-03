@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 import 'package:medelyra/auth/forgot_password_page.dart';
 import 'package:medelyra/emergency/emergency_guide_details_page.dart';
 import 'package:medelyra/profile/notification_settings_page.dart';
@@ -23,10 +27,17 @@ import 'profile/profile_page.dart';
 import 'profile/settings_page.dart';
 import 'auth/success_login_page.dart';
 
+import 'onboarding/onboarding_page.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  // Keep the native splash screen visible while
+  // Firebase and app startup information are loading.
+  FlutterNativeSplash.preserve(
+    widgetsBinding: widgetsBinding,
+  );
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -36,11 +47,46 @@ Future<void> main() async {
   // Initialize local notifications
   await NotificationService.initialize();
 
-  runApp(const MedelyraApp());
+  // Check whether onboarding has already been completed.
+  final prefs = await SharedPreferences.getInstance();
+
+  final onboardingCompleted = prefs.getBool('onboardingCompleted') ?? false;
+
+  Widget initialPage;
+
+  if (!onboardingCompleted) {
+    // First launch → Onboarding
+    initialPage = const OnboardingPage();
+  } else {
+    // Onboarding completed → check Firebase login
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Already logged in → Home
+      initialPage = const HomePage();
+    } else {
+      // Logged out → Sign In
+      initialPage = const SignInPage();
+    }
+  }
+
+  runApp(
+    MedelyraApp(
+      initialPage: initialPage,
+    ),
+  );
+
+  // Flutter is now ready, so remove the native splash.
+  FlutterNativeSplash.remove();
 }
 
 class MedelyraApp extends StatelessWidget {
-  const MedelyraApp({super.key});
+  final Widget initialPage;
+
+  const MedelyraApp({
+    super.key,
+    this.initialPage = const SignInPage(),
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +101,9 @@ class MedelyraApp extends StatelessWidget {
           seedColor: const Color(0xFF08007C),
         ),
       ),
-      home: const SignInPage(),
+      home: initialPage,
       routes: {
+        '/onboarding': (context) => const OnboardingPage(),
         '/signin': (context) => const SignInPage(),
         '/signup': (context) => const SignUpPage(),
         '/home': (context) => const HomePage(),
@@ -77,6 +124,7 @@ class MedelyraApp extends StatelessWidget {
         '/forgot-password': (context) => const ForgotPasswordPage(),
         '/emergencyGuide': (context) {
           final guideId = ModalRoute.of(context)!.settings.arguments as String;
+
           return EmergencyGuideDetailsPage(
             guideId: guideId,
           );
