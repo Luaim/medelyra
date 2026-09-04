@@ -1,9 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/nav_bar.dart';
 import '../services/notification_service.dart';
+import '../services/local_database_service.dart';
+import '../services/local_appointment_service.dart';
 
 class Managereminderspage extends StatefulWidget {
   const Managereminderspage({super.key});
@@ -15,7 +16,6 @@ class Managereminderspage extends StatefulWidget {
 class _ManagereminderspageState extends State<Managereminderspage> {
   final Color primaryBlue = const Color(0xFF3D84A8);
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool _loading = true;
@@ -111,36 +111,36 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     }
 
     try {
-      final medicineSnapshot = await _firestore
-          .collection('medicines')
-          .where('userId', isEqualTo: user.uid)
-          .get();
+      // ==========================================================
+      // LOAD BOTH REMINDER TYPES LOCALLY
+      // ==========================================================
+      final medicineRows =
+          await LocalDatabaseService.instance.getMedicines(user.uid);
 
-      final appointmentSnapshot = await _firestore
-          .collection('appointments')
-          .where('userId', isEqualTo: user.uid)
-          .get();
+      final appointmentRows =
+          await LocalAppointmentService.instance.getAppointments(user.uid);
 
       final List<Map<String, dynamic>> loaded = [];
 
       // ==========================================================
       // MEDICINES
       // ==========================================================
+      for (final data in medicineRows) {
+        final rawTimes = data['times'];
+        final List<String> times = rawTimes is String
+            ? rawTimes
+                .split(',')
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList()
+            : rawTimes is List
+                ? rawTimes.map((e) => e.toString()).toList()
+                : <String>[];
 
-      for (final doc in medicineSnapshot.docs) {
-        final data = doc.data();
-
-        final List<dynamic> times = data['times'] is List ? data['times'] : [];
-
-        String timeText = 'No time';
-
-        if (times.isNotEmpty) {
-          timeText = times.map((e) => e.toString()).join(' • ');
-        }
+        final timeText = times.isEmpty ? 'No time' : times.join(' • ');
 
         final String instructions =
             (data['instructions'] ?? '').toString().trim();
-
         final String frequency = (data['frequency'] ?? '').toString().trim();
 
         String subtitle = '';
@@ -156,51 +156,49 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         }
 
         loaded.add({
-          'id': doc.id,
+          'id': data['id'].toString(),
           'collection': 'medicines',
           'title': data['medicineName'] ?? 'Medicine',
           'subtitle': subtitle,
           'time': timeText,
           'type': 'pill',
-          'active': data['active'] ?? true,
-          'data': data,
+          'active': data['active'] == 1 || data['active'] == true,
+          'data': Map<String, dynamic>.from(data),
         });
       }
 
       // ==========================================================
       // APPOINTMENTS
       // ==========================================================
+      for (final data in appointmentRows) {
+        DateTime? appointmentDateTime;
+        final rawDateTime = data['dateTime'];
 
-      for (final doc in appointmentSnapshot.docs) {
-        final data = doc.data();
-
-        final Timestamp? dateTime = data['dateTime'] is Timestamp
-            ? data['dateTime'] as Timestamp
-            : null;
+        if (rawDateTime is String && rawDateTime.isNotEmpty) {
+          appointmentDateTime = DateTime.tryParse(rawDateTime);
+        }
 
         String timeText = 'No date';
 
-        if (dateTime != null) {
-          final date = dateTime.toDate();
-
+        if (appointmentDateTime != null) {
           timeText =
-              '${date.day}/${date.month}/${date.year} • ${_formatTime(date)}';
+              '${appointmentDateTime.day}/${appointmentDateTime.month}/${appointmentDateTime.year} • '
+              '${_formatTime(appointmentDateTime)}';
         }
 
         final String hospital = (data['hospital'] ?? '').toString().trim();
-
         final String appointmentType =
             (data['appointmentType'] ?? 'Appointment').toString();
 
         loaded.add({
-          'id': doc.id,
+          'id': data['id'].toString(),
           'collection': 'appointments',
           'title': appointmentType,
           'subtitle': hospital.isEmpty ? 'Appointment' : hospital,
           'time': timeText,
           'type': 'appointment',
-          'active': data['active'] ?? true,
-          'data': data,
+          'active': data['active'] == 1 || data['active'] == true,
+          'data': Map<String, dynamic>.from(data),
         });
       }
 
@@ -227,6 +225,48 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       debugPrint('Load reminders error: $e');
     }
+  }
+
+  DateTime? _parseLocalDate(
+    dynamic value, {
+    DateTime? fallback,
+  }) {
+    if (value is DateTime) {
+      return value;
+    }
+
+    if (value is String && value.isNotEmpty) {
+      return DateTime.tryParse(value) ?? fallback;
+    }
+
+    return fallback;
+  }
+
+  int? _storedInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '');
+  }
+
+  List<TimeOfDay> _storedTimesAsTimeOfDay(dynamic value) {
+    if (value is List) {
+      return value
+          .map((e) => _parseStoredTime(e.toString()))
+          .whereType<TimeOfDay>()
+          .toList();
+    }
+
+    if (value is String && value.trim().isNotEmpty) {
+      return value
+          .split(',')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .map(_parseStoredTime)
+          .whereType<TimeOfDay>()
+          .toList();
+    }
+
+    return [];
   }
 
   // ============================================================
@@ -265,15 +305,24 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   // PARSE STORED TIME
   // ============================================================
 
-  TimeOfDay _parseStoredTime(String value) {
-    final parts = value.split(':');
+  TimeOfDay? _parseStoredTime(String value) {
+    final parts = value.trim().split(':');
 
     if (parts.length != 2) {
-      return TimeOfDay.now();
+      return null;
     }
 
-    final hour = int.tryParse(parts[0]) ?? 0;
-    final minute = int.tryParse(parts[1]) ?? 0;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+
+    if (hour == null ||
+        minute == null ||
+        hour < 0 ||
+        hour > 23 ||
+        minute < 0 ||
+        minute > 59) {
+      return null;
+    }
 
     return TimeOfDay(
       hour: hour,
@@ -401,20 +450,57 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     Map<String, dynamic> item,
     bool value,
   ) async {
-    final String collection = item['collection'];
-    final String id = item['id'];
+    final String collection = item['collection'].toString();
+    final String id = item['id'].toString();
 
     try {
-      await _firestore.collection(collection).doc(id).update({
-        'active': value,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      final now = DateTime.now().toIso8601String();
 
-      // ==========================================================
-      // APPOINTMENT NOTIFICATION
-      // ==========================================================
+      if (collection == 'medicines') {
+        await LocalDatabaseService.instance.updateMedicine(
+          id,
+          {
+            'active': value ? 1 : 0,
+            'updatedAt': now,
+          },
+        );
 
-      if (collection == 'appointments') {
+        final data = Map<String, dynamic>.from(item['data']);
+
+        if (!value) {
+          await _cancelMedicineNotifications(
+            medicineId: id,
+            data: data,
+          );
+        } else {
+          final times = _storedTimesAsTimeOfDay(data['times']);
+          final startDate = _parseLocalDate(
+                data['startDate'],
+                fallback: DateTime.now(),
+              ) ??
+              DateTime.now();
+          final durationDays = _storedInt(data['durationDays']);
+
+          await NotificationService.instance.requestPermission();
+
+          await _scheduleMedicineNotifications(
+            medicineId: id,
+            medicineName: (data['medicineName'] ?? 'Medicine').toString(),
+            times: times,
+            durationDays: durationDays,
+            startDate: startDate,
+          );
+        }
+      } else {
+        await LocalAppointmentService.instance.updateAppointment(
+          id,
+          {
+            'active': value ? 1 : 0,
+            'updatedAt': now,
+          },
+        );
+
+        final data = Map<String, dynamic>.from(item['data']);
         final notificationId = id.hashCode.abs();
 
         if (!value) {
@@ -422,15 +508,16 @@ class _ManagereminderspageState extends State<Managereminderspage> {
             notificationId,
           );
         } else {
-          final data = Map<String, dynamic>.from(item['data']);
-
-          DateTime? appointmentTime;
-
-          if (data['dateTime'] is Timestamp) {
-            appointmentTime = (data['dateTime'] as Timestamp).toDate();
-          }
+          final appointmentTime = _parseLocalDate(data['dateTime']);
 
           if (appointmentTime != null) {
+            final permissionGranted =
+                await NotificationService.instance.requestPermission();
+
+            if (!permissionGranted) {
+              throw Exception('Notification permission was not granted.');
+            }
+
             final reminderBefore = await NotificationService.instance
                 .getAppointmentReminderDuration();
 
@@ -506,14 +593,23 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     if (confirmed != true) return;
 
     try {
-      // Cancel appointment notification.
-      if (item['collection'] == 'appointments') {
-        await NotificationService.instance.cancelAppointmentNotification(
-          appointmentId: item['id'],
-        );
-      }
+      final String collection = item['collection'].toString();
+      final String id = item['id'].toString();
 
-      await _firestore.collection(item['collection']).doc(item['id']).delete();
+      if (collection == 'medicines') {
+        await _cancelMedicineNotifications(
+          medicineId: id,
+          data: Map<String, dynamic>.from(item['data']),
+        );
+
+        await LocalDatabaseService.instance.deleteMedicine(id);
+      } else {
+        await NotificationService.instance.cancel(
+          id.hashCode.abs(),
+        );
+
+        await LocalAppointmentService.instance.deleteAppointment(id);
+      }
 
       if (!mounted) return;
 
@@ -594,23 +690,13 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       duration = '7 Days';
     }
 
-    DateTime startDate = DateTime.now();
+    DateTime startDate = _parseLocalDate(
+          data['startDate'],
+          fallback: DateTime.now(),
+        ) ??
+        DateTime.now();
 
-    if (data['startDate'] is Timestamp) {
-      startDate = (data['startDate'] as Timestamp).toDate();
-    }
-
-    List<TimeOfDay> times = [];
-
-    if (data['times'] is List) {
-      final storedTimes = List<dynamic>.from(data['times']);
-
-      times = storedTimes
-          .map(
-            (e) => _parseStoredTime(e.toString()),
-          )
-          .toList();
-    }
+    List<TimeOfDay> times = _storedTimesAsTimeOfDay(data['times']);
 
     if (times.isEmpty && frequency != 'As Needed') {
       times = [TimeOfDay.now()];
@@ -642,10 +728,6 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                 ),
                 child: Column(
                   children: [
-                    // ==================================================
-                    // HEADER
-                    // ==================================================
-
                     Padding(
                       padding: const EdgeInsets.fromLTRB(
                         22,
@@ -682,23 +764,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               dialogContext,
                               false,
                             ),
-                            icon: const Icon(
-                              Icons.close,
-                            ),
+                            icon: const Icon(Icons.close),
                           ),
                         ],
                       ),
                     ),
-
                     Divider(
                       height: 1,
                       color: Colors.grey.shade200,
                     ),
-
-                    // ==================================================
-                    // CONTENT
-                    // ==================================================
-
                     Expanded(
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.fromLTRB(
@@ -710,9 +784,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _dialogSectionTitle(
-                              'Basic Information',
-                            ),
+                            _dialogSectionTitle('Basic Information'),
                             const SizedBox(height: 12),
                             _modernTextField(
                               controller: nameController,
@@ -726,9 +798,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               icon: Icons.category_outlined,
                               value: medicineType,
                               items: medicineTypes
-                                  .map(
-                                    (e) => e['label'].toString(),
-                                  )
+                                  .map((e) => e['label'].toString())
                                   .toList(),
                               onChanged: (value) {
                                 setDialogState(() {
@@ -744,9 +814,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               icon: Icons.scale_outlined,
                             ),
                             const SizedBox(height: 22),
-                            _dialogSectionTitle(
-                              'Schedule',
-                            ),
+                            _dialogSectionTitle('Schedule'),
                             const SizedBox(height: 12),
                             _modernDropdown(
                               label: 'Frequency',
@@ -791,13 +859,11 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               date: startDate,
                               onTap: () async {
                                 final now = DateTime.now();
-
                                 final firstDate = DateTime(
                                   now.year,
                                   now.month,
                                   now.day,
                                 );
-
                                 final initialDate = startDate.isBefore(
                                   firstDate,
                                 )
@@ -831,9 +897,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               },
                             ),
                             const SizedBox(height: 22),
-                            _dialogSectionTitle(
-                              'Additional Information',
-                            ),
+                            _dialogSectionTitle('Additional Information'),
                             const SizedBox(height: 12),
                             _modernTextField(
                               controller: instructionsController,
@@ -846,11 +910,6 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                         ),
                       ),
                     ),
-
-                    // ==================================================
-                    // BOTTOM ACTIONS
-                    // ==================================================
-
                     Container(
                       padding: const EdgeInsets.fromLTRB(
                         22,
@@ -881,22 +940,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                 false,
                               ),
                               style: OutlinedButton.styleFrom(
-                                minimumSize: const Size(
-                                  0,
-                                  50,
-                                ),
+                                minimumSize: const Size(0, 50),
                                 side: BorderSide(
                                   color: Colors.grey.shade300,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    14,
-                                  ),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
-                              child: const Text(
-                                'Cancel',
-                              ),
+                              child: const Text('Cancel'),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -928,23 +980,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                   return;
                                 }
 
-                                Navigator.pop(
-                                  dialogContext,
-                                  true,
-                                );
+                                Navigator.pop(dialogContext, true);
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: primaryBlue,
                                 foregroundColor: Colors.white,
-                                minimumSize: const Size(
-                                  0,
-                                  50,
-                                ),
+                                minimumSize: const Size(0, 50),
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    14,
-                                  ),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
                               child: const Text(
@@ -976,7 +1020,6 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
     try {
       final finalTimes = frequency == 'As Needed' ? <TimeOfDay>[] : times;
-
       final durationDays = _durationInDays(duration);
 
       DateTime? endDate;
@@ -986,58 +1029,50 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           startDate.year,
           startDate.month,
           startDate.day,
-        ).add(
-          Duration(days: durationDays - 1),
-        );
+        ).add(Duration(days: durationDays - 1));
       }
-
-      // ----------------------------------------------------------
-      // Cancel old medicine notifications.
-      // ----------------------------------------------------------
 
       await _cancelMedicineNotifications(
         medicineId: item['id'],
         data: data,
       );
 
-      // ----------------------------------------------------------
-      // Update Firestore.
-      // ----------------------------------------------------------
+      final now = DateTime.now();
 
-      await _firestore.collection('medicines').doc(item['id']).update({
-        'medicineName': nameController.text.trim(),
-        'medicineType': medicineType,
-        'dose': doseController.text.trim(),
-        'instructions': instructionsController.text.trim(),
-        'frequency': frequency,
-        'times': finalTimes.map(_formatTimeForDatabase).toList(),
-        'duration': duration,
-        'durationDays': durationDays,
-        'startDate': Timestamp.fromDate(
-          DateTime(
+      await LocalDatabaseService.instance.updateMedicine(
+        item['id'],
+        {
+          'medicineName': nameController.text.trim(),
+          'medicineType': medicineType,
+          'dose': doseController.text.trim(),
+          'instructions': instructionsController.text.trim(),
+          'frequency': frequency,
+          'times': finalTimes.map(_formatTimeForDatabase).join(','),
+          'duration': duration,
+          'durationDays': durationDays,
+          'startDate': DateTime(
             startDate.year,
             startDate.month,
             startDate.day,
-          ),
-        ),
-        'endDate': endDate == null ? null : Timestamp.fromDate(endDate),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-
-      // ----------------------------------------------------------
-      // Schedule new notifications if active.
-      // ----------------------------------------------------------
+          ).toIso8601String(),
+          'endDate': endDate?.toIso8601String(),
+          'updatedAt': now.toIso8601String(),
+        },
+      );
 
       if (item['active'] == true) {
-        await NotificationService.instance.requestPermission();
+        final permissionGranted =
+            await NotificationService.instance.requestPermission();
 
-        await _scheduleMedicineNotifications(
-          medicineId: item['id'],
-          medicineName: nameController.text.trim(),
-          times: finalTimes,
-          durationDays: durationDays,
-          startDate: startDate,
-        );
+        if (permissionGranted) {
+          await _scheduleMedicineNotifications(
+            medicineId: item['id'],
+            medicineName: nameController.text.trim(),
+            times: finalTimes,
+            durationDays: durationDays,
+            startDate: startDate,
+          );
+        }
       }
 
       nameController.dispose();
@@ -1050,9 +1085,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Medicine updated successfully.',
-          ),
+          content: Text('Medicine updated successfully.'),
         ),
       );
     } catch (e) {
@@ -1064,15 +1097,11 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Could not update medicine.',
-          ),
+          content: Text('Could not update medicine.'),
         ),
       );
 
-      debugPrint(
-        'Edit medicine error: $e',
-      );
+      debugPrint('Edit medicine error: $e');
     }
   }
 
@@ -1351,33 +1380,30 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     required Map<String, dynamic> data,
   }) async {
     try {
-      DateTime startDate = DateTime.now();
+      final startDate = _parseLocalDate(
+            data['startDate'],
+            fallback: DateTime.now(),
+          ) ??
+          DateTime.now();
 
-      if (data['startDate'] is Timestamp) {
-        startDate = (data['startDate'] as Timestamp).toDate();
-      }
-
-      int daysToCancel = 30;
-
-      if (data['durationDays'] is int) {
-        daysToCancel = data['durationDays'] as int;
-      }
+      int daysToCancel = _storedInt(data['durationDays']) ?? 30;
 
       if (daysToCancel > 365) {
         daysToCancel = 365;
       }
 
-      final List<dynamic> oldTimes =
-          data['times'] is List ? List<dynamic>.from(data['times']) : [];
+      if (daysToCancel < 1) {
+        daysToCancel = 30;
+      }
+
+      final oldTimes = _storedTimesAsTimeOfDay(data['times']);
 
       for (int day = 0; day < daysToCancel; day++) {
         final date = DateTime(
           startDate.year,
           startDate.month,
           startDate.day,
-        ).add(
-          Duration(days: day),
-        );
+        ).add(Duration(days: day));
 
         for (int timeIndex = 0; timeIndex < oldTimes.length; timeIndex++) {
           final notificationId =
@@ -1389,9 +1415,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         }
       }
     } catch (e) {
-      debugPrint(
-        'Cancel medicine notifications error: $e',
-      );
+      debugPrint('Cancel medicine notifications error: $e');
     }
   }
 
@@ -1480,11 +1504,11 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       appointmentType = 'General';
     }
 
-    DateTime appointmentDate = DateTime.now();
-
-    if (data['dateTime'] is Timestamp) {
-      appointmentDate = (data['dateTime'] as Timestamp).toDate();
-    }
+    DateTime appointmentDate = _parseLocalDate(
+          data['dateTime'],
+          fallback: DateTime.now().add(const Duration(hours: 1)),
+        ) ??
+        DateTime.now().add(const Duration(hours: 1));
 
     final bool? result = await showDialog<bool>(
       context: context,
@@ -1512,10 +1536,6 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                 ),
                 child: Column(
                   children: [
-                    // ==================================================
-                    // HEADER
-                    // ==================================================
-
                     Padding(
                       padding: const EdgeInsets.fromLTRB(
                         22,
@@ -1529,21 +1549,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                             width: 44,
                             height: 44,
                             decoration: BoxDecoration(
-                              color: primaryBlue.withOpacity(
-                                0.12,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                14,
-                              ),
+                              color: primaryBlue.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(14),
                             ),
                             child: Icon(
                               Icons.calendar_month_outlined,
                               color: primaryBlue,
                             ),
                           ),
-                          const SizedBox(
-                            width: 12,
-                          ),
+                          const SizedBox(width: 12),
                           const Expanded(
                             child: Text(
                               'Edit Appointment',
@@ -1558,23 +1572,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               dialogContext,
                               false,
                             ),
-                            icon: const Icon(
-                              Icons.close,
-                            ),
+                            icon: const Icon(Icons.close),
                           ),
                         ],
                       ),
                     ),
-
                     Divider(
                       height: 1,
                       color: Colors.grey.shade200,
                     ),
-
-                    // ==================================================
-                    // CONTENT
-                    // ==================================================
-
                     Expanded(
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.fromLTRB(
@@ -1586,12 +1592,8 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _dialogSectionTitle(
-                              'Appointment Details',
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
+                            _dialogSectionTitle('Appointment Details'),
+                            const SizedBox(height: 12),
                             _modernDropdown(
                               label: 'Appointment Type',
                               icon: Icons.local_hospital_outlined,
@@ -1603,43 +1605,31 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                 'Heart',
                               ],
                               onChanged: (value) {
-                                setDialogState(
-                                  () {
-                                    appointmentType = value;
-                                  },
-                                );
+                                setDialogState(() {
+                                  appointmentType = value;
+                                });
                               },
                             ),
-                            const SizedBox(
-                              height: 14,
-                            ),
+                            const SizedBox(height: 14),
                             _modernTextField(
                               controller: hospitalController,
                               label: 'Hospital / Clinic',
                               hint: 'Enter hospital or clinic name',
                               icon: Icons.local_hospital_outlined,
                             ),
-                            const SizedBox(
-                              height: 22,
-                            ),
-                            _dialogSectionTitle(
-                              'Date & Time',
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
+                            const SizedBox(height: 22),
+                            _dialogSectionTitle('Date & Time'),
+                            const SizedBox(height: 12),
                             _modernDateField(
                               label: 'Appointment Date',
                               date: appointmentDate,
                               onTap: () async {
                                 final now = DateTime.now();
-
                                 final firstDate = DateTime(
                                   now.year,
                                   now.month,
                                   now.day,
                                 );
-
                                 final initialDate = appointmentDate.isBefore(
                                   firstDate,
                                 )
@@ -1650,34 +1640,26 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                   context: dialogContext,
                                   initialDate: initialDate,
                                   firstDate: firstDate,
-                                  lastDate: DateTime(
-                                    2035,
-                                  ),
+                                  lastDate: DateTime(2035),
                                 );
 
                                 if (picked != null) {
-                                  setDialogState(
-                                    () {
-                                      appointmentDate = DateTime(
-                                        picked.year,
-                                        picked.month,
-                                        picked.day,
-                                        appointmentDate.hour,
-                                        appointmentDate.minute,
-                                      );
-                                    },
-                                  );
+                                  setDialogState(() {
+                                    appointmentDate = DateTime(
+                                      picked.year,
+                                      picked.month,
+                                      picked.day,
+                                      appointmentDate.hour,
+                                      appointmentDate.minute,
+                                    );
+                                  });
                                 }
                               },
                             ),
-                            const SizedBox(
-                              height: 14,
-                            ),
+                            const SizedBox(height: 14),
                             _timeSelector(
                               context: context,
-                              time: TimeOfDay.fromDateTime(
-                                appointmentDate,
-                              ),
+                              time: TimeOfDay.fromDateTime(appointmentDate),
                               onTap: () async {
                                 final picked = await showTimePicker(
                                   context: dialogContext,
@@ -1687,29 +1669,21 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                 );
 
                                 if (picked != null) {
-                                  setDialogState(
-                                    () {
-                                      appointmentDate = DateTime(
-                                        appointmentDate.year,
-                                        appointmentDate.month,
-                                        appointmentDate.day,
-                                        picked.hour,
-                                        picked.minute,
-                                      );
-                                    },
-                                  );
+                                  setDialogState(() {
+                                    appointmentDate = DateTime(
+                                      appointmentDate.year,
+                                      appointmentDate.month,
+                                      appointmentDate.day,
+                                      picked.hour,
+                                      picked.minute,
+                                    );
+                                  });
                                 }
                               },
                             ),
-                            const SizedBox(
-                              height: 22,
-                            ),
-                            _dialogSectionTitle(
-                              'Notes',
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
+                            const SizedBox(height: 22),
+                            _dialogSectionTitle('Notes'),
+                            const SizedBox(height: 12),
                             _modernTextField(
                               controller: reasonController,
                               label: 'Reason / Notes',
@@ -1721,11 +1695,6 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                         ),
                       ),
                     ),
-
-                    // ==================================================
-                    // BOTTOM ACTIONS
-                    // ==================================================
-
                     Container(
                       padding: const EdgeInsets.fromLTRB(
                         22,
@@ -1736,12 +1705,8 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       decoration: const BoxDecoration(
                         color: Color(0xFFF9F7FC),
                         borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(
-                            28,
-                          ),
-                          bottomRight: Radius.circular(
-                            28,
-                          ),
+                          bottomLeft: Radius.circular(28),
+                          bottomRight: Radius.circular(28),
                         ),
                       ),
                       child: Row(
@@ -1753,27 +1718,18 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                 false,
                               ),
                               style: OutlinedButton.styleFrom(
-                                minimumSize: const Size(
-                                  0,
-                                  50,
-                                ),
+                                minimumSize: const Size(0, 50),
                                 side: BorderSide(
                                   color: Colors.grey.shade300,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    14,
-                                  ),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
-                              child: const Text(
-                                'Cancel',
-                              ),
+                              child: const Text('Cancel'),
                             ),
                           ),
-                          const SizedBox(
-                            width: 12,
-                          ),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
@@ -1795,23 +1751,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                   return;
                                 }
 
-                                Navigator.pop(
-                                  dialogContext,
-                                  true,
-                                );
+                                Navigator.pop(dialogContext, true);
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: primaryBlue,
                                 foregroundColor: Colors.white,
-                                minimumSize: const Size(
-                                  0,
-                                  50,
-                                ),
+                                minimumSize: const Size(0, 50),
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    14,
-                                  ),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
                               child: const Text(
@@ -1843,43 +1791,39 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     try {
       final notificationId = item['id'].hashCode.abs();
 
-      // ----------------------------------------------------------
-      // Cancel old notification.
-      // ----------------------------------------------------------
-
-      await NotificationService.instance.cancelAppointmentNotification(
-        appointmentId: item['id'],
+      await NotificationService.instance.cancel(
+        notificationId,
       );
 
-      // ----------------------------------------------------------
-      // Update Firestore.
-      // ----------------------------------------------------------
+      final now = DateTime.now().toIso8601String();
 
-      await _firestore.collection('appointments').doc(item['id']).update({
-        'appointmentType': appointmentType,
-        'hospital': hospitalController.text.trim(),
-        'reason': reasonController.text.trim(),
-        'dateTime': Timestamp.fromDate(
-          appointmentDate,
-        ),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-
-      // ----------------------------------------------------------
-      // Schedule updated notification.
-      // ----------------------------------------------------------
+      await LocalAppointmentService.instance.updateAppointment(
+        item['id'],
+        {
+          'appointmentType': appointmentType,
+          'hospital': hospitalController.text.trim(),
+          'reason': reasonController.text.trim(),
+          'dateTime': appointmentDate.toIso8601String(),
+          'updatedAt': now,
+        },
+      );
 
       if (item['active'] == true) {
-        final reminderBefore =
-            await NotificationService.instance.getAppointmentReminderDuration();
+        final permissionGranted =
+            await NotificationService.instance.requestPermission();
 
-        await NotificationService.instance.scheduleAppointmentNotification(
-          id: notificationId,
-          appointmentType: '$appointmentType appointment at '
-              '${hospitalController.text.trim()}',
-          appointmentTime: appointmentDate,
-          reminderBefore: reminderBefore,
-        );
+        if (permissionGranted) {
+          final reminderBefore = await NotificationService.instance
+              .getAppointmentReminderDuration();
+
+          await NotificationService.instance.scheduleAppointmentNotification(
+            id: notificationId,
+            appointmentType: '$appointmentType appointment at '
+                '${hospitalController.text.trim()}',
+            appointmentTime: appointmentDate,
+            reminderBefore: reminderBefore,
+          );
+        }
       }
 
       hospitalController.dispose();
@@ -1891,9 +1835,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Appointment updated successfully.',
-          ),
+          content: Text('Appointment updated successfully.'),
         ),
       );
     } catch (e) {
@@ -1904,15 +1846,11 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Could not update appointment.',
-          ),
+          content: Text('Could not update appointment.'),
         ),
       );
 
-      debugPrint(
-        'Edit appointment error: $e',
-      );
+      debugPrint('Edit appointment error: $e');
     }
   }
 

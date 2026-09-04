@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/nav_bar.dart';
 import '../services/notification_service.dart';
+import '../services/local_appointment_service.dart';
 
 class AppointmentReminderPage extends StatefulWidget {
   const AppointmentReminderPage({super.key});
@@ -159,7 +159,6 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
     final appointmentDateTime = _combineDateAndTime();
 
-    // Appointment must be in the future.
     if (appointmentDateTime.isBefore(DateTime.now())) {
       _showMessage(
         'Please select a future date and time.',
@@ -168,31 +167,36 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       return;
     }
 
-    // ==========================================================
-    // REMINDER
-    // ==========================================================
-
-    // Read the user's appointment reminder preference.
-    final reminderBefore =
-        await NotificationService.instance.getAppointmentReminderDuration();
-
-    final notificationTime = appointmentDateTime.subtract(reminderBefore);
-
-// The reminder itself must also be in the future.
-    if (notificationTime.isBefore(DateTime.now())) {
-      final reminderLabel = _formatReminderDuration(reminderBefore);
-
-      _showMessage(
-        'The appointment must be more than $reminderLabel from now '
-        'to receive the reminder.',
-        isError: true,
-      );
-      return;
-    }
+    setState(() {
+      isSaving = true;
+    });
 
     try {
       // ========================================================
-      // 1. REQUEST NOTIFICATION + EXACT ALARM PERMISSION
+      // 1. GET REMINDER PREFERENCE
+      // ========================================================
+
+      final reminderBefore =
+          await NotificationService.instance.getAppointmentReminderDuration();
+
+      final notificationTime = appointmentDateTime.subtract(reminderBefore);
+
+      if (notificationTime.isBefore(DateTime.now())) {
+        final reminderLabel = _formatReminderDuration(reminderBefore);
+
+        if (!mounted) return;
+
+        _showMessage(
+          'The appointment must be more than $reminderLabel from now '
+          'to receive the reminder.',
+          isError: true,
+        );
+
+        return;
+      }
+
+      // ========================================================
+      // 2. REQUEST NOTIFICATION PERMISSION
       // ========================================================
 
       final permissionGranted =
@@ -211,30 +215,39 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       }
 
       // ========================================================
-      // 2. SAVE APPOINTMENT TO FIRESTORE
+      // 3. CREATE LOCAL APPOINTMENT ID
       // ========================================================
 
-      final appointmentDoc =
-          await FirebaseFirestore.instance.collection('appointments').add({
+      final now = DateTime.now();
+
+      final appointmentId =
+          '${now.microsecondsSinceEpoch}_${hospital.hashCode}';
+
+      // ========================================================
+      // 4. SAVE APPOINTMENT LOCALLY
+      // ========================================================
+
+      final appointmentData = <String, dynamic>{
+        'id': appointmentId,
         'userId': user.uid,
         'appointmentType': selectedType,
         'hospital': hospital,
-        'dateTime': Timestamp.fromDate(appointmentDateTime),
+        'dateTime': appointmentDateTime.toIso8601String(),
         'reason': reason,
-        'active': true,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+        'active': 1,
+        'createdAt': now.toIso8601String(),
+        'updatedAt': now.toIso8601String(),
+      };
+
+      await LocalAppointmentService.instance.insertAppointment(
+        appointmentData,
+      );
 
       // ========================================================
-      // 3. CREATE NOTIFICATION ID
+      // 5. SCHEDULE LOCAL NOTIFICATION
       // ========================================================
 
-      final notificationId = appointmentDoc.id.hashCode.abs();
-
-      // ========================================================
-      // 4. SCHEDULE NOTIFICATION
-      // ========================================================
+      final notificationId = appointmentId.hashCode.abs();
 
       await NotificationService.instance.scheduleAppointmentNotification(
         id: notificationId,
@@ -250,7 +263,8 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       if (!mounted) return;
 
       _showMessage(
-        'Appointment saved. Reminder set for 1 hour before.',
+        'Appointment saved. Reminder set for '
+        '${_formatReminderDuration(reminderBefore)} before.',
         isError: false,
       );
 
@@ -263,18 +277,6 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       Navigator.pushReplacementNamed(
         context,
         '/reminder',
-      );
-    } on FirebaseException catch (e) {
-      if (!mounted) return;
-
-      debugPrint(
-        'Save appointment Firebase error: $e',
-      );
-
-      _showMessage(
-        'Could not save appointment: '
-        '${e.message ?? e.code}',
-        isError: true,
       );
     } catch (e) {
       if (!mounted) return;
@@ -297,12 +299,18 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
   }
 
   // ============================================================
-// FORMAT REMINDER DURATION
-// ============================================================
+  // FORMAT REMINDER DURATION
+  // ============================================================
 
   String _formatReminderDuration(Duration duration) {
     if (duration.inDays >= 1) {
-      return '1 day';
+      final days = duration.inDays;
+
+      if (days == 1) {
+        return '1 day';
+      }
+
+      return '$days days';
     }
 
     if (duration.inHours >= 1) {
