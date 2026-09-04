@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../widgets/nav_bar.dart';
 import '../services/notification_service.dart';
+import '../services/local_database_service.dart';
 
 class PillReminderPage extends StatefulWidget {
   const PillReminderPage({super.key});
@@ -264,7 +264,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
   }
 
   // ------------------------------------------------------------
-  // FORMAT TIME FOR FIRESTORE
+  // FORMAT TIME FOR LOCAL DATABASE
   // ------------------------------------------------------------
 
   String _formatTimeForDatabase(TimeOfDay time) {
@@ -304,7 +304,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
   }
 
   // ------------------------------------------------------------
-  // SAVE TO FIRESTORE
+  // SAVE REMINDER LOCALLY
   // ------------------------------------------------------------
 
   Future<void> _saveReminder() async {
@@ -357,57 +357,68 @@ class _PillReminderPageState extends State<PillReminderPage> {
         );
       }
 
-      final reminderData = <String, dynamic>{
+      final startDate = DateTime(
+        selectedStartDate.year,
+        selectedStartDate.month,
+        selectedStartDate.day,
+      );
+
+      final now = DateTime.now();
+
+      // Stable local ID.
+      final medicineId =
+          '${now.microsecondsSinceEpoch}_${medicineName.hashCode}';
+
+      final medicineData = <String, dynamic>{
+        'id': medicineId,
         'userId': user.uid,
         'medicineName': medicineName,
         'medicineType': selectedType,
         'dose': dose,
         'instructions': instructions,
         'frequency': selectedFrequency,
-        'times': finalTimes.map(_formatTimeForDatabase).toList(),
+
+        // SQLite stores this as a single String.
+        // Example: "08:00,20:00"
+        'times': finalTimes.map(_formatTimeForDatabase).join(','),
+
         'duration': selectedDuration,
         'durationDays': durationDays,
-        'startDate': Timestamp.fromDate(
-          DateTime(
-            selectedStartDate.year,
-            selectedStartDate.month,
-            selectedStartDate.day,
-          ),
-        ),
-        'endDate': endDate == null ? null : Timestamp.fromDate(endDate),
-        'active': true,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
+        'startDate': startDate.toIso8601String(),
+        'endDate': endDate?.toIso8601String(),
+        'active': 1,
+        'createdAt': now.toIso8601String(),
+        'updatedAt': now.toIso8601String(),
       };
 
-      // ------------------------------------------------------------
-// SCHEDULE MEDICINE NOTIFICATIONS
-// ------------------------------------------------------------
+      // ----------------------------------------------------------
+      // SAVE TO LOCAL SQLITE DATABASE
+      // ----------------------------------------------------------
 
-      Future<void> scheduleMedicineNotifications({
-        required String medicineId,
-        required String medicineName,
-        required List<TimeOfDay> times,
-        required int? durationDays,
-      }) async {
-        // "As Needed" medicines have no fixed notification time.
-        if (times.isEmpty) {
-          return;
-        }
+      await LocalDatabaseService.instance.insertMedicine(
+        medicineData,
+      );
 
-        // For now, schedule up to 30 days for ongoing medicines.
-        // We can improve this later with a proper recurring system.
+      // ----------------------------------------------------------
+      // REQUEST NOTIFICATION PERMISSION
+      // ----------------------------------------------------------
+
+      await NotificationService.instance.requestPermission();
+
+      // ----------------------------------------------------------
+      // SCHEDULE MEDICINE NOTIFICATIONS
+      // ----------------------------------------------------------
+
+      if (finalTimes.isNotEmpty) {
         final daysToSchedule = durationDays ?? 30;
 
         for (int day = 0; day < daysToSchedule; day++) {
-          final date = DateTime(
-            selectedStartDate.year,
-            selectedStartDate.month,
-            selectedStartDate.day,
-          ).add(Duration(days: day));
+          final date = startDate.add(
+            Duration(days: day),
+          );
 
-          for (int timeIndex = 0; timeIndex < times.length; timeIndex++) {
-            final time = times[timeIndex];
+          for (int timeIndex = 0; timeIndex < finalTimes.length; timeIndex++) {
+            final time = finalTimes[timeIndex];
 
             final scheduledTime = DateTime(
               date.year,
@@ -417,7 +428,8 @@ class _PillReminderPageState extends State<PillReminderPage> {
               time.minute,
             );
 
-            // Don't schedule notifications that are already in the past.
+            // Don't schedule notifications that are already
+            // in the past.
             if (scheduledTime.isBefore(DateTime.now())) {
               continue;
             }
@@ -436,23 +448,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
         }
       }
 
-      final medicineDoc = await FirebaseFirestore.instance
-          .collection('medicines')
-          .add(reminderData);
-
       if (!mounted) return;
-
-      // Schedule medicine notifications
-      // Request notification permissions
-      await NotificationService.instance.requestPermission();
-
-// Schedule medicine notifications
-      await scheduleMedicineNotifications(
-        medicineId: medicineDoc.id,
-        medicineName: medicineName,
-        times: finalTimes,
-        durationDays: durationDays,
-      );
 
       _showMessage(
         'Medicine reminder added successfully.',
@@ -466,17 +462,11 @@ class _PillReminderPageState extends State<PillReminderPage> {
       if (!mounted) return;
 
       Navigator.pop(context);
-    } on FirebaseException catch (e) {
-      if (!mounted) return;
-
-      _showMessage(
-        'Could not save reminder: ${e.message ?? e.code}',
-      );
     } catch (e) {
       if (!mounted) return;
 
       _showMessage(
-        'Something went wrong. Please try again.',
+        'Could not save reminder. Please try again.',
       );
 
       debugPrint('Save reminder error: $e');
