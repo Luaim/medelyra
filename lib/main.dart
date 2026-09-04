@@ -38,12 +38,12 @@ Future<void> main() async {
     widgetsBinding: widgetsBinding,
   );
 
-  // Initialize Firebase
+  // Initialize Firebase.
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize local notifications
+  // Initialize local notifications.
   await NotificationService.initialize();
 
   // Check whether onboarding has already been completed.
@@ -54,17 +54,17 @@ Future<void> main() async {
   Widget initialPage;
 
   if (!onboardingCompleted) {
-    // First launch → Onboarding
+    // First launch → Onboarding.
     initialPage = const OnboardingPage();
   } else {
-    // Onboarding completed → check Firebase login
+    // Onboarding completed → check Firebase login.
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Already logged in → Home
+      // Already logged in → Home.
       initialPage = const HomePage();
     } else {
-      // Logged out → Sign In
+      // Logged out → Sign In.
       initialPage = const SignInPage();
     }
   }

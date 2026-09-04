@@ -21,14 +21,14 @@ class LocalDatabaseService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onOpen: (db) async {
-        // Make sure both tables exist even if another service created
-        // the database first.
         await _createMedicinesTable(db);
         await _createAppointmentsTable(db);
+        await _createMedicineDoseStatusTable(db);
+        await _ensureAppointmentCompletedAtColumn(db);
       },
     );
   }
@@ -36,6 +36,7 @@ class LocalDatabaseService {
   Future<void> _createDB(Database db, int version) async {
     await _createMedicinesTable(db);
     await _createAppointmentsTable(db);
+    await _createMedicineDoseStatusTable(db);
   }
 
   Future<void> _upgradeDB(
@@ -45,7 +46,16 @@ class LocalDatabaseService {
   ) async {
     await _createMedicinesTable(db);
     await _createAppointmentsTable(db);
+    await _createMedicineDoseStatusTable(db);
+
+    if (oldVersion < 3) {
+      await _ensureAppointmentCompletedAtColumn(db);
+    }
   }
+
+  // ============================================================
+  // MEDICINES
+  // ============================================================
 
   Future<void> _createMedicinesTable(Database db) async {
     await db.execute('''
@@ -69,6 +79,10 @@ class LocalDatabaseService {
     ''');
   }
 
+  // ============================================================
+  // APPOINTMENTS
+  // ============================================================
+
   Future<void> _createAppointmentsTable(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS appointments (
@@ -79,13 +93,63 @@ class LocalDatabaseService {
         dateTime TEXT NOT NULL,
         reason TEXT NOT NULL,
         active INTEGER NOT NULL DEFAULT 1,
+        completedAt TEXT,
         createdAt TEXT NOT NULL,
         updatedAt TEXT NOT NULL
       )
     ''');
   }
 
-  Future<String> insertMedicine(Map<String, dynamic> medicine) async {
+  Future<void> _ensureAppointmentCompletedAtColumn(
+    Database db,
+  ) async {
+    try {
+      final columns = await db.rawQuery(
+        'PRAGMA table_info(appointments)',
+      );
+
+      final hasCompletedAt = columns.any(
+        (column) => column['name'] == 'completedAt',
+      );
+
+      if (!hasCompletedAt) {
+        await db.execute(
+          'ALTER TABLE appointments ADD COLUMN completedAt TEXT',
+        );
+      }
+    } catch (_) {
+      // Ignore if the column already exists.
+    }
+  }
+
+  // ============================================================
+  // MEDICINE DOSE STATUS
+  // ============================================================
+
+  Future<void> _createMedicineDoseStatusTable(
+    Database db,
+  ) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS medicine_dose_status (
+        medicineId TEXT NOT NULL,
+        userId TEXT NOT NULL,
+        date TEXT NOT NULL,
+        time TEXT NOT NULL,
+        status TEXT NOT NULL,
+        postponedUntil TEXT,
+        updatedAt TEXT NOT NULL,
+        PRIMARY KEY (medicineId, date, time)
+      )
+    ''');
+  }
+
+  // ============================================================
+  // MEDICINE CRUD
+  // ============================================================
+
+  Future<String> insertMedicine(
+    Map<String, dynamic> medicine,
+  ) async {
     final db = await database;
 
     await db.insert(
@@ -97,7 +161,9 @@ class LocalDatabaseService {
     return medicine['id'] as String;
   }
 
-  Future<List<Map<String, dynamic>>> getMedicines(String userId) async {
+  Future<List<Map<String, dynamic>>> getMedicines(
+    String userId,
+  ) async {
     final db = await database;
 
     return await db.query(
@@ -108,7 +174,9 @@ class LocalDatabaseService {
     );
   }
 
-  Future<Map<String, dynamic>?> getMedicine(String id) async {
+  Future<Map<String, dynamic>?> getMedicine(
+    String id,
+  ) async {
     final db = await database;
 
     final results = await db.query(
@@ -142,6 +210,12 @@ class LocalDatabaseService {
   Future<int> deleteMedicine(String id) async {
     final db = await database;
 
+    await db.delete(
+      'medicine_dose_status',
+      where: 'medicineId = ?',
+      whereArgs: [id],
+    );
+
     return await db.delete(
       'medicines',
       where: 'id = ?',
@@ -152,12 +226,113 @@ class LocalDatabaseService {
   Future<int> deleteAllMedicines(String userId) async {
     final db = await database;
 
+    final medicines = await db.query(
+      'medicines',
+      columns: ['id'],
+      where: 'userId = ?',
+      whereArgs: [userId],
+    );
+
+    for (final medicine in medicines) {
+      await db.delete(
+        'medicine_dose_status',
+        where: 'medicineId = ?',
+        whereArgs: [medicine['id']],
+      );
+    }
+
     return await db.delete(
       'medicines',
       where: 'userId = ?',
       whereArgs: [userId],
     );
   }
+
+  // ============================================================
+  // DOSE STATUS
+  // ============================================================
+
+  Future<void> upsertMedicineDoseStatus({
+    required String medicineId,
+    required String userId,
+    required String date,
+    required String time,
+    required String status,
+    DateTime? postponedUntil,
+  }) async {
+    final db = await database;
+
+    await db.insert(
+      'medicine_dose_status',
+      {
+        'medicineId': medicineId,
+        'userId': userId,
+        'date': date,
+        'time': time,
+        'status': status,
+        'postponedUntil': postponedUntil?.toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<Map<String, dynamic>?> getMedicineDoseStatus({
+    required String medicineId,
+    required String date,
+    required String time,
+  }) async {
+    final db = await database;
+
+    final results = await db.query(
+      'medicine_dose_status',
+      where: 'medicineId = ? AND date = ? AND time = ?',
+      whereArgs: [
+        medicineId,
+        date,
+        time,
+      ],
+      limit: 1,
+    );
+
+    if (results.isEmpty) {
+      return null;
+    }
+
+    return results.first;
+  }
+
+  Future<List<Map<String, dynamic>>> getMedicineDoseStatusesForDate({
+    required String userId,
+    required String date,
+  }) async {
+    final db = await database;
+
+    return await db.query(
+      'medicine_dose_status',
+      where: 'userId = ? AND date = ?',
+      whereArgs: [
+        userId,
+        date,
+      ],
+    );
+  }
+
+  Future<int> deleteMedicineDoseStatuses(
+    String medicineId,
+  ) async {
+    final db = await database;
+
+    return await db.delete(
+      'medicine_dose_status',
+      where: 'medicineId = ?',
+      whereArgs: [medicineId],
+    );
+  }
+
+  // ============================================================
+  // CLOSE
+  // ============================================================
 
   Future<void> close() async {
     final db = await database;
