@@ -22,14 +22,14 @@ class LocalAppointmentService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onOpen: (db) async {
-        // Make sure both tables exist regardless of which local service
-        // opened the database first.
         await _createMedicinesTable(db);
         await _createAppointmentsTable(db);
+        await _createMedicineDoseStatusTable(db);
+        await _ensureAppointmentCompletedAtColumn(db);
       },
     );
   }
@@ -37,6 +37,7 @@ class LocalAppointmentService {
   Future<void> _createDB(Database db, int version) async {
     await _createMedicinesTable(db);
     await _createAppointmentsTable(db);
+    await _createMedicineDoseStatusTable(db);
   }
 
   Future<void> _upgradeDB(
@@ -46,6 +47,11 @@ class LocalAppointmentService {
   ) async {
     await _createMedicinesTable(db);
     await _createAppointmentsTable(db);
+    await _createMedicineDoseStatusTable(db);
+
+    if (oldVersion < 3) {
+      await _ensureAppointmentCompletedAtColumn(db);
+    }
   }
 
   Future<void> _createMedicinesTable(Database db) async {
@@ -80,11 +86,55 @@ class LocalAppointmentService {
         dateTime TEXT NOT NULL,
         reason TEXT NOT NULL,
         active INTEGER NOT NULL DEFAULT 1,
+        completedAt TEXT,
         createdAt TEXT NOT NULL,
         updatedAt TEXT NOT NULL
       )
     ''');
   }
+
+  Future<void> _ensureAppointmentCompletedAtColumn(
+    Database db,
+  ) async {
+    try {
+      final columns = await db.rawQuery(
+        'PRAGMA table_info(appointments)',
+      );
+
+      final hasCompletedAt = columns.any(
+        (column) => column['name'] == 'completedAt',
+      );
+
+      if (!hasCompletedAt) {
+        await db.execute(
+          'ALTER TABLE appointments ADD COLUMN completedAt TEXT',
+        );
+      }
+    } catch (_) {
+      // Ignore if the column already exists.
+    }
+  }
+
+  Future<void> _createMedicineDoseStatusTable(
+    Database db,
+  ) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS medicine_dose_status (
+        medicineId TEXT NOT NULL,
+        userId TEXT NOT NULL,
+        date TEXT NOT NULL,
+        time TEXT NOT NULL,
+        status TEXT NOT NULL,
+        postponedUntil TEXT,
+        updatedAt TEXT NOT NULL,
+        PRIMARY KEY (medicineId, date, time)
+      )
+    ''');
+  }
+
+  // ============================================================
+  // APPOINTMENTS
+  // ============================================================
 
   Future<String> insertAppointment(
     Map<String, dynamic> appointment,
@@ -113,7 +163,9 @@ class LocalAppointmentService {
     );
   }
 
-  Future<Map<String, dynamic>?> getAppointment(String id) async {
+  Future<Map<String, dynamic>?> getAppointment(
+    String id,
+  ) async {
     final db = await database;
 
     final results = await db.query(
@@ -139,6 +191,22 @@ class LocalAppointmentService {
     return await db.update(
       'appointments',
       appointment,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> markAppointmentCompleted(
+    String id,
+  ) async {
+    final db = await database;
+
+    return await db.update(
+      'appointments',
+      {
+        'completedAt': DateTime.now().toIso8601String(),
+        'updatedAt': DateTime.now().toIso8601String(),
+      },
       where: 'id = ?',
       whereArgs: [id],
     );

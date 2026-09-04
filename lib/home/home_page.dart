@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../services/local_database_service.dart';
+import '../services/local_appointment_service.dart';
 import '../widgets/nav_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,26 +18,35 @@ class _HomePageState extends State<HomePage> {
   final Color red = const Color(0xFFEF5350);
   final Color orange = const Color(0xFFF59E0B);
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool showMedicines = true;
+  bool _isLoading = true;
 
   DateTime selectedDate = DateTime.now();
 
   // ============================================================
-// HOME DATE RANGE
-// ============================================================
-//
-// Keep the Home screen focused:
-//
-// 2 previous days
-// Today
-// 30 upcoming days
-//
-// This keeps today's reminders easy to find while still allowing
-// the user to scroll forward for upcoming appointments/medicines.
-//
+  // LOCAL DATA
+  // ============================================================
+
+  List<Map<String, dynamic>> _medicines = [];
+  List<Map<String, dynamic>> _appointments = [];
+
+  // Key:
+  // medicineId + date + time
+  Map<String, Map<String, dynamic>> _doseStatuses = {};
+
+  // ============================================================
+  // HOME DATE RANGE
+  // ============================================================
+  //
+  // 2 previous days
+  // Today
+  // 30 upcoming days
+  //
+  // This keeps today's reminders easy to find while still allowing
+  // the user to scroll forward for upcoming appointments/medicines.
+  //
 
   List<DateTime> availableDates = [];
   int selectedDayIndex = 2;
@@ -64,6 +74,8 @@ class _HomePageState extends State<HomePage> {
     // Always open Home on today.
     selectedDate = today;
     selectedDayIndex = 2;
+
+    _loadHomeData();
   }
 
   // ============================================================
@@ -99,6 +111,86 @@ class _HomePageState extends State<HomePage> {
       case 4:
         Navigator.pushReplacementNamed(context, '/profile');
         break;
+    }
+  }
+
+  // ============================================================
+  // LOAD HOME DATA
+  // ============================================================
+
+  Future<void> _loadHomeData() async {
+    final uid = currentUserId;
+
+    if (uid == null) {
+      if (!mounted) return;
+
+      setState(() {
+        _medicines = [];
+        _appointments = [];
+        _doseStatuses = {};
+        _isLoading = false;
+      });
+
+      return;
+    }
+
+    try {
+      final medicines = await LocalDatabaseService.instance.getMedicines(uid);
+
+      final appointments =
+          await LocalAppointmentService.instance.getAppointments(uid);
+
+      final doseStatuses =
+          await LocalDatabaseService.instance.getMedicineDoseStatusesForDate(
+        userId: uid,
+        date: _dateKey(selectedDate),
+      );
+
+      final Map<String, Map<String, dynamic>> statusMap = {};
+
+      for (final status in doseStatuses) {
+        final medicineId = status['medicineId']?.toString() ?? '';
+        final date = status['date']?.toString() ?? '';
+        final time = status['time']?.toString() ?? '';
+
+        if (medicineId.isEmpty || date.isEmpty || time.isEmpty) {
+          continue;
+        }
+
+        final key = _localDoseKey(
+          medicineId: medicineId,
+          date: date,
+          time: time,
+        );
+
+        statusMap[key] = status;
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _medicines = medicines;
+        _appointments = appointments;
+        _doseStatuses = statusMap;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('HOME LOAD ERROR: $e');
+
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Could not load reminders: $e',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -158,14 +250,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ============================================================
-// MEDICINE TYPE ICON
-// ============================================================
+  // MEDICINE TYPE ICON
+  // ============================================================
 
   IconData _medicineTypeIcon(dynamic type) {
     final value = type?.toString().toLowerCase().trim();
-
-    // DEBUG:
-    debugPrint('MEDICINE TYPE FROM FIRESTORE: "$value"');
 
     if (value == null || value.isEmpty) {
       return Icons.medication_outlined;
@@ -208,13 +297,12 @@ class _HomePageState extends State<HomePage> {
       return Icons.air_outlined;
     }
 
-    // DEFAULT
     return Icons.medication_outlined;
   }
 
-// ============================================================
-// APPOINTMENT TYPE ICON
-// ============================================================
+  // ============================================================
+  // APPOINTMENT TYPE ICON
+  // ============================================================
 
   IconData _appointmentTypeIcon(dynamic type) {
     final value = type?.toString().toLowerCase().trim();
@@ -241,35 +329,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ============================================================
-  // FIRESTORE STREAMS
+  // LOCAL DOSE KEY
   // ============================================================
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> _medicineStream() {
-    final uid = currentUserId;
-
-    if (uid == null) {
-      return const Stream.empty();
-    }
-
-    return _firestore
-        .collection('medicines')
-        .where('userId', isEqualTo: uid)
-        .where('active', isEqualTo: true)
-        .snapshots();
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> _appointmentStream() {
-    final uid = currentUserId;
-
-    if (uid == null) {
-      return const Stream.empty();
-    }
-
-    return _firestore
-        .collection('appointments')
-        .where('userId', isEqualTo: uid)
-        .where('active', isEqualTo: true)
-        .snapshots();
+  String _localDoseKey({
+    required String medicineId,
+    required String date,
+    required String time,
+  }) {
+    return '$medicineId|$date|$time';
   }
 
   // ============================================================
@@ -286,16 +354,16 @@ class _HomePageState extends State<HomePage> {
     final start = data['startDate'];
     final end = data['endDate'];
 
-    if (start is Timestamp) {
-      startDate = start.toDate();
-    } else if (start is DateTime) {
+    if (start is DateTime) {
       startDate = start;
+    } else if (start is String && start.isNotEmpty) {
+      startDate = DateTime.tryParse(start);
     }
 
-    if (end is Timestamp) {
-      endDate = end.toDate();
-    } else if (end is DateTime) {
+    if (end is DateTime) {
       endDate = end;
+    } else if (end is String && end.isNotEmpty) {
+      endDate = DateTime.tryParse(end);
     }
 
     if (startDate == null) {
@@ -332,10 +400,10 @@ class _HomePageState extends State<HomePage> {
 
     DateTime? appointmentDate;
 
-    if (value is Timestamp) {
-      appointmentDate = value.toDate();
-    } else if (value is DateTime) {
+    if (value is DateTime) {
       appointmentDate = value;
+    } else if (value is String && value.isNotEmpty) {
+      appointmentDate = DateTime.tryParse(value);
     }
 
     if (appointmentDate == null) {
@@ -349,41 +417,71 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ============================================================
-  // MEDICINE TIMES
+  // MEDICINE TIME FORMAT
   // ============================================================
 
-  String _formatFirestoreTime(dynamic value) {
-    if (value == null) {
+  String _formatLocalTime(String value) {
+    final trimmed = value.trim();
+
+    if (trimmed.isEmpty) {
       return '';
     }
 
-    DateTime? date;
+    // Already contains AM/PM.
+    final upper = trimmed.toUpperCase();
 
-    if (value is Timestamp) {
-      date = value.toDate();
-    } else if (value is DateTime) {
-      date = value;
+    if (upper.contains('AM') || upper.contains('PM')) {
+      return trimmed;
     }
 
-    if (date != null) {
-      return TimeOfDay.fromDateTime(date).format(context);
+    // Try HH:mm / H:mm
+    final parts = trimmed.split(':');
+
+    if (parts.length == 2) {
+      final hour = int.tryParse(parts[0]);
+      final minute = int.tryParse(parts[1]);
+
+      if (hour != null && minute != null) {
+        if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
+          final time = TimeOfDay(
+            hour: hour,
+            minute: minute,
+          );
+
+          return time.format(context);
+        }
+      }
     }
 
-    if (value is String) {
-      return value;
-    }
-
-    return '';
+    return trimmed;
   }
+
+  // ============================================================
+  // MEDICINE TIMES
+  // ============================================================
 
   List<String> _medicineTimes(
     Map<String, dynamic> data,
   ) {
     final times = data['times'];
 
+    if (times is String && times.trim().isNotEmpty) {
+      return times
+          .split(',')
+          .map((time) => _formatLocalTime(time))
+          .where((time) => time.isNotEmpty)
+          .toList();
+    }
+
     if (times is List && times.isNotEmpty) {
       final result = times
-          .map((time) => _formatFirestoreTime(time))
+          .map((time) {
+            if (time is String) {
+              return _formatLocalTime(time);
+            }
+
+            return time?.toString() ?? '';
+          })
           .where((time) => time.isNotEmpty)
           .toList();
 
@@ -394,40 +492,11 @@ class _HomePageState extends State<HomePage> {
 
     final singleTime = data['time'];
 
-    if (singleTime != null) {
-      final result = _formatFirestoreTime(singleTime);
-
-      if (result.isNotEmpty) {
-        return [result];
-      }
+    if (singleTime is String && singleTime.isNotEmpty) {
+      return [_formatLocalTime(singleTime)];
     }
 
     return [];
-  }
-
-  // ============================================================
-  // DOSE KEY
-  //
-  // Every dose gets its own key:
-  //
-  // 2026-08-21_8_00_AM
-  // 2026-08-21_9_00_PM
-  //
-  // This means taking the morning dose does NOT mark the
-  // evening dose as taken.
-  // ============================================================
-
-  String _doseKey(
-    DateTime date,
-    String time,
-  ) {
-    final safeTime = time
-        .replaceAll(' ', '_')
-        .replaceAll(':', '_')
-        .replaceAll('.', '_')
-        .replaceAll('/', '_');
-
-    return '${_dateKey(date)}_$safeTime';
   }
 
   // ============================================================
@@ -435,27 +504,18 @@ class _HomePageState extends State<HomePage> {
   // ============================================================
 
   Map<String, dynamic>? _getDoseStatus(
-    Map<String, dynamic> medicine,
+    String medicineId,
     String time,
   ) {
-    final dailyStatus = medicine['dailyStatus'];
+    final date = _dateKey(selectedDate);
 
-    if (dailyStatus is! Map) {
-      return null;
-    }
-
-    final key = _doseKey(
-      selectedDate,
-      time,
+    final key = _localDoseKey(
+      medicineId: medicineId,
+      date: date,
+      time: time,
     );
 
-    final status = dailyStatus[key];
-
-    if (status is Map) {
-      return Map<String, dynamic>.from(status);
-    }
-
-    return null;
+    return _doseStatuses[key];
   }
 
   // ============================================================
@@ -468,46 +528,25 @@ class _HomePageState extends State<HomePage> {
     required String status,
     DateTime? postponedUntil,
   }) async {
+    final uid = currentUserId;
+
+    if (uid == null) {
+      return;
+    }
+
     try {
-      final ref = _firestore.collection('medicines').doc(medicineId);
+      final date = _dateKey(selectedDate);
 
-      await _firestore.runTransaction((transaction) async {
-        final snapshot = await transaction.get(ref);
+      await LocalDatabaseService.instance.upsertMedicineDoseStatus(
+        medicineId: medicineId,
+        userId: uid,
+        date: date,
+        time: time,
+        status: status,
+        postponedUntil: postponedUntil,
+      );
 
-        if (!snapshot.exists) {
-          throw Exception('Medicine no longer exists.');
-        }
-
-        final data = snapshot.data() as Map<String, dynamic>;
-
-        final existing = data['dailyStatus'];
-
-        final Map<String, dynamic> dailyStatus =
-            existing is Map ? Map<String, dynamic>.from(existing) : {};
-
-        final key = _doseKey(
-          selectedDate,
-          time,
-        );
-
-        final Map<String, dynamic> newStatus = {
-          'status': status,
-          'updatedAt': FieldValue.serverTimestamp(),
-        };
-
-        if (postponedUntil != null) {
-          newStatus['postponedUntil'] = Timestamp.fromDate(postponedUntil);
-        }
-
-        dailyStatus[key] = newStatus;
-
-        transaction.update(
-          ref,
-          {
-            'dailyStatus': dailyStatus,
-          },
-        );
-      });
+      await _loadHomeData();
     } catch (e) {
       if (!mounted) return;
 
@@ -630,9 +669,11 @@ class _HomePageState extends State<HomePage> {
     String appointmentId,
   ) async {
     try {
-      await _firestore.collection('appointments').doc(appointmentId).update({
-        'completedAt': FieldValue.serverTimestamp(),
-      });
+      await LocalAppointmentService.instance.markAppointmentCompleted(
+        appointmentId,
+      );
+
+      await _loadHomeData();
     } catch (e) {
       if (!mounted) return;
 
@@ -705,11 +746,14 @@ class _HomePageState extends State<HomePage> {
                     final isToday = _sameDate(date, DateTime.now());
 
                     return GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         setState(() {
                           selectedDayIndex = index;
                           selectedDate = date;
+                          _isLoading = true;
                         });
+
+                        await _loadHomeData();
                       },
                       child: Container(
                         width: 64,
@@ -807,6 +851,13 @@ class _HomePageState extends State<HomePage> {
                   title: 'Please log in',
                   message: 'Log in to see your reminders.',
                 )
+              else if (_isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(30),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
               else if (showMedicines)
                 _buildMedicines()
               else
@@ -825,52 +876,36 @@ class _HomePageState extends State<HomePage> {
   // ============================================================
 
   Widget _buildMedicines() {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: _medicineStream(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(30),
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
+    final filtered = _medicines.where((medicine) {
+      final active = medicine['active'] == 1 || medicine['active'] == true;
 
-        if (snapshot.hasError) {
-          return _emptyState(
-            icon: Icons.error_outline,
-            title: 'Could not load medicines',
-            message: 'Please check your connection and try again.',
-          );
-        }
+      if (!active) {
+        return false;
+      }
 
-        final docs = snapshot.data?.docs ?? [];
+      return _medicineIsForDate(
+        medicine,
+        selectedDate,
+      );
+    }).toList();
 
-        final filtered = docs.where((doc) {
-          return _medicineIsForDate(
-            doc.data(),
-            selectedDate,
-          );
-        }).toList();
+    if (filtered.isEmpty) {
+      return _emptyState(
+        icon: Icons.medication_outlined,
+        title: 'No medicines on this date',
+        message: 'You have no active medicine reminders for this day.',
+      );
+    }
 
-        if (filtered.isEmpty) {
-          return _emptyState(
-            icon: Icons.medication_outlined,
-            title: 'No medicines on this date',
-            message: 'You have no active medicine reminders for this day.',
-          );
-        }
+    return Column(
+      children: filtered.map((medicine) {
+        final id = medicine['id']?.toString() ?? '';
 
-        return Column(
-          children: filtered.map((doc) {
-            return _medicineCard(
-              doc.id,
-              doc.data(),
-            );
-          }).toList(),
+        return _medicineCard(
+          id,
+          medicine,
         );
-      },
+      }).toList(),
     );
   }
 
@@ -987,7 +1022,6 @@ class _HomePageState extends State<HomePage> {
               medicineId: documentId,
               medicineName: medicineName,
               time: time,
-              medicineData: item,
             ),
           ),
         ],
@@ -1003,10 +1037,9 @@ class _HomePageState extends State<HomePage> {
     required String medicineId,
     required String medicineName,
     required String time,
-    required Map<String, dynamic> medicineData,
   }) {
     final status = _getDoseStatus(
-      medicineData,
+      medicineId,
       time,
     );
 
@@ -1017,9 +1050,17 @@ class _HomePageState extends State<HomePage> {
     if (statusValue == 'postponed') {
       final postponed = status?['postponedUntil'];
 
-      if (postponed is Timestamp) {
+      DateTime? postponedDate;
+
+      if (postponed is DateTime) {
+        postponedDate = postponed;
+      } else if (postponed is String && postponed.isNotEmpty) {
+        postponedDate = DateTime.tryParse(postponed);
+      }
+
+      if (postponedDate != null) {
         postponedText = TimeOfDay.fromDateTime(
-          postponed.toDate(),
+          postponedDate,
         ).format(context);
       }
     }
@@ -1337,52 +1378,37 @@ class _HomePageState extends State<HomePage> {
   // ============================================================
 
   Widget _buildAppointments() {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: _appointmentStream(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(30),
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
+    final filtered = _appointments.where((appointment) {
+      final active =
+          appointment['active'] == 1 || appointment['active'] == true;
 
-        if (snapshot.hasError) {
-          return _emptyState(
-            icon: Icons.error_outline,
-            title: 'Could not load appointments',
-            message: 'Please check your connection and try again.',
-          );
-        }
+      if (!active) {
+        return false;
+      }
 
-        final docs = snapshot.data?.docs ?? [];
+      return _appointmentIsForDate(
+        appointment,
+        selectedDate,
+      );
+    }).toList();
 
-        final filtered = docs.where((doc) {
-          return _appointmentIsForDate(
-            doc.data(),
-            selectedDate,
-          );
-        }).toList();
+    if (filtered.isEmpty) {
+      return _emptyState(
+        icon: Icons.calendar_today_outlined,
+        title: 'No appointments on this date',
+        message: 'You have no appointments scheduled for this day.',
+      );
+    }
 
-        if (filtered.isEmpty) {
-          return _emptyState(
-            icon: Icons.calendar_today_outlined,
-            title: 'No appointments on this date',
-            message: 'You have no appointments scheduled for this day.',
-          );
-        }
+    return Column(
+      children: filtered.map((appointment) {
+        final id = appointment['id']?.toString() ?? '';
 
-        return Column(
-          children: filtered.map((doc) {
-            return _appointmentCard(
-              doc.id,
-              doc.data(),
-            );
-          }).toList(),
+        return _appointmentCard(
+          id,
+          appointment,
         );
-      },
+      }).toList(),
     );
   }
 
@@ -1404,8 +1430,10 @@ class _HomePageState extends State<HomePage> {
 
     DateTime? dateTime;
 
-    if (value is Timestamp) {
-      dateTime = value.toDate();
+    if (value is DateTime) {
+      dateTime = value;
+    } else if (value is String && value.isNotEmpty) {
+      dateTime = DateTime.tryParse(value);
     }
 
     String timeText = 'Time not set';
@@ -1416,7 +1444,8 @@ class _HomePageState extends State<HomePage> {
       ).format(context);
     }
 
-    final completed = item['completedAt'] != null;
+    final completed = item['completedAt'] != null &&
+        item['completedAt'].toString().isNotEmpty;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -1442,7 +1471,9 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
-              _appointmentTypeIcon(item['appointmentType']),
+              _appointmentTypeIcon(
+                item['appointmentType'],
+              ),
               color: completed ? green : primaryBlue,
             ),
           ),
