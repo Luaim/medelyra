@@ -1,0 +1,318 @@
+[
+  {
+    "id": "cpr",
+    "title": "CPR / Cardiac Arrest",
+    "shortDescription": "When someone is unresponsive and not breathing normally, start CPR immediately.",
+    "thumbnail": "assets/emergency_guides/cpr/thumbnail.png",
+    "order": 1,
+    "steps": [
+      {
+        "title": "Check the person",
+        "description": "Tap their shoulders and ask loudly, “Are you OK?”",
+        "image": "assets/emergency_guides/cpr/step_01.png"
+      },
+      {
+        "title": "Check breathing",
+        "description": "Look for normal breathing. Gasping is not normal breathing.",
+        "image": "assets/emergency_guides/cpr/step_02.png"
+      },
+      {
+        "title": "Call emergency services",
+        "description": "Call your local emergency number. Ask someone to get an AED if one is nearby.",
+        "image": "assets/emergency_guides/cpr/step_03.png"
+      },
+      {
+        "title": "Start chest compressions",
+        "description": "Put both hands in the center of the chest. Push hard and fast.",
+        "image": "assets/emergency_guides/cpr/step_04.png"
+      },
+      {
+        "title": "Keep CPR going",
+        "description": "Push about 5–6 cm deep at 100–120 compressions per minute. Let the chest come back up after each push.",
+        "image": "assets/emergency_guides/cpr/step_05.png"
+      },
+      {
+        "title": "Use an AED",
+        "description": "Turn on the AED and follow its voice instructions. Do not touch the person when the AED tells you to stand clear.",
+        "image": "assets/emergency_guides/cpr/step_06.png"
+      }
+    ]
+  },
+  {
+    "id": "choking",
+    "title": "Choking",
+    "shortDescription": "Help someone who is choking and cannot breathe normally.",
+    "thumbnail": "assets/emergency_guides/choking/thumbnail.png",
+    "order": 2,
+    "steps": [
+      {
+        "title": "Check if they can cough",
+        "description": "Ask if the person is choking. If they can cough or speak, encourage them to keep coughing.",
+        "image": "assets/emergency_guides/choking/step_01.png"
+      },
+      {
+        "title": "Give back blows",
+        "description": "If they cannot cough, speak, or breathe normally, lean them forward and give up to 5 firm back blows between the shoulder blades.",
+        "image": "assets/emergency_guides/choking/step_02.png"
+      },
+      {
+        "title": "Give abdominal thrusts",
+        "description": "If the blockage does not clear, give up to 5 abdominal thrusts.",
+        "image": "assets/emergency_guides/choking/step_03.png"
+      },
+      {
+        "title": "Repeat if needed",
+        "description": "Continue alternating back blows and abdominal thrusts until the object is cleared or the person becomes unresponsive.",
+        "image": "assets/emergency_guides/choking/step_04.png"
+      },
+      {
+        "title": "If they become unresponsive",
+        "description": "Carefully lower them to the ground and begin CPR. Get emergency medical help immediately.",
+        "image": "assets/emergency_guides/choking/step_05.png"
+      }
+    ]
+  },
+  {
+    "id": "severe_bleeding",
+    "title": "Severe Bleeding",
+    "shortDescription": "Heavy or continuous bleeding can become life-threatening within minutes.",
+    "thumbnail": "assets/emergency_guides/Severe Bleeding/thumbnail.png",
+    "order": 3,
+    "steps": [
+      {
+        "title": "Make the area safe",
+        "description": "Protect yourself if possible. Look for heavy, continuous, or spurting bleeding.",
+        "image": "assets/emergency_guides/Severe Bleeding/step_01.png"
+      },
+      {
+        "title": "Apply firm pressure",
+        "description": "Place clean gauze or cloth directly on the wound. Press firmly and continuously.",
+        "image": "assets/emergency_guides/Severe Bleeding/step_02.png"
+      },
+      {
+        "title": "Keep pressure on",
+        "description": "Do not keep lifting the cloth to check the wound. Keep pressing until bleeding stops or help takes over.",
+        "image": "assets/emergency_guides/Severe Bleeding/step_03.png"
+      },
+      {
+        "title": "Use a tourniquet when needed",
+        "description": "For life-threatening bleeding from an arm or leg that is not controlled by direct pressure, use a commercial tourniquet if available and follow its instructions.",
+        "image": "assets/emergency_guides/Severe Bleeding/step_04.png"
+      },
+      {
+        "title": "Call emergency services",
+        "description": "Get emergency medical help immediately for severe bleeding.",
+        "image": "assets/emergency_guides/Severe Bleeding/step_05.png"
+      }
+    ]
+  },
+  {
+    "id": "burns",
+    "title": "Burns",
+    "shortDescription": "Cool a thermal burn quickly and safely.",
+    "thumbnail": "assets/emergency_guides/Burns/thumbnail.png",
+    "order": 4,
+    "steps": [
+      {
+        "title": "Stop the burning",
+        "description": "Move away from the heat or danger if it is safe to do so.",
+        "image": "assets/emergency_guides/Burns/step_01.png"
+      },
+      {
+        "title": "Cool the burn",
+        "description": "Cool the burn under cool, clean running water.",
+        "image": "assets/emergency_guides/Burns/step_02.png"
+      },
+      {
+        "title": "Remove tight items",
+        "description": "Remove rings, watches, belts, or tight clothing near the burn before swelling starts. Do not pull away anything stuck to the skin.",
+        "image": "assets/emergency_guides/Burns/step_03.png"
+      },
+      {
+        "title": "Cover the burn",
+        "description": "After cooling, loosely cover the burn with a clean, non-stick dressing or clean cloth.",
+        "image": "assets/emergency_guides/Burns/step_04.png"
+      },
+      {
+        "title": "Get medical help when needed",
+        "description": "Get urgent medical help for large or deep burns, burns on the face, hands, feet, genitals or major joints, electrical/chemical burns, or difficulty breathing.",
+        "image": "assets/emergency_guides/Burns/step_05.png"
+      }
+    ]
+  },
+  {
+    "id": "fainting",
+    "title": "Fainting / Unconscious Person",
+    "shortDescription": "First determine whether the person is breathing normally.",
+    "thumbnail": "assets/emergency_guides/Fainting/thumbnail.png",
+    "order": 5,
+    "steps": [
+      {
+        "title": "Check for a response",
+        "description": "Tap their shoulders and ask loudly, “Are you OK?”",
+        "image": "assets/emergency_guides/Fainting/step_01.png"
+      },
+      {
+        "title": "Check breathing",
+        "description": "Check whether they are breathing normally.",
+        "image": "assets/emergency_guides/Fainting/step_02.png"
+      },
+      {
+        "title": "If they are breathing",
+        "description": "If they are unconscious but breathing normally, place them in the recovery position and monitor them.",
+        "image": "assets/emergency_guides/Fainting/step_03.png"
+      },
+      {
+        "title": "If they are NOT breathing normally",
+        "description": "Call emergency services and start CPR immediately.",
+        "image": "assets/emergency_guides/Fainting/step_04.png"
+      },
+      {
+        "title": "Stay with them",
+        "description": "Keep checking their breathing until emergency help arrives.",
+        "image": "assets/emergency_guides/Fainting/step_05.png"
+      }
+    ]
+  },
+  {
+    "id": "fracture",
+    "title": "Broken Bone / Suspected Fracture",
+    "shortDescription": "Treat a serious injury as a possible fracture. Do not try to straighten it.",
+    "thumbnail": "assets/emergency_guides/Fracture/thumbnail.png",
+    "order": 6,
+    "steps": [
+      {
+        "title": "Keep the person still",
+        "description": "Tell them not to move the injured area.",
+        "image": "assets/emergency_guides/Fracture/step_01.png"
+      },
+      {
+        "title": "Do not straighten it",
+        "description": "Do not push the bone back or try to straighten a deformed limb.",
+        "image": "assets/emergency_guides/Fracture/step_02.png"
+      },
+      {
+        "title": "Support the injury",
+        "description": "Support the injured area in the position you found it.",
+        "image": "assets/emergency_guides/Fracture/step_03.png"
+      },
+      {
+        "title": "Control bleeding",
+        "description": "If there is bleeding, cover the wound and apply pressure around the wound. Do not press directly on a bone sticking through the skin.",
+        "image": "assets/emergency_guides/Fracture/step_04.png"
+      },
+      {
+        "title": "Get medical help",
+        "description": "Get urgent medical help for severe pain, deformity, numbness, heavy bleeding, an open fracture, or injuries involving the head, neck, spine, pelvis, or thigh.",
+        "image": "assets/emergency_guides/Fracture/step_05.png"
+      },
+      {
+        "title": "Monitor the person",
+        "description": "Keep them comfortable and watch for signs of shock while waiting for help.",
+        "image": "assets/emergency_guides/Fracture/step_06.png"
+      }
+    ]
+  },
+  {
+    "id": "suspected_poisoning",
+    "title": "Suspected Poisoning",
+    "shortDescription": "Do not wait for symptoms if you suspect a serious poisoning.",
+    "thumbnail": "assets/emergency_guides/Suspected Poisoning/thumbnail.png",
+    "order": 8,
+    "steps": [
+      {
+        "title": "Get away from the poison",
+        "description": "Move away from the source if it is safe. Do not expose yourself to fumes or chemicals.",
+        "image": "assets/emergency_guides/Suspected Poisoning/step_01.png"
+      },
+      {
+        "title": "Call for expert help",
+        "description": "Call your local emergency service or poison-control service if available.",
+        "image": "assets/emergency_guides/Suspected Poisoning/step_02.png"
+      },
+      {
+        "title": "Do NOT make them vomit",
+        "description": "Do not make the person vomit unless a medical professional specifically tells you to.",
+        "image": "assets/emergency_guides/Suspected Poisoning/step_03.png"
+      },
+      {
+        "title": "Keep the container",
+        "description": "Keep the medicine, chemical container, label, or packaging if it is safe. Tell medical professionals what was taken, how much, and when.",
+        "image": "assets/emergency_guides/Suspected Poisoning/step_04.png"
+      },
+      {
+        "title": "If they become unconscious",
+        "description": "If they are unconscious but breathing normally, place them in the recovery position. If they are not breathing normally, start CPR.",
+        "image": "assets/emergency_guides/Suspected Poisoning/step_05.png"
+      }
+    ]
+  },
+  {
+    "id": "seizure",
+    "title": "Seizure",
+    "shortDescription": "Protect the person from injury. Do not try to stop the seizure.",
+    "thumbnail": "assets/emergency_guides/Seizure/thumbnail.png",
+    "order": 9,
+    "steps": [
+      {
+        "title": "Keep them safe",
+        "description": "Move dangerous objects away. If they are falling, help them safely to the ground.",
+        "image": "assets/emergency_guides/Seizure/step_01.png"
+      },
+      {
+        "title": "Protect their head",
+        "description": "Place something soft under their head if possible.",
+        "image": "assets/emergency_guides/Seizure/step_02.png"
+      },
+      {
+        "title": "Do not restrain them",
+        "description": "Do not hold their arms or legs down. Let the seizure run its course.",
+        "image": "assets/emergency_guides/Seizure/step_03.png"
+      },
+      {
+        "title": "Nothing in the mouth",
+        "description": "Do not put anything in their mouth. Do not give food, drink, or medicine during the seizure.",
+        "image": "assets/emergency_guides/Seizure/step_04.png"
+      },
+      {
+        "title": "Call emergency services if needed",
+        "description": "Call emergency services if it is their first seizure, lasts more than 5 minutes, happens repeatedly without recovery, happens in water, causes injury or breathing problems, occurs during pregnancy, or they do not return to normal within about 5–10 minutes.",
+        "image": "assets/emergency_guides/Seizure/step_06.png"
+      }
+    ]
+  },
+  {
+    "id": "severe_allergic_reaction",
+    "title": "Severe Allergic Reaction",
+    "shortDescription": "A severe allergic reaction can become life-threatening very quickly.",
+    "thumbnail": "assets/emergency_guides/Severe Allergic Reaction/thumbnail.png",
+    "order": 10,
+    "steps": [
+      {
+        "title": "Recognize the signs",
+        "description": "Look for difficulty breathing, swelling of the face or throat, wheezing, widespread hives, dizziness, vomiting, or collapse.",
+        "image": "assets/emergency_guides/Severe Allergic Reaction/step_01.png"
+      },
+      {
+        "title": "Call emergency services",
+        "description": "Call emergency services",
+        "image": "assets/emergency_guides/Severe Allergic Reaction/step_02.png"
+      },
+      {
+        "title": "Help with their epinephrine",
+        "description": "If they have a prescribed epinephrine auto-injector, help them use it according to its instructions.",
+        "image": "assets/emergency_guides/Severe Allergic Reaction/step_03.png"
+      },
+      {
+        "title": "Keep them in a comfortable position",
+        "description": "Help them sit or lie down. If they are faint or showing signs of shock, keep them lying down unless breathing is easier sitting up.",
+        "image": "assets/emergency_guides/Severe Allergic Reaction/step_04.png"
+      },
+      {
+        "title": "Monitor them",
+        "description": "Stay with them and watch their breathing and responsiveness. If they become unresponsive and are not breathing normally, start CPR.",
+        "image": "assets/emergency_guides/Severe Allergic Reaction/step_05.png"
+      }
+    ]
+  }
+]

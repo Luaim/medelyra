@@ -56,6 +56,20 @@ flutter:
     - assets/medelyraIcon.png
     - assets/medelyraIconSplash.png
     - assets/medelyraIconLauncher.png 
+  
+  # Emergency guide data
+    - assets/emergency_guides/emergency_guides.json
+
+    # Emergency guide images
+    - assets/emergency_guides/Burns/
+    - assets/emergency_guides/choking/
+    - assets/emergency_guides/cpr/
+    - assets/emergency_guides/Fainting/
+    - assets/emergency_guides/Fracture/
+    - assets/emergency_guides/Seizure/
+    - assets/emergency_guides/Severe Allergic Reaction/
+    - assets/emergency_guides/Severe Bleeding/
+    - assets/emergency_guides/Suspected Poisoning/
 
 
 flutter_native_splash:
