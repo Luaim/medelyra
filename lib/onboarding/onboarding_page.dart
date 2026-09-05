@@ -32,10 +32,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
       icon: Icons.medication_outlined,
     ),
     _OnboardingItem(
-      title: 'Help when you need it',
+      title: 'Tools for your health',
       description:
-          'Access emergency guidance and find nearby medical services when you need them.',
-      icon: Icons.location_on_outlined,
+          'Use helpful health tools and access emergency guidance when you need it.',
+      icon: Icons.health_and_safety_outlined,
     ),
   ];
 
@@ -177,7 +177,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             height: smallScreen ? 35 : 55,
                           ),
 
-                          /// FEATURE DETAILS
+                          /// PAGE 2 FEATURES
                           if (index == 1)
                             const _FeatureRow(
                               icon: Icons.alarm_outlined,
@@ -192,18 +192,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
                               text: 'Appointment reminders',
                             ),
 
+                          /// PAGE 3 FEATURES
                           if (index == 2)
                             const _FeatureRow(
-                              icon: Icons.emergency_outlined,
-                              text: 'Emergency guidance',
+                              icon: Icons.health_and_safety_outlined,
+                              text: 'Helpful health tools',
                             ),
 
                           if (index == 2) const SizedBox(height: 14),
 
                           if (index == 2)
                             const _FeatureRow(
-                              icon: Icons.search_outlined,
-                              text: 'Nearby medical places',
+                              icon: Icons.medical_services_outlined,
+                              text: 'Emergency guidance',
                             ),
                         ],
                       ),
