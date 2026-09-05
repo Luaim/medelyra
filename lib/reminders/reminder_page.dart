@@ -13,7 +13,7 @@ class ReminderPage extends StatelessWidget {
         Navigator.pushReplacementNamed(context, '/reminder');
         break;
       case 2:
-        Navigator.pushReplacementNamed(context, '/finder');
+        Navigator.pushReplacementNamed(context, '/health-tools');
         break;
       case 3:
         Navigator.pushReplacementNamed(context, '/sos');

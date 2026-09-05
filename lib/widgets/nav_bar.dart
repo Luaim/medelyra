@@ -13,7 +13,7 @@ class CustomBottomNavBar extends StatelessWidget {
   static const List<_NavItem> _items = [
     _NavItem(icon: Icons.home_rounded, label: 'Home'),
     _NavItem(icon: Icons.alarm_outlined, label: 'Reminder'),
-    _NavItem(icon: Icons.location_on_outlined, label: 'Finder'),
+    _NavItem(icon: Icons.health_and_safety_outlined, label: 'Health Tools'),
     _NavItem(icon: Icons.medical_services_outlined, label: 'SoS guide'),
     _NavItem(icon: Icons.person_outline_rounded, label: 'Profile'),
   ];

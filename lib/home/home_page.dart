@@ -101,7 +101,7 @@ class _HomePageState extends State<HomePage> {
         break;
 
       case 2:
-        Navigator.pushReplacementNamed(context, '/finder');
+        Navigator.pushReplacementNamed(context, '/health-tools');
         break;
 
       case 3:

@@ -100,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
       case 2:
         Navigator.pushReplacementNamed(
           context,
-          '/finder',
+          '/health-tools',
         );
         break;
 
