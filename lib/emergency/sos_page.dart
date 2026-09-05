@@ -166,7 +166,7 @@ class _SosPageState extends State<SosPage> {
         break;
 
       case 2:
-        Navigator.pushReplacementNamed(context, '/finder');
+        Navigator.pushReplacementNamed(context, '/health-tools');
         break;
 
       case 3:

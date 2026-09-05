@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:medelyra/health_tools/health_tools_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
@@ -21,7 +22,6 @@ import 'home/home_page.dart';
 import 'reminders/reminder_page.dart';
 import 'reminders/pill_reminder_page.dart';
 import 'reminders/appointment_reminder_page.dart';
-import 'emergency/finder_page.dart';
 import 'emergency/sos_page.dart';
 import 'profile/profile_page.dart';
 import 'profile/settings_page.dart';
@@ -109,7 +109,7 @@ class MedelyraApp extends StatelessWidget {
         '/reminder': (context) => const ReminderPage(),
         '/pillReminder': (context) => const PillReminderPage(),
         '/appointmentReminder': (context) => const AppointmentReminderPage(),
-        '/finder': (context) => const FinderPage(),
+        '/health-tools': (context) => const HealthToolsPage(),
         '/sos': (context) => const SosPage(),
         '/profile': (context) => const ProfilePage(),
         '/settings': (context) => const SettingsPage(),
