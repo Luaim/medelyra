@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/nav_bar.dart';
+import 'age.dart';
+import 'blood_pressure.dart';
+import 'bmi.dart';
+import 'heart_rate.dart';
+import 'medical_unit_converter_page.dart';
+import 'sleep_calculator.dart';
 
 const Color _backgroundColor = Color(0xFFFAF9FC);
 const Color _primaryColor = Color(0xFF3D84A8);
@@ -53,10 +59,10 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
       iconColor: Color(0xFF7167B7),
     ),
     _HealthTool(
-      title: 'Medication Schedule Helper',
-      description: 'Organize your medication schedule',
-      icon: Icons.medication_outlined,
-      iconColor: Color(0xFF4E9A78),
+      title: 'Sleep Calculator',
+      description: 'Find suggested sleep and wake times',
+      icon: Icons.bedtime_outlined,
+      iconColor: Color(0xFF6B67B7),
     ),
   ];
 
@@ -109,15 +115,81 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
   // --------------------------------------------------------------------------
 
   void _openTool(_HealthTool tool) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '${tool.title} will be available soon.',
-        ),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    if (tool.title == 'BMI Calculator') {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return const BmiPage();
+        },
+      );
+
+      return;
+    }
+
+    if (tool.title == 'Age Calculator') {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return const AgePage();
+        },
+      );
+
+      return;
+    }
+
+    if (tool.title == 'Blood Pressure') {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return const BloodPressurePage();
+        },
+      );
+
+      return;
+    }
+
+    if (tool.title == 'Heart Rate') {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return const HeartRatePage();
+        },
+      );
+    }
+
+    if (tool.title == 'Medical Unit Converter') {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return const MedicalUnitConverterPage();
+        },
+      );
+
+      return;
+    }
+
+    if (tool.title == 'Sleep Calculator') {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return const SleepCalculatorPage();
+        },
+      );
+
+      return;
+    }
   }
 
   // --------------------------------------------------------------------------
