@@ -53,6 +53,8 @@ flutter:
     - assets/medelyraIcon.png
     - assets/medelyraIconSplash.png
     - assets/medelyraIconLauncher.png 
+    - assets/onboarding_reminders.png
+    - assets/onboarding_health.png
   
   # Emergency guide data
     - assets/emergency_guides/emergency_guides.json

@@ -13,29 +13,26 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   int _currentPage = 0;
 
-  final Color _backgroundColor = const Color(0xFFFAF9FC);
-  final Color _primaryColor = const Color(0xFF3D84A8);
-  final Color _textColor = const Color(0xFF333333);
-  final Color _secondaryTextColor = const Color(0xFF666666);
+  static const Color _backgroundColor = Color(0xFFFAF9FC);
+  static const Color _primaryColor = Color(0xFF3D84A8);
+  static const Color _textColor = Color(0xFF333333);
+  static const Color _secondaryTextColor = Color(0xFF666666);
 
-  final List<_OnboardingItem> _pages = const [
+  static const List<_OnboardingItem> _pages = [
     _OnboardingItem(
       title: 'Welcome to Medelyra',
       description:
           'Your simple companion for staying organized and prepared for your health.',
-      icon: Icons.favorite_outline,
     ),
     _OnboardingItem(
       title: 'Stay on track',
       description:
           'Keep your medications and appointments organized with reminders that fit into your day.',
-      icon: Icons.medication_outlined,
     ),
     _OnboardingItem(
       title: 'Tools for your health',
       description:
           'Use helpful health tools and access emergency guidance when you need it.',
-      icon: Icons.health_and_safety_outlined,
     ),
   ];
 
@@ -44,6 +41,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
     _pageController.dispose();
     super.dispose();
   }
+
+  // ==========================================================================
+  // NEXT PAGE
+  // ==========================================================================
 
   void _nextPage() {
     if (_currentPage < _pages.length - 1) {
@@ -56,6 +57,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
   }
 
+  // ==========================================================================
+  // FINISH ONBOARDING
+  // ==========================================================================
+
   Future<void> _finishOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -66,41 +71,57 @@ class _OnboardingPageState extends State<OnboardingPage> {
     Navigator.pushReplacementNamed(context, '/signin');
   }
 
+  // ==========================================================================
+  // BUILD
+  // ==========================================================================
+
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final smallScreen = size.height < 700;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 700;
 
     return Scaffold(
       backgroundColor: _backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            /// TOP BAR
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 16,
-              ),
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: _currentPage < _pages.length - 1
-                    ? TextButton(
-                        onPressed: _finishOnboarding,
-                        child: Text(
-                          'Skip',
-                          style: TextStyle(
-                            color: _secondaryTextColor,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
+            // ------------------------------------------------------------------
+            // TOP BAR
+            // ------------------------------------------------------------------
+
+            SizedBox(
+              height: 64,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: _currentPage < _pages.length - 1
+                      ? TextButton(
+                          onPressed: _finishOnboarding,
+                          style: TextButton.styleFrom(
+                            foregroundColor: _secondaryTextColor,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
+                            ),
                           ),
-                        ),
-                      )
-                    : const SizedBox(height: 48),
+                          child: const Text(
+                            'Skip',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
               ),
             ),
 
-            /// PAGES
+            // ------------------------------------------------------------------
+            // PAGES
+            // ------------------------------------------------------------------
+
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -111,115 +132,32 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   });
                 },
                 itemBuilder: (context, index) {
-                  final page = _pages[index];
-
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 28,
-                      vertical: smallScreen ? 10 : 20,
-                    ),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: 430,
-                      ),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: smallScreen ? 10 : 25,
-                          ),
-
-                          /// LOGO ON FIRST PAGE
-                          if (index == 0)
-                            Image.asset(
-                              'assets/medelyraIcon.png',
-                              width: smallScreen ? 105 : 125,
-                              height: smallScreen ? 105 : 125,
-                              fit: BoxFit.contain,
-                            )
-                          else
-                            _FeatureIcon(
-                              icon: page.icon,
-                              primaryColor: _primaryColor,
-                            ),
-
-                          SizedBox(
-                            height: smallScreen ? 35 : 45,
-                          ),
-
-                          /// TITLE
-                          Text(
-                            page.title,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: smallScreen ? 25 : 28,
-                              fontWeight: FontWeight.w600,
-                              color: _textColor,
-                              fontFamily: 'serif',
-                            ),
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          /// DESCRIPTION
-                          Text(
-                            page.description,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: smallScreen ? 15.5 : 17,
-                              height: 1.5,
-                              fontWeight: FontWeight.w400,
-                              color: _secondaryTextColor,
-                              fontFamily: 'serif',
-                            ),
-                          ),
-
-                          SizedBox(
-                            height: smallScreen ? 35 : 55,
-                          ),
-
-                          /// PAGE 2 FEATURES
-                          if (index == 1)
-                            const _FeatureRow(
-                              icon: Icons.alarm_outlined,
-                              text: 'Medication reminders',
-                            ),
-
-                          if (index == 1) const SizedBox(height: 14),
-
-                          if (index == 1)
-                            const _FeatureRow(
-                              icon: Icons.calendar_today_outlined,
-                              text: 'Appointment reminders',
-                            ),
-
-                          /// PAGE 3 FEATURES
-                          if (index == 2)
-                            const _FeatureRow(
-                              icon: Icons.health_and_safety_outlined,
-                              text: 'Helpful health tools',
-                            ),
-
-                          if (index == 2) const SizedBox(height: 14),
-
-                          if (index == 2)
-                            const _FeatureRow(
-                              icon: Icons.medical_services_outlined,
-                              text: 'Emergency guidance',
-                            ),
-                        ],
-                      ),
-                    ),
+                  return _OnboardingContent(
+                    page: _pages[index],
+                    pageIndex: index,
+                    isSmallScreen: isSmallScreen,
                   );
                 },
               ),
             ),
 
-            /// BOTTOM CONTROLS
+            // ------------------------------------------------------------------
+            // BOTTOM CONTROLS
+            // ------------------------------------------------------------------
+
             Padding(
-              padding: const EdgeInsets.fromLTRB(28, 10, 28, 24),
+              padding: EdgeInsets.fromLTRB(
+                24,
+                8,
+                24,
+                isSmallScreen ? 18 : 24,
+              ),
               child: Column(
                 children: [
-                  /// PAGE INDICATORS
+                  // ------------------------------------------------------------
+                  // PAGE INDICATORS
+                  // ------------------------------------------------------------
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
@@ -243,9 +181,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 25),
+                  SizedBox(
+                    height: isSmallScreen ? 20 : 25,
+                  ),
 
-                  /// BUTTON
+                  // ------------------------------------------------------------
+                  // BUTTON
+                  // ------------------------------------------------------------
+
                   SizedBox(
                     width: double.infinity,
                     height: 54,
@@ -281,56 +224,184 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 }
 
-/// ------------------------------------------------------------
-/// ONBOARDING DATA
-/// ------------------------------------------------------------
+// ============================================================================
+// ONBOARDING CONTENT
+// ============================================================================
 
-class _OnboardingItem {
-  final String title;
-  final String description;
-  final IconData icon;
+class _OnboardingContent extends StatelessWidget {
+  final _OnboardingItem page;
+  final int pageIndex;
+  final bool isSmallScreen;
 
-  const _OnboardingItem({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-}
-
-/// ------------------------------------------------------------
-/// FEATURE ICON
-/// ------------------------------------------------------------
-
-class _FeatureIcon extends StatelessWidget {
-  final IconData icon;
-  final Color primaryColor;
-
-  const _FeatureIcon({
-    required this.icon,
-    required this.primaryColor,
+  const _OnboardingContent({
+    required this.page,
+    required this.pageIndex,
+    required this.isSmallScreen,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 125,
-      height: 125,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: primaryColor.withOpacity(0.08),
-      ),
-      child: Icon(
-        icon,
-        size: 58,
-        color: primaryColor,
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight,
+            ),
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: isSmallScreen ? 12 : 20,
+                ),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 430,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // --------------------------------------------------------
+                      // ILLUSTRATION
+                      // --------------------------------------------------------
+
+                      _buildIllustration(),
+
+                      // --------------------------------------------------------
+                      // SPACE AFTER ILLUSTRATION
+                      // --------------------------------------------------------
+
+                      SizedBox(
+                        height: isSmallScreen ? 16 : 22,
+                      ),
+
+                      // --------------------------------------------------------
+                      // TITLE
+                      // --------------------------------------------------------
+
+                      Text(
+                        page.title,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: isSmallScreen ? 25 : 28,
+                          height: 1.2,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF333333),
+                          fontFamily: 'serif',
+                        ),
+                      ),
+
+                      // --------------------------------------------------------
+                      // DESCRIPTION
+                      // --------------------------------------------------------
+
+                      const SizedBox(height: 14),
+
+                      Text(
+                        page.description,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: isSmallScreen ? 15.5 : 17,
+                          height: 1.5,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF666666),
+                          fontFamily: 'serif',
+                        ),
+                      ),
+
+                      // --------------------------------------------------------
+                      // FEATURES
+                      // --------------------------------------------------------
+
+                      SizedBox(
+                        height: isSmallScreen ? 26 : 34,
+                      ),
+
+                      if (pageIndex == 1) ...[
+                        const _FeatureRow(
+                          icon: Icons.alarm_outlined,
+                          text: 'Medication reminders',
+                        ),
+                        const SizedBox(height: 14),
+                        const _FeatureRow(
+                          icon: Icons.calendar_today_outlined,
+                          text: 'Appointment reminders',
+                        ),
+                      ],
+
+                      if (pageIndex == 2) ...[
+                        const _FeatureRow(
+                          icon: Icons.health_and_safety_outlined,
+                          text: 'Helpful health tools',
+                        ),
+                        const SizedBox(height: 14),
+                        const _FeatureRow(
+                          icon: Icons.medical_services_outlined,
+                          text: 'Emergency guidance',
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ==========================================================================
+  // ILLUSTRATIONS
+  // ==========================================================================
+
+  Widget _buildIllustration() {
+    // ------------------------------------------------------------------------
+    // PAGE 1 — MEDELYRA LOGO
+    // ------------------------------------------------------------------------
+
+    if (pageIndex == 0) {
+      return Image.asset(
+        'assets/medelyraIcon.png',
+        width: isSmallScreen ? 120 : 145,
+        height: isSmallScreen ? 120 : 145,
+        fit: BoxFit.contain,
+      );
+    }
+
+    // ------------------------------------------------------------------------
+    // PAGE 2 + PAGE 3 — ILLUSTRATIONS
+    // ------------------------------------------------------------------------
+
+    return Image.asset(
+      pageIndex == 1
+          ? 'assets/onboarding_reminders.png'
+          : 'assets/onboarding_health.png',
+      width: isSmallScreen ? 220 : 255,
+      height: isSmallScreen ? 220 : 255,
+      fit: BoxFit.contain,
     );
   }
 }
 
-/// ------------------------------------------------------------
-/// FEATURE ROW
-/// ------------------------------------------------------------
+// ============================================================================
+// ONBOARDING DATA
+// ============================================================================
+
+class _OnboardingItem {
+  final String title;
+  final String description;
+
+  const _OnboardingItem({
+    required this.title,
+    required this.description,
+  });
+}
+
+// ============================================================================
+// FEATURE ROW
+// ============================================================================
 
 class _FeatureRow extends StatelessWidget {
   final IconData icon;
