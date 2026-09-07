@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 import 'package:flutter/services.dart';
 
 class HelpSupportPage extends StatefulWidget {
@@ -74,14 +75,14 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: ThemeService.surface(context, backgroundColor),
 
       // =====================================================================
       // APP BAR
       // =====================================================================
 
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: ThemeService.surface(context, backgroundColor),
         foregroundColor: darkText,
         elevation: 0,
         centerTitle: true,

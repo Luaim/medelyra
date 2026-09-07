@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 
 import '../widgets/nav_bar.dart';
 import '../services/notification_service.dart';
@@ -2165,7 +2166,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: ThemeService.surface(context, const Color(0xFFF5F6FA)),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 1,
         onTap: (i) => _onBottomTap(context, i),

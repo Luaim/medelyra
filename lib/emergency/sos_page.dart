@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 import 'package:flutter/services.dart';
 
 import '../widgets/nav_bar.dart';
@@ -203,7 +204,7 @@ class _SosPageState extends State<SosPage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: ThemeService.surface(context, const Color(0xFFF6F6F6)),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 3,
         onTap: (index) => _onBottomTap(context, index),

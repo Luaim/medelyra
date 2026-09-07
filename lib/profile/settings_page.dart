@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:medelyra/services/theme_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -23,7 +24,23 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    darkMode = ThemeService.instance.value;
+    ThemeService.instance.addListener(_onThemeChanged);
     _loadVersion();
+  }
+
+  @override
+  void dispose() {
+    ThemeService.instance.removeListener(_onThemeChanged);
+    super.dispose();
+  }
+
+  void _onThemeChanged() {
+    if (mounted && darkMode != ThemeService.instance.value) {
+      setState(() {
+        darkMode = ThemeService.instance.value;
+      });
+    }
   }
 
   // ===========================================================================
@@ -804,9 +821,9 @@ class _SettingsPageState extends State<SettingsPage> {
     final bool busy = isLoggingOut || isDeletingAccount;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F7F7),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -815,15 +832,15 @@ class _SettingsPageState extends State<SettingsPage> {
               : () {
                   Navigator.pop(context);
                 },
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Color(0xFF222222),
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
-        title: const Text(
+        title: Text(
           'Settings',
           style: TextStyle(
-            color: Color(0xFF222222),
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 24,
             fontWeight: FontWeight.w700,
           ),
@@ -904,11 +921,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   value: darkMode,
                   onChanged: busy
                       ? (_) {}
-                      : (value) {
-                          setState(() {
-                            darkMode = value;
-                          });
-                        },
+                      : (value) => ThemeService.instance.setDarkMode(value),
                 ),
 
                 const SizedBox(height: 12),
@@ -1361,10 +1374,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _sectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w700,
-        color: Color(0xFF333333),
+        color: Theme.of(context).colorScheme.onSurface,
       ),
     );
   }
@@ -1390,7 +1403,7 @@ class _SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surfaceContainer,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
@@ -1400,7 +1413,7 @@ class _SettingsTile extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFFE3E3E3),
+              color: Theme.of(context).colorScheme.outlineVariant,
             ),
             boxShadow: [
               BoxShadow(
@@ -1431,28 +1444,28 @@ class _SettingsTile extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF2A2A2A),
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF777777),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         height: 1.3,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 18,
-                color: Color(0xFF9A9A9A),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ],
           ),
@@ -1486,10 +1499,10 @@ class _SwitchTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFE3E3E3),
+          color: Theme.of(context).colorScheme.outlineVariant,
         ),
         boxShadow: [
           BoxShadow(
@@ -1520,18 +1533,18 @@ class _SwitchTile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF2A2A2A),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF777777),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     height: 1.3,
                   ),
                 ),

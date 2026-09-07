@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
@@ -20,14 +21,14 @@ class PrivacyPolicyPage extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: ThemeService.surface(context, backgroundColor),
 
       // =====================================================================
       // APP BAR
       // =====================================================================
 
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: ThemeService.surface(context, backgroundColor),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,

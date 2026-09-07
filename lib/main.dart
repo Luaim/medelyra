@@ -15,6 +15,7 @@ import 'package:medelyra/settings/help_support_page.dart';
 import 'package:medelyra/settings/privacy_policy_page.dart';
 
 import 'services/notification_service.dart';
+import 'services/theme_service.dart';
 
 import 'auth/signin_page.dart';
 import 'auth/signup_page.dart';
@@ -50,6 +51,8 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
 
   final onboardingCompleted = prefs.getBool('onboardingCompleted') ?? false;
+  final darkMode = prefs.getBool(ThemeService.darkModeKey) ?? false;
+  ThemeService.instance.initialize(darkMode);
 
   Widget initialPage;
 
@@ -89,7 +92,9 @@ class MedelyraApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ValueListenableBuilder<bool>(
+      valueListenable: ThemeService.instance,
+      builder: (context, isDarkMode, child) => MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Medelyra',
       theme: ThemeData(
@@ -100,6 +105,16 @@ class MedelyraApp extends StatelessWidget {
           seedColor: const Color(0xFF08007C),
         ),
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        fontFamily: 'Roboto',
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF08007C),
+          brightness: Brightness.dark,
+        ),
+      ),
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: initialPage,
       routes: {
         '/onboarding': (context) => const OnboardingPage(),
@@ -128,6 +143,7 @@ class MedelyraApp extends StatelessWidget {
           );
         },
       },
+      ),
     );
   }
 }

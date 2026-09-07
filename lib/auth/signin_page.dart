@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -258,7 +259,7 @@ class _SignInPageState extends State<SignInPage>
     final bool busy = isLoading || isGoogleLoading;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: ThemeService.surface(context, const Color(0xFFF6F6F6)),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

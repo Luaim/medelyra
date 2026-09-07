@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../services/local_database_service.dart';
@@ -1047,7 +1048,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: ThemeService.surface(context, const Color(0xFFF5F6FA)),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 0,
         onTap: (index) => _onBottomTap(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class EditPasswordPage extends StatefulWidget {
@@ -317,7 +318,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
     final googleOnlyAccount = isGoogleAccount && !hasPasswordProvider;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: ThemeService.surface(context, const Color(0xFFF6F6F6)),
 
       // ==========================================================
       // APP BAR

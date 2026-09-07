@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 
 import '../widgets/nav_bar.dart';
 import 'age.dart';
@@ -227,7 +228,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      backgroundColor: ThemeService.surface(context, _backgroundColor),
 
       // ----------------------------------------------------------------------
       // BODY

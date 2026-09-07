@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -337,7 +338,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final emergencyContact = _getEmergencyContact();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: ThemeService.surface(context, const Color(0xFFF7F7F7)),
 
       // ==========================================================
       // BOTTOM NAVIGATION

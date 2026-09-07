@@ -48,10 +48,10 @@ class CustomBottomNavBar extends StatelessWidget {
             vertical: 7,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFFE3EAF5),
+              color: Theme.of(context).colorScheme.outlineVariant,
             ),
             boxShadow: [
               BoxShadow(
@@ -82,7 +82,7 @@ class CustomBottomNavBar extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFE8F0FF)
+                            ? Theme.of(context).colorScheme.secondaryContainer
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -96,7 +96,9 @@ class CustomBottomNavBar extends StatelessWidget {
                               item.icon,
                               size: 22,
                               color:
-                                  isSelected ? accent : const Color(0xFF6B7280),
+                                  isSelected
+                                      ? accent
+                                      : Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -108,7 +110,9 @@ class CustomBottomNavBar extends StatelessWidget {
                                   ? FontWeight.w700
                                   : FontWeight.w500,
                               color:
-                                  isSelected ? accent : const Color(0xFF6B7280),
+                                  isSelected
+                                      ? accent
+                                      : Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                             child: Text(
                               item.label,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 import 'package:flutter/services.dart';
 
 class EmergencyGuideDetailsPage extends StatefulWidget {
@@ -96,9 +97,9 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: ThemeService.surface(context, const Color(0xFFF6F6F6)),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF6F6F6),
+        backgroundColor: ThemeService.surface(context, const Color(0xFFF6F6F6)),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(

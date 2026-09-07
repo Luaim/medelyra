@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
@@ -83,7 +84,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: ThemeService.surface(context, const Color(0xFFF6F6F6)),
       appBar: AppBar(
         title: const Text("Notifications"),
         backgroundColor: Colors.white,

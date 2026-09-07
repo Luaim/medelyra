@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -453,9 +454,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: background,
+      backgroundColor: ThemeService.surface(context, background),
       appBar: AppBar(
-        backgroundColor: background,
+        backgroundColor: ThemeService.surface(context, background),
         foregroundColor: textDark,
         elevation: 0,
         scrolledUnderElevation: 0,

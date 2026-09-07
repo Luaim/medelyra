@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medelyra/services/theme_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../widgets/nav_bar.dart';
@@ -508,7 +509,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: ThemeService.surface(context, const Color(0xFFF6F6F6)),
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 1,
         onTap: (i) => _onBottomTap(context, i),
