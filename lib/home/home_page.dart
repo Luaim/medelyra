@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../services/local_database_service.dart';
 import '../services/local_appointment_service.dart';
+import '../services/notification_service.dart';
 import '../widgets/nav_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -39,14 +40,6 @@ class _HomePageState extends State<HomePage> {
   // ============================================================
   // HOME DATE RANGE
   // ============================================================
-  //
-  // 2 previous days
-  // Today
-  // 30 upcoming days
-  //
-  // This keeps today's reminders easy to find while still allowing
-  // the user to scroll forward for upcoming appointments/medicines.
-  //
 
   List<DateTime> availableDates = [];
   int selectedDayIndex = 2;
@@ -61,7 +54,6 @@ class _HomePageState extends State<HomePage> {
       DateTime.now().day,
     );
 
-    // 2 days before today + today + 30 future days
     availableDates = List.generate(
       33,
       (index) {
@@ -71,7 +63,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-    // Always open Home on today.
     selectedDate = today;
     selectedDayIndex = 2;
 
@@ -260,39 +251,32 @@ class _HomePageState extends State<HomePage> {
       return Icons.medication_outlined;
     }
 
-    // PILL / TABLET
     if (value.contains('pill') || value.contains('tablet')) {
       return Icons.medication_outlined;
     }
 
-    // CAPSULE
     if (value.contains('capsule')) {
       return Icons.medication_liquid_outlined;
     }
 
-    // SYRINGE / INJECTION
     if (value.contains('syringe') || value.contains('injection')) {
       return Icons.vaccines_outlined;
     }
 
-    // LIQUID / SYRUP
     if (value.contains('liquid') ||
         value.contains('syrup') ||
         value.contains('solution')) {
       return Icons.local_drink_outlined;
     }
 
-    // DROPS
     if (value.contains('drop')) {
       return Icons.visibility_outlined;
     }
 
-    // CREAM / OINTMENT
     if (value.contains('cream') || value.contains('ointment')) {
       return Icons.sanitizer_outlined;
     }
 
-    // INHALER
     if (value.contains('inhaler')) {
       return Icons.air_outlined;
     }
@@ -427,29 +411,30 @@ class _HomePageState extends State<HomePage> {
       return '';
     }
 
-    // Already contains AM/PM.
     final upper = trimmed.toUpperCase();
 
     if (upper.contains('AM') || upper.contains('PM')) {
       return trimmed;
     }
 
-    // Try HH:mm / H:mm
     final parts = trimmed.split(':');
 
     if (parts.length == 2) {
       final hour = int.tryParse(parts[0]);
       final minute = int.tryParse(parts[1]);
 
-      if (hour != null && minute != null) {
-        if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
-          final time = TimeOfDay(
-            hour: hour,
-            minute: minute,
-          );
+      if (hour != null &&
+          minute != null &&
+          hour >= 0 &&
+          hour <= 23 &&
+          minute >= 0 &&
+          minute <= 59) {
+        final time = TimeOfDay(
+          hour: hour,
+          minute: minute,
+        );
 
-          return time.format(context);
-        }
+        return time.format(context);
       }
     }
 
@@ -519,6 +504,126 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ============================================================
+  // ORIGINAL MEDICINE NOTIFICATION ID
+  //
+  // IMPORTANT:
+  // This must match the ID used when the medicine reminder
+  // was originally scheduled.
+  // ============================================================
+
+  int _medicineNotificationId({
+    required String medicineId,
+    required DateTime date,
+    required int timeIndex,
+  }) {
+    return NotificationService.instance.medicineNotificationId(
+      medicineId: medicineId,
+      date: date,
+      timeIndex: timeIndex,
+    );
+  }
+
+  // ============================================================
+  // FIND MEDICINE TIME INDEX
+  // ============================================================
+
+  int _medicineTimeIndex({
+    required Map<String, dynamic> medicine,
+    required String time,
+  }) {
+    final times = _medicineTimes(medicine);
+
+    final index = times.indexOf(time);
+
+    if (index >= 0) {
+      return index;
+    }
+
+    return 0;
+  }
+
+  // ============================================================
+  // CANCEL ORIGINAL DOSE NOTIFICATION
+  // ============================================================
+
+  Future<void> _cancelOriginalDoseNotification({
+    required String medicineId,
+    required Map<String, dynamic> medicine,
+    required String time,
+  }) async {
+    try {
+      final timeIndex = _medicineTimeIndex(
+        medicine: medicine,
+        time: time,
+      );
+
+      final notificationId = _medicineNotificationId(
+        medicineId: medicineId,
+        date: selectedDate,
+        timeIndex: timeIndex,
+      );
+
+      await NotificationService.instance.cancel(
+        notificationId,
+      );
+
+      debugPrint(
+        'Cancelled original medicine notification: $notificationId',
+      );
+    } catch (e) {
+      debugPrint(
+        'Could not cancel original medicine notification: $e',
+      );
+    }
+  }
+
+  // ============================================================
+  // CANCEL EXISTING POSTPONED NOTIFICATION
+  // ============================================================
+
+  Future<void> _cancelExistingPostponedNotification({
+    required String medicineId,
+    required Map<String, dynamic>? status,
+  }) async {
+    if (status == null) {
+      return;
+    }
+
+    final statusValue = status['status']?.toString();
+
+    if (statusValue != 'postponed') {
+      return;
+    }
+
+    final postponed = status['postponedUntil'];
+
+    DateTime? postponedDate;
+
+    if (postponed is DateTime) {
+      postponedDate = postponed;
+    } else if (postponed is String && postponed.isNotEmpty) {
+      postponedDate = DateTime.tryParse(postponed);
+    }
+
+    if (postponedDate == null) {
+      return;
+    }
+
+    final notificationId = _postponedNotificationId(
+      medicineId: medicineId,
+      postponedUntil: postponedDate,
+    );
+
+    await NotificationService.instance.cancel(
+      notificationId,
+    );
+
+    debugPrint(
+      'Cancelled previous postponed notification: $notificationId',
+    );
+  }
+
+  // ============================================================
   // SAVE DOSE STATUS
   // ============================================================
 
@@ -567,13 +672,61 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _markMedicineTaken({
     required String medicineId,
+    required String medicineName,
     required String time,
   }) async {
-    await _saveDoseStatus(
-      medicineId: medicineId,
-      time: time,
-      status: 'taken',
-    );
+    try {
+      Map<String, dynamic>? medicine;
+
+      for (final item in _medicines) {
+        if (item['id']?.toString() == medicineId) {
+          medicine = item;
+          break;
+        }
+      }
+
+      if (medicine != null) {
+        // Cancel the original scheduled notification.
+        await _cancelOriginalDoseNotification(
+          medicineId: medicineId,
+          medicine: medicine,
+          time: time,
+        );
+
+        // If this dose had previously been postponed,
+        // cancel that postponed notification too.
+        final existingStatus = _getDoseStatus(
+          medicineId,
+          time,
+        );
+
+        await _cancelExistingPostponedNotification(
+          medicineId: medicineId,
+          status: existingStatus,
+        );
+      }
+
+      await _saveDoseStatus(
+        medicineId: medicineId,
+        time: time,
+        status: 'taken',
+      );
+    } catch (e) {
+      debugPrint(
+        'MARK TAKEN ERROR: $e',
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Could not mark medicine as taken: $e',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   // ============================================================
@@ -582,6 +735,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _skipMedicine({
     required String medicineId,
+    required String medicineName,
     required String time,
   }) async {
     final confirm = await showDialog<bool>(
@@ -620,10 +774,102 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    await _saveDoseStatus(
+    try {
+      Map<String, dynamic>? medicine;
+
+      for (final item in _medicines) {
+        if (item['id']?.toString() == medicineId) {
+          medicine = item;
+          break;
+        }
+      }
+
+      if (medicine != null) {
+        // IMPORTANT:
+        // Cancel the original reminder so it cannot fire
+        // after the user has skipped the dose.
+        await _cancelOriginalDoseNotification(
+          medicineId: medicineId,
+          medicine: medicine,
+          time: time,
+        );
+
+        // Also cancel an existing postponed reminder, if any.
+        final existingStatus = _getDoseStatus(
+          medicineId,
+          time,
+        );
+
+        await _cancelExistingPostponedNotification(
+          medicineId: medicineId,
+          status: existingStatus,
+        );
+      }
+
+      await _saveDoseStatus(
+        medicineId: medicineId,
+        time: time,
+        status: 'skipped',
+      );
+    } catch (e) {
+      debugPrint(
+        'SKIP MEDICINE ERROR: $e',
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Could not skip reminder: $e',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  // ============================================================
+  // POSTPONED NOTIFICATION ID
+  // ============================================================
+
+  int _postponedNotificationId({
+    required String medicineId,
+    required DateTime postponedUntil,
+  }) {
+    return '${medicineId}_postponed_'
+                '${postponedUntil.year}_'
+                '${postponedUntil.month}_'
+                '${postponedUntil.day}_'
+                '${postponedUntil.hour}_'
+                '${postponedUntil.minute}'
+            .hashCode &
+        0x7fffffff;
+  }
+
+  // ============================================================
+  // SCHEDULE POSTPONED NOTIFICATION
+  // ============================================================
+
+  Future<void> _schedulePostponedNotification({
+    required String medicineId,
+    required String medicineName,
+    required DateTime postponedUntil,
+  }) async {
+    final notificationId = _postponedNotificationId(
       medicineId: medicineId,
-      time: time,
-      status: 'skipped',
+      postponedUntil: postponedUntil,
+    );
+
+    await NotificationService.instance.scheduleMedicineNotification(
+      id: notificationId,
+      medicineName: medicineName,
+      scheduledTime: postponedUntil,
+    );
+
+    debugPrint(
+      'Scheduled postponed notification: $notificationId '
+      'at $postponedUntil',
     );
   }
 
@@ -633,6 +879,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _postponeMedicine({
     required String medicineId,
+    required String medicineName,
     required String time,
   }) async {
     final selected = await showTimePicker(
@@ -653,12 +900,117 @@ class _HomePageState extends State<HomePage> {
       selected.minute,
     );
 
-    await _saveDoseStatus(
-      medicineId: medicineId,
-      time: time,
-      status: 'postponed',
-      postponedUntil: postponedUntil,
-    );
+    // ------------------------------------------------------------
+    // Do not allow a postponed notification in the past.
+    // ------------------------------------------------------------
+
+    if (!postponedUntil.isAfter(DateTime.now())) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Please choose a time later than the current time.',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      return;
+    }
+
+    try {
+      final uid = currentUserId;
+
+      if (uid == null) {
+        return;
+      }
+
+      // Find the medicine.
+      Map<String, dynamic>? medicine;
+
+      for (final item in _medicines) {
+        if (item['id']?.toString() == medicineId) {
+          medicine = item;
+          break;
+        }
+      }
+
+      // ----------------------------------------------------------
+      // 1. Cancel the ORIGINAL reminder.
+      //
+      // This is the important fix.
+      // ----------------------------------------------------------
+
+      if (medicine != null) {
+        await _cancelOriginalDoseNotification(
+          medicineId: medicineId,
+          medicine: medicine,
+          time: time,
+        );
+      }
+
+      // ----------------------------------------------------------
+      // 2. Cancel an OLD postponed reminder if this dose
+      //    was already postponed before.
+      // ----------------------------------------------------------
+
+      final existingStatus = _getDoseStatus(
+        medicineId,
+        time,
+      );
+
+      await _cancelExistingPostponedNotification(
+        medicineId: medicineId,
+        status: existingStatus,
+      );
+
+      // ----------------------------------------------------------
+      // 3. Save postponed state locally.
+      // ----------------------------------------------------------
+
+      final date = _dateKey(selectedDate);
+
+      await LocalDatabaseService.instance.upsertMedicineDoseStatus(
+        medicineId: medicineId,
+        userId: uid,
+        date: date,
+        time: time,
+        status: 'postponed',
+        postponedUntil: postponedUntil,
+      );
+
+      // ----------------------------------------------------------
+      // 4. Schedule ONLY the new postponed notification.
+      // ----------------------------------------------------------
+
+      await _schedulePostponedNotification(
+        medicineId: medicineId,
+        medicineName: medicineName,
+        postponedUntil: postponedUntil,
+      );
+
+      // ----------------------------------------------------------
+      // 5. Refresh Home.
+      // ----------------------------------------------------------
+
+      await _loadHomeData();
+    } catch (e) {
+      debugPrint(
+        'POSTPONE NOTIFICATION ERROR: $e',
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Could not postpone reminder: $e',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   // ============================================================
@@ -964,7 +1316,6 @@ class _HomePageState extends State<HomePage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ICON
               Container(
                 width: 65,
                 height: 65,
@@ -981,9 +1332,7 @@ class _HomePageState extends State<HomePage> {
                   color: const Color(0xFF3D84A8),
                 ),
               ),
-
               const SizedBox(width: 12),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1010,17 +1359,12 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-
           const SizedBox(height: 14),
-
-          // ======================================================
-          // EACH DOSE
-          // ======================================================
-
           ...times.map(
             (time) => _doseRow(
               medicineId: documentId,
               medicineName: medicineName,
+              medicine: item,
               time: time,
             ),
           ),
@@ -1036,6 +1380,7 @@ class _HomePageState extends State<HomePage> {
   Widget _doseRow({
     required String medicineId,
     required String medicineName,
+    required Map<String, dynamic> medicine,
     required String time,
   }) {
     final status = _getDoseStatus(
@@ -1077,7 +1422,6 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // TIME + STATUS
           Row(
             children: [
               Icon(
@@ -1127,6 +1471,7 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         _markMedicineTaken(
                           medicineId: medicineId,
+                          medicineName: medicineName,
                           time: time,
                         );
                       },
@@ -1157,6 +1502,7 @@ class _HomePageState extends State<HomePage> {
                   onTap: () {
                     _postponeMedicine(
                       medicineId: medicineId,
+                      medicineName: medicineName,
                       time: time,
                     );
                   },
@@ -1182,6 +1528,7 @@ class _HomePageState extends State<HomePage> {
                   onTap: () {
                     _skipMedicine(
                       medicineId: medicineId,
+                      medicineName: medicineName,
                       time: time,
                     );
                   },
@@ -1227,6 +1574,7 @@ class _HomePageState extends State<HomePage> {
                   onTap: () {
                     _markMedicineTaken(
                       medicineId: medicineId,
+                      medicineName: medicineName,
                       time: time,
                     );
                   },
@@ -1448,14 +1796,18 @@ class _HomePageState extends State<HomePage> {
         item['completedAt'].toString().isNotEmpty;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: const EdgeInsets.only(
+        bottom: 14,
+      ),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withOpacity(
+              0.03,
+            ),
             blurRadius: 8,
           ),
         ],
@@ -1534,7 +1886,9 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                           size: 18,
                         ),
-                        SizedBox(width: 6),
+                        SizedBox(
+                          width: 6,
+                        ),
                         Text(
                           'Completed',
                           style: TextStyle(
