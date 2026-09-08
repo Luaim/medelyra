@@ -65,6 +65,60 @@ class _EditProfilePageState extends State<EditProfilePage> {
   static const Color border = Color(0xFFE9E9ED);
 
   // ============================================================
+  // DARK MODE COLORS
+  // ============================================================
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground => _isDark ? const Color(0xFF121212) : background;
+
+  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _fieldBackground =>
+      _isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFB);
+
+  Color get _disabledFieldBackground =>
+      _isDark ? const Color(0xFF202020) : const Color(0xFFF2F2F4);
+
+  Color get _borderColor => _isDark ? const Color(0xFF3A3A3A) : border;
+
+  Color get _primaryTextColor => _isDark ? Colors.white : textDark;
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : textMedium;
+
+  Color get _lightTextColor => _isDark ? const Color(0xFF9E9E9E) : textLight;
+
+  Color get _introStartColor =>
+      _isDark ? const Color(0xFF1D3038) : const Color(0xFFEAF6FA);
+
+  Color get _introEndColor =>
+      _isDark ? const Color(0xFF202B30) : const Color(0xFFF4FAFC);
+
+  Color get _introBorderColor =>
+      _isDark ? const Color(0xFF31454D) : const Color(0xFFDCEFF4);
+
+  Color get _iconBackground => _isDark ? const Color(0xFF243943) : Colors.white;
+
+  Color get _sectionIconBackground =>
+      _isDark ? const Color(0xFF243943) : primaryLight;
+
+  Color get _allergyBackground =>
+      _isDark ? const Color(0xFF20353A) : const Color(0xFFF0F8FA);
+
+  Color get _allergyBorder =>
+      _isDark ? const Color(0xFF315058) : const Color(0xFFDCEFF4);
+
+  Color get _privacyBackground =>
+      _isDark ? const Color(0xFF1D3035) : const Color(0xFFF1F7F9);
+
+  Color get _privacyBorder =>
+      _isDark ? const Color(0xFF304B52) : const Color(0xFFDCECF1);
+
+  Color get _dateIconBackground =>
+      _isDark ? const Color(0xFF243943) : primaryLight;
+
+  // ============================================================
   // INIT
   // ============================================================
 
@@ -208,14 +262,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
       firstDate: DateTime(1950),
       lastDate: DateTime.now(),
       builder: (context, child) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: primary,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: textDark,
-            ),
+            colorScheme: isDark
+                ? const ColorScheme.dark(
+                    primary: primary,
+                    onPrimary: Colors.white,
+                    surface: Color(0xFF1E1E1E),
+                    onSurface: Colors.white,
+                  )
+                : const ColorScheme.light(
+                    primary: primary,
+                    onPrimary: Colors.white,
+                    surface: Colors.white,
+                    onSurface: textDark,
+                  ),
           ),
           child: child!,
         );
@@ -453,10 +516,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: background,
+      backgroundColor: _pageBackground,
       appBar: AppBar(
-        backgroundColor: background,
-        foregroundColor: textDark,
+        backgroundColor: _pageBackground,
+        foregroundColor: _primaryTextColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -468,12 +531,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
             size: 20,
           ),
         ),
-        title: const Text(
+        title: Text(
           'Edit Profile',
           style: TextStyle(
             fontSize: 23,
             fontWeight: FontWeight.w700,
-            color: textDark,
+            color: _primaryTextColor,
           ),
         ),
       ),
@@ -601,20 +664,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               },
                             ),
                             const SizedBox(height: 20),
-                            const Text(
+                            Text(
                               'Allergies',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: textDark,
+                                color: _primaryTextColor,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
+                            Text(
                               'Add any medicines or substances you are allergic to.',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: textLight,
+                                color: _lightTextColor,
                                 height: 1.35,
                               ),
                             ),
@@ -624,7 +687,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 spacing: 8,
                                 runSpacing: 8,
                                 children: allergies.map((item) {
-                                  return _buildAllergyChip(item);
+                                  return _buildAllergyChip(
+                                    item,
+                                  );
                                 }).toList(),
                               ),
                               const SizedBox(height: 12),
@@ -743,12 +808,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                         const SizedBox(height: 10),
 
-                        const Center(
+                        Center(
                           child: Text(
                             'Your changes will be saved securely.',
                             style: TextStyle(
                               fontSize: 12,
-                              color: textLight,
+                              color: _lightTextColor,
                             ),
                           ),
                         ),
@@ -770,17 +835,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFFEAF6FA),
-            Color(0xFFF4FAFC),
+            _introStartColor,
+            _introEndColor,
           ],
         ),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: const Color(0xFFDCEFF4),
+          color: _introBorderColor,
         ),
       ),
       child: Row(
@@ -789,14 +854,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: _iconBackground,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
+                if (!_isDark)
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
               ],
             ),
             child: const Icon(
@@ -806,7 +872,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -815,16 +881,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: textDark,
+                    color: _primaryTextColor,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   'Update your information to keep your Medelyra profile accurate.',
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
-                    color: textMedium,
+                    color: _secondaryTextColor,
                   ),
                 ),
               ],
@@ -851,7 +917,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           width: 38,
           height: 38,
           decoration: BoxDecoration(
-            color: primaryLight,
+            color: _sectionIconBackground,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
@@ -867,18 +933,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: textDark,
+                  color: _primaryTextColor,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
-                  color: textLight,
+                  color: _lightTextColor,
                 ),
               ),
             ],
@@ -899,17 +965,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBackground,
         borderRadius: BorderRadius.circular(21),
         border: Border.all(
-          color: border,
+          color: _borderColor,
         ),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.025),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
+          if (!_isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.025),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
         ],
       ),
       child: Column(
@@ -944,13 +1011,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
       style: TextStyle(
         fontSize: 15,
         fontWeight: FontWeight.w500,
-        color: enabled ? textDark : textLight,
+        color: enabled ? _primaryTextColor : _lightTextColor,
       ),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(
+        labelStyle: TextStyle(
           fontSize: 13,
-          color: textMedium,
+          color: _secondaryTextColor,
           fontWeight: FontWeight.w500,
         ),
         floatingLabelStyle: const TextStyle(
@@ -960,35 +1027,35 @@ class _EditProfilePageState extends State<EditProfilePage> {
         prefixIcon: Icon(
           icon,
           size: 21,
-          color: enabled ? primary : textLight,
+          color: enabled ? primary : _lightTextColor,
         ),
         helperText: helperText,
-        helperStyle: const TextStyle(
+        helperStyle: TextStyle(
           fontSize: 11,
-          color: textLight,
+          color: _lightTextColor,
         ),
         filled: true,
-        fillColor: enabled ? const Color(0xFFFAFAFB) : const Color(0xFFF2F2F4),
+        fillColor: enabled ? _fieldBackground : _disabledFieldBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(
-            color: border,
+          borderSide: BorderSide(
+            color: _borderColor,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(
-            color: border,
+          borderSide: BorderSide(
+            color: _borderColor,
           ),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(
-            color: border,
+          borderSide: BorderSide(
+            color: _borderColor,
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -1019,10 +1086,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             vertical: 13,
           ),
           decoration: BoxDecoration(
-            color: const Color(0xFFFAFAFB),
+            color: _fieldBackground,
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
-              color: border,
+              color: _borderColor,
             ),
           ),
           child: Row(
@@ -1031,7 +1098,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: primaryLight,
+                  color: _dateIconBackground,
                   borderRadius: BorderRadius.circular(11),
                 ),
                 child: const Icon(
@@ -1041,7 +1108,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1049,25 +1116,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       'Date of Birth',
                       style: TextStyle(
                         fontSize: 12,
-                        color: textLight,
+                        color: _lightTextColor,
                       ),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                   ],
                 ),
               ),
               Text(
                 _formattedDate(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: textDark,
+                  color: _primaryTextColor,
                 ),
               ),
               const SizedBox(width: 6),
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
-                color: textLight,
+                color: _lightTextColor,
                 size: 21,
               ),
             ],
@@ -1094,10 +1161,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         vertical: 5,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFB),
+        color: _fieldBackground,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: border,
+          color: _borderColor,
         ),
       ),
       child: Row(
@@ -1106,7 +1173,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: primaryLight,
+              color: _sectionIconBackground,
               borderRadius: BorderRadius.circular(11),
             ),
             child: Icon(
@@ -1122,14 +1189,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 value: items.contains(value) ? value : items.first,
                 isExpanded: true,
                 borderRadius: BorderRadius.circular(15),
+                dropdownColor: _isDark ? const Color(0xFF1E1E1E) : Colors.white,
                 icon: const Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: primary,
                 ),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: textDark,
+                  color: _primaryTextColor,
                 ),
                 selectedItemBuilder: (context) {
                   return items.map((item) {
@@ -1141,18 +1209,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         children: [
                           Text(
                             label,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: textLight,
+                              color: _lightTextColor,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             item,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: textDark,
+                              color: _primaryTextColor,
                             ),
                           ),
                         ],
@@ -1163,7 +1231,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 items: items.map((item) {
                   return DropdownMenuItem<String>(
                     value: item,
-                    child: Text(item),
+                    child: Text(
+                      item,
+                      style: TextStyle(
+                        color: _primaryTextColor,
+                      ),
+                    ),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -1192,10 +1265,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         bottom: 7,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F8FA),
+        color: _allergyBackground,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFFDCEFF4),
+          color: _allergyBorder,
         ),
       ),
       child: Row(
@@ -1209,22 +1282,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
           const SizedBox(width: 6),
           Text(
             item,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: textDark,
+              color: _primaryTextColor,
             ),
           ),
           const SizedBox(width: 3),
           InkWell(
             onTap: () => _removeAllergy(item),
             borderRadius: BorderRadius.circular(20),
-            child: const Padding(
-              padding: EdgeInsets.all(3),
+            child: Padding(
+              padding: const EdgeInsets.all(3),
               child: Icon(
                 Icons.close_rounded,
                 size: 17,
-                color: textMedium,
+                color: _secondaryTextColor,
               ),
             ),
           ),
@@ -1272,27 +1345,27 @@ class _EditProfilePageState extends State<EditProfilePage> {
         vertical: 12,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F7F9),
+        color: _privacyBackground,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: const Color(0xFFDCECF1),
+          color: _privacyBorder,
         ),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.lock_outline_rounded,
             size: 18,
             color: primary,
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               'Your profile information is securely stored and used to personalize your Medelyra experience.',
               style: TextStyle(
                 fontSize: 11.5,
                 height: 1.4,
-                color: textMedium,
+                color: _secondaryTextColor,
               ),
             ),
           ),

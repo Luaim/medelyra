@@ -24,6 +24,60 @@ class _SignUpPageState extends State<SignUpPage> {
   bool isLoading = false;
   bool isGoogleLoading = false;
 
+  // ===========================================================================
+  // THEME COLORS
+  // ===========================================================================
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : const Color(0xFFF8F6F8);
+
+  Color get _primaryTextColor =>
+      _isDark ? Colors.white : const Color(0xFF292929);
+
+  Color get _labelTextColor =>
+      _isDark ? const Color(0xFFE0E0E0) : const Color(0xFF303030);
+
+  Color get _bodyTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF333333);
+
+  Color get _inputBackground =>
+      _isDark ? const Color(0xFF252525) : const Color(0xFFEAF4F8);
+
+  Color get _inputBorderColor =>
+      _isDark ? const Color(0xFF3A3A3A) : const Color(0xFFD0D8DC);
+
+  Color get _inputTextColor => _isDark ? Colors.white : const Color(0xFF303030);
+
+  Color get _hintColor =>
+      _isDark ? const Color(0xFF8E8E8E) : const Color(0xFF9BA5AA);
+
+  Color get _inputIconColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF4F5A5F);
+
+  Color get _visibilityIconColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF555555);
+
+  Color get _dividerColor =>
+      _isDark ? const Color(0xFF555555) : const Color(0xFFBDBDBD);
+
+  Color get _dividerTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF777777);
+
+  Color get _googleBackground =>
+      _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _googleBorderColor =>
+      _isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE1E1E1);
+
+  Color get _googleTextColor =>
+      _isDark ? Colors.white : const Color(0xFF353535);
+
+  // ===========================================================================
+  // DISPOSE
+  // ===========================================================================
+
   @override
   void dispose() {
     userNameController.dispose();
@@ -207,10 +261,27 @@ class _SignUpPageState extends State<SignUpPage> {
   // ===========================================================================
 
   void _showTermsAndConditions() {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final Color dialogBackground =
+        isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F6F8);
+
+    final Color dialogPrimaryText =
+        isDark ? Colors.white : const Color(0xFF292929);
+
+    final Color dialogBodyText =
+        isDark ? const Color(0xFFBDBDBD) : const Color(0xFF555555);
+
+    final Color dialogCloseIcon =
+        isDark ? const Color(0xFFBDBDBD) : const Color(0xFF555555);
+
+    final Color dialogDivider =
+        isDark ? const Color(0xFF3A3A3A) : const Color(0xFFD0D0D0);
+
     showDialog(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.35),
+      barrierColor: Colors.black.withOpacity(isDark ? 0.60 : 0.35),
       builder: (dialogContext) {
         return Dialog(
           backgroundColor: Colors.transparent,
@@ -224,14 +295,21 @@ class _SignUpPageState extends State<SignUpPage> {
               maxHeight: 620,
             ),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8F6F8),
+              color: dialogBackground,
               borderRadius: BorderRadius.circular(22),
+              border: isDark
+                  ? Border.all(
+                      color: const Color(0xFF333333),
+                      width: 1,
+                    )
+                  : null,
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.20),
-                  blurRadius: 15,
-                  offset: const Offset(0, 6),
-                ),
+                if (!isDark)
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.20),
+                    blurRadius: 15,
+                    offset: const Offset(0, 6),
+                  ),
               ],
             ),
             child: Column(
@@ -250,13 +328,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   child: Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Terms & Conditions',
                           style: TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF292929),
+                            color: dialogPrimaryText,
                             fontFamily: 'serif',
                           ),
                         ),
@@ -265,28 +343,28 @@ class _SignUpPageState extends State<SignUpPage> {
                         onPressed: () {
                           Navigator.pop(dialogContext);
                         },
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.close,
                           size: 24,
-                          color: Color(0xFF555555),
+                          color: dialogCloseIcon,
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                const Divider(
+                Divider(
                   height: 1,
-                  color: Color(0xFFD0D0D0),
+                  color: dialogDivider,
                 ),
 
                 // ----------------------------------------------------------------
                 // TERMS CONTENT
                 // ----------------------------------------------------------------
 
-                const Flexible(
+                Flexible(
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
+                    padding: const EdgeInsets.fromLTRB(
                       20,
                       18,
                       20,
@@ -299,46 +377,55 @@ class _SignUpPageState extends State<SignUpPage> {
                           title: '1. Acceptance of Terms',
                           text:
                               'By creating a Medelyra account, you agree to these Terms & Conditions. If you do not agree with these terms, please do not create an account or use the application.',
+                          isDark: isDark,
                         ),
                         _TermsSection(
                           title: '2. Use of Medelyra',
                           text:
                               'Medelyra is designed to help users manage and organize their medication-related information and reminders. You agree to use the application only for lawful purposes and in a responsible manner.',
+                          isDark: isDark,
                         ),
                         _TermsSection(
                           title: '3. Medical Information',
                           text:
                               'Medelyra is not a replacement for a doctor, pharmacist, or other qualified healthcare professional. Information and reminders provided through the application should not be considered medical advice. Always follow instructions provided by your healthcare professional.',
+                          isDark: isDark,
                         ),
                         _TermsSection(
                           title: '4. Your Account',
                           text:
                               'You are responsible for providing accurate information when creating your account and for keeping your account information secure. You are responsible for activity performed through your account.',
+                          isDark: isDark,
                         ),
                         _TermsSection(
                           title: '5. User Information',
                           text:
                               'Medelyra may store information that you provide when using the application, such as your name, email address, and information necessary to provide the application services. Your information should be handled according to the application’s privacy practices.',
+                          isDark: isDark,
                         ),
                         _TermsSection(
                           title: '6. Medication Reminders',
                           text:
                               'Medication reminders are provided as a convenience. You remain responsible for taking medications according to the instructions given by your healthcare professional. Medelyra should not be relied upon as the sole method for remembering or managing medication.',
+                          isDark: isDark,
                         ),
                         _TermsSection(
                           title: '7. Application Availability',
                           text:
                               'We aim to keep Medelyra available and functioning correctly, but we cannot guarantee that the application will always be available, error-free, or uninterrupted.',
+                          isDark: isDark,
                         ),
                         _TermsSection(
                           title: '8. Changes to These Terms',
                           text:
                               'These Terms & Conditions may be updated from time to time. Continued use of Medelyra after changes are made means that you accept the updated terms.',
+                          isDark: isDark,
                         ),
                         _TermsSection(
                           title: '9. Contact',
                           text:
                               'If you have questions about these Terms & Conditions, please contact the Medelyra support team.',
+                          isDark: isDark,
                         ),
                       ],
                     ),
@@ -366,7 +453,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF3D84A8),
                         foregroundColor: Colors.white,
-                        elevation: 2,
+                        elevation: isDark ? 0 : 2,
                         shadowColor: Colors.black.withOpacity(0.20),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
@@ -565,7 +652,7 @@ class _SignUpPageState extends State<SignUpPage> {
     final bool busy = isLoading || isGoogleLoading;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F6F8),
+      backgroundColor: _pageBackground,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
@@ -596,10 +683,12 @@ class _SignUpPageState extends State<SignUpPage> {
                           minWidth: 40,
                           minHeight: 40,
                         ),
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.arrow_back,
                           size: 27,
-                          color: Color(0xFF222222),
+                          color: _isDark
+                              ? const Color(0xFFE0E0E0)
+                              : const Color(0xFF222222),
                         ),
                       ),
                     ),
@@ -627,12 +716,12 @@ class _SignUpPageState extends State<SignUpPage> {
                   // TITLE
                   // =================================================================
 
-                  const Text(
+                  Text(
                     'Sign Up',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF292929),
+                      color: _primaryTextColor,
                       fontFamily: 'serif',
                     ),
                   ),
@@ -701,7 +790,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ? Icons.visibility_off_outlined
                             : Icons.visibility_outlined,
                         size: 21,
-                        color: const Color(0xFF555555),
+                        color: _visibilityIconColor,
                       ),
                     ),
                   ),
@@ -735,7 +824,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ? Icons.visibility_off_outlined
                             : Icons.visibility_outlined,
                         size: 21,
-                        color: const Color(0xFF555555),
+                        color: _visibilityIconColor,
                       ),
                     ),
                   ),
@@ -796,12 +885,12 @@ class _SignUpPageState extends State<SignUpPage> {
                       // AGREE WITH TEXT
                       // -------------------------------------------------------------
 
-                      const Text(
+                      Text(
                         'Agree With ',
                         style: TextStyle(
                           fontSize: 14,
                           height: 1.2,
-                          color: Color(0xFF333333),
+                          color: _bodyTextColor,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -846,7 +935,9 @@ class _SignUpPageState extends State<SignUpPage> {
                         ).withOpacity(0.55),
                         disabledForegroundColor: Colors.white,
                         elevation: 2,
-                        shadowColor: Colors.black.withOpacity(0.20),
+                        shadowColor: Colors.black.withOpacity(
+                          _isDark ? 0.35 : 0.20,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -878,22 +969,22 @@ class _SignUpPageState extends State<SignUpPage> {
                   // DIVIDER
                   // =================================================================
 
-                  const Row(
+                  Row(
                     children: [
                       Expanded(
                         child: Divider(
-                          color: Color(0xFFBDBDBD),
+                          color: _dividerColor,
                           thickness: 1,
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 10,
                         ),
                         child: Text(
                           'OR Continue with',
                           style: TextStyle(
-                            color: Color(0xFF777777),
+                            color: _dividerTextColor,
                             fontSize: 13,
                             fontWeight: FontWeight.w400,
                           ),
@@ -901,7 +992,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       Expanded(
                         child: Divider(
-                          color: Color(0xFFBDBDBD),
+                          color: _dividerColor,
                           thickness: 1,
                         ),
                       ),
@@ -927,11 +1018,11 @@ class _SignUpPageState extends State<SignUpPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'Already have an account? ',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Color(0xFF333333),
+                          color: _bodyTextColor,
                         ),
                       ),
                       GestureDetector(
@@ -971,10 +1062,10 @@ class _SignUpPageState extends State<SignUpPage> {
       alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF303030),
+          color: _labelTextColor,
         ),
       ),
     );
@@ -995,15 +1086,17 @@ class _SignUpPageState extends State<SignUpPage> {
     return Container(
       height: 47,
       decoration: BoxDecoration(
-        color: const Color(0xFFEAF4F8),
+        color: _inputBackground,
         borderRadius: BorderRadius.circular(11),
         border: Border.all(
-          color: const Color(0xFFD0D8DC),
+          color: _inputBorderColor,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withOpacity(
+              _isDark ? 0.28 : 0.08,
+            ),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -1013,9 +1106,11 @@ class _SignUpPageState extends State<SignUpPage> {
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
-        style: const TextStyle(
+        cursorColor:
+            _isDark ? const Color(0xFF8FC4DE) : const Color(0xFF4F5A5F),
+        style: TextStyle(
           fontSize: 14,
-          color: Color(0xFF303030),
+          color: _inputTextColor,
         ),
         decoration: InputDecoration(
           isDense: true,
@@ -1025,14 +1120,14 @@ class _SignUpPageState extends State<SignUpPage> {
             vertical: 11,
           ),
           hintText: hintText,
-          hintStyle: const TextStyle(
-            color: Color(0xFF9BA5AA),
+          hintStyle: TextStyle(
+            color: _hintColor,
             fontSize: 14,
           ),
           prefixIcon: Icon(
             prefixIcon,
             size: 20,
-            color: const Color(0xFF4F5A5F),
+            color: _inputIconColor,
           ),
           suffixIcon: suffixIcon,
         ),
@@ -1056,18 +1151,19 @@ class _SignUpPageState extends State<SignUpPage> {
           width: double.infinity,
           height: 47,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: _googleBackground,
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
-              color: const Color(0xFFE1E1E1),
+              color: _googleBorderColor,
               width: 1,
             ),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.10),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
+              if (!_isDark)
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.10),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
             ],
           ),
           child: Center(
@@ -1089,12 +1185,12 @@ class _SignUpPageState extends State<SignUpPage> {
                         height: 22,
                       ),
                       const SizedBox(width: 10),
-                      const Text(
+                      Text(
                         'Continue with Google',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF353535),
+                          color: _googleTextColor,
                         ),
                       ),
                     ],
@@ -1113,10 +1209,12 @@ class _SignUpPageState extends State<SignUpPage> {
 class _TermsSection extends StatelessWidget {
   final String title;
   final String text;
+  final bool isDark;
 
   const _TermsSection({
     required this.title,
     required this.text,
+    required this.isDark,
   });
 
   @override
@@ -1130,19 +1228,19 @@ class _TermsSection extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF2B2B2B),
+              color: isDark ? Colors.white : const Color(0xFF2B2B2B),
             ),
           ),
           const SizedBox(height: 6),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13.5,
               height: 1.45,
-              color: Color(0xFF555555),
+              color: isDark ? const Color(0xFFBDBDBD) : const Color(0xFF555555),
             ),
           ),
         ],

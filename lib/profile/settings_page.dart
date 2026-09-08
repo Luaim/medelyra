@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:medelyra/services/theme_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -12,7 +13,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool darkMode = false;
+  final ThemeService _themeService = ThemeService.instance;
 
   String selectedLanguage = 'English';
   String appVersion = '';
@@ -66,29 +67,16 @@ class _SettingsPageState extends State<SettingsPage> {
     });
 
     try {
-      // -----------------------------------------------------------------------
-      // ACTUALLY SIGN OUT FROM FIREBASE
-      // -----------------------------------------------------------------------
-
       await FirebaseAuth.instance.signOut();
-
-      // -----------------------------------------------------------------------
-      // ALSO SIGN OUT FROM GOOGLE IF A GOOGLE ACCOUNT WAS USED
-      // -----------------------------------------------------------------------
 
       try {
         final GoogleSignIn googleSignIn = GoogleSignIn();
         await googleSignIn.signOut();
       } catch (e) {
-        // Google sign-out failure should not prevent Firebase logout.
         debugPrint('GOOGLE SIGN OUT INFO: $e');
       }
 
       if (!mounted) return;
-
-      // -----------------------------------------------------------------------
-      // REMOVE ALL PREVIOUS SCREENS
-      // -----------------------------------------------------------------------
 
       Navigator.pushNamedAndRemoveUntil(
         context,
@@ -122,37 +110,40 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       barrierDismissible: true,
       builder: (dialogContext) {
+        final dark = Theme.of(dialogContext).brightness == Brightness.dark;
+
         return AlertDialog(
-          backgroundColor: const Color(0xFFF8F6F8),
+          backgroundColor:
+              dark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F6F8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(22),
           ),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.logout_rounded,
                 color: Color(0xFF3D84A8),
                 size: 26,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   'Log Out',
                   style: TextStyle(
                     fontSize: 21,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF292929),
+                    color: dark ? Colors.white : const Color(0xFF292929),
                   ),
                 ),
               ),
             ],
           ),
-          content: const Text(
+          content: Text(
             'Are you sure you want to log out of your Medelyra account?',
             style: TextStyle(
               fontSize: 15,
               height: 1.45,
-              color: Color(0xFF555555),
+              color: dark ? const Color(0xFFBDBDBD) : const Color(0xFF555555),
             ),
           ),
           actionsPadding: const EdgeInsets.fromLTRB(
@@ -166,10 +157,11 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text(
+              child: Text(
                 'Cancel',
                 style: TextStyle(
-                  color: Color(0xFF666666),
+                  color:
+                      dark ? const Color(0xFFBDBDBD) : const Color(0xFF666666),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -208,17 +200,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _deleteAccount() async {
     if (isDeletingAccount || isLoggingOut) return;
 
-    // -------------------------------------------------------------------------
-    // FIRST CONFIRMATION
-    // -------------------------------------------------------------------------
-
     final firstConfirmation = await _showDeleteWarning();
 
     if (!firstConfirmation) return;
-
-    // -------------------------------------------------------------------------
-    // SECOND CONFIRMATION
-    // -------------------------------------------------------------------------
 
     final secondConfirmation = await _showFinalDeleteConfirmation();
 
@@ -240,34 +224,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
       final String uid = user.uid;
 
-      // -----------------------------------------------------------------------
-      // RE-AUTHENTICATE IF FIREBASE REQUIRES RECENT LOGIN
-      // -----------------------------------------------------------------------
-
       await _reauthenticateUserIfNeeded(user);
-
-      // -----------------------------------------------------------------------
-      // DELETE USER DATA FROM FIRESTORE
-      //
-      // The profile document contains account/profile information such as:
-      // - name
-      // - email
-      // - emergency contact information
-      //
-      // when those values are stored under users/{uid}.
-      // -----------------------------------------------------------------------
 
       await firestore.collection('users').doc(uid).delete();
 
-      // -----------------------------------------------------------------------
-      // DELETE FIREBASE AUTHENTICATION ACCOUNT
-      // -----------------------------------------------------------------------
-
       await user.delete();
-
-      // -----------------------------------------------------------------------
-      // SIGN OUT LOCALLY
-      // -----------------------------------------------------------------------
 
       await auth.signOut();
 
@@ -280,19 +241,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
       if (!mounted) return;
 
-      // -----------------------------------------------------------------------
-      // SEND USER TO SIGN IN AND REMOVE ALL PREVIOUS ROUTES
-      // -----------------------------------------------------------------------
-
       Navigator.pushNamedAndRemoveUntil(
         context,
         '/signin',
         (route) => false,
       );
-
-      // -----------------------------------------------------------------------
-      // SUCCESS MESSAGE
-      // -----------------------------------------------------------------------
 
       Future.delayed(const Duration(milliseconds: 300), () {
         if (!mounted) return;
@@ -360,23 +313,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _reauthenticateUserIfNeeded(User user) async {
     try {
-      // -----------------------------------------------------------------------
-      // TRY TO DELETE LATER.
-      //
-      // Firebase will tell us if recent authentication is required.
-      // However, we cannot call user.delete() here because Firestore data
-      // should not be removed before authentication is confirmed.
-      //
-      // So we check whether the user has a supported provider and perform
-      // re-authentication proactively.
-      // -----------------------------------------------------------------------
-
       final providerIds =
           user.providerData.map((provider) => provider.providerId).toList();
-
-      // -----------------------------------------------------------------------
-      // GOOGLE ACCOUNT
-      // -----------------------------------------------------------------------
 
       if (providerIds.contains('google.com')) {
         final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -407,10 +345,6 @@ class _SettingsPageState extends State<SettingsPage> {
         return;
       }
 
-      // -----------------------------------------------------------------------
-      // EMAIL / PASSWORD ACCOUNT
-      // -----------------------------------------------------------------------
-
       if (providerIds.contains('password')) {
         final String? password = await _showPasswordDialog();
 
@@ -440,10 +374,6 @@ class _SettingsPageState extends State<SettingsPage> {
         return;
       }
 
-      // -----------------------------------------------------------------------
-      // OTHER PROVIDERS
-      // -----------------------------------------------------------------------
-
       debugPrint(
         'No supported re-authentication provider found: $providerIds',
       );
@@ -470,24 +400,28 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
+            final dark = Theme.of(context).brightness == Brightness.dark;
+
             return AlertDialog(
-              backgroundColor: const Color(0xFFF8F6F8),
+              backgroundColor:
+                  dark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F6F8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(22),
               ),
-              title: const Row(
+              title: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.lock_outline_rounded,
                     color: Color(0xFF3D84A8),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'Confirm Your Password',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
+                        color: dark ? Colors.white : const Color(0xFF292929),
                       ),
                     ),
                   ),
@@ -497,12 +431,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'For your security, enter your current password to permanently delete your account.',
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.45,
-                      color: Color(0xFF555555),
+                      color: dark
+                          ? const Color(0xFFBDBDBD)
+                          : const Color(0xFF555555),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -510,10 +446,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     controller: passwordController,
                     obscureText: obscure,
                     autofocus: true,
+                    style: TextStyle(
+                      color: dark ? Colors.white : const Color(0xFF292929),
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Current password',
+                      hintStyle: TextStyle(
+                        color: dark
+                            ? const Color(0xFF888888)
+                            : const Color(0xFF777777),
+                      ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: dark ? const Color(0xFF292929) : Colors.white,
                       prefixIcon: const Icon(
                         Icons.lock_outline_rounded,
                         color: Color(0xFF3D84A8),
@@ -528,18 +472,25 @@ class _SettingsPageState extends State<SettingsPage> {
                           obscure
                               ? Icons.visibility_off_outlined
                               : Icons.visibility_outlined,
+                          color: dark
+                              ? const Color(0xFFBDBDBD)
+                              : const Color(0xFF666666),
                         ),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFE0E0E0),
+                        borderSide: BorderSide(
+                          color: dark
+                              ? const Color(0xFF3A3A3A)
+                              : const Color(0xFFE0E0E0),
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFE0E0E0),
+                        borderSide: BorderSide(
+                          color: dark
+                              ? const Color(0xFF3A3A3A)
+                              : const Color(0xFFE0E0E0),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -564,10 +515,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   onPressed: () {
                     Navigator.pop(dialogContext);
                   },
-                  child: const Text(
+                  child: Text(
                     'Cancel',
                     style: TextStyle(
-                      color: Color(0xFF666666),
+                      color: dark
+                          ? const Color(0xFFBDBDBD)
+                          : const Color(0xFF666666),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -615,38 +568,41 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       barrierDismissible: true,
       builder: (dialogContext) {
+        final dark = Theme.of(dialogContext).brightness == Brightness.dark;
+
         return AlertDialog(
-          backgroundColor: const Color(0xFFF8F6F8),
+          backgroundColor:
+              dark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F6F8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(22),
           ),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.warning_amber_rounded,
                 color: Color(0xFFC62828),
                 size: 28,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   'Delete Account',
                   style: TextStyle(
                     fontSize: 21,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF292929),
+                    color: dark ? Colors.white : const Color(0xFF292929),
                   ),
                 ),
               ),
             ],
           ),
-          content: const Text(
+          content: Text(
             'Deleting your Medelyra account is permanent.\n\n'
             'Your account and the information stored with your profile will be deleted and cannot be recovered.',
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
-              color: Color(0xFF555555),
+              color: dark ? const Color(0xFFBDBDBD) : const Color(0xFF555555),
             ),
           ),
           actionsPadding: const EdgeInsets.fromLTRB(
@@ -660,10 +616,11 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text(
+              child: Text(
                 'Cancel',
                 style: TextStyle(
-                  color: Color(0xFF666666),
+                  color:
+                      dark ? const Color(0xFFBDBDBD) : const Color(0xFF666666),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -704,26 +661,29 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
+        final dark = Theme.of(dialogContext).brightness == Brightness.dark;
+
         return AlertDialog(
-          backgroundColor: const Color(0xFFF8F6F8),
+          backgroundColor:
+              dark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F6F8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(22),
           ),
-          title: const Text(
+          title: Text(
             'Are you absolutely sure?',
             style: TextStyle(
               fontSize: 21,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF292929),
+              color: dark ? Colors.white : const Color(0xFF292929),
             ),
           ),
-          content: const Text(
+          content: Text(
             'This is your final confirmation.\n\n'
             'Your Medelyra account will be permanently deleted. This action cannot be undone.',
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
-              color: Color(0xFF555555),
+              color: dark ? const Color(0xFFBDBDBD) : const Color(0xFF555555),
             ),
           ),
           actionsPadding: const EdgeInsets.fromLTRB(
@@ -737,9 +697,9 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text(
+              child: Text(
                 'Keep My Account',
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFF3D84A8),
                   fontWeight: FontWeight.w600,
                 ),
@@ -801,12 +761,15 @@ class _SettingsPageState extends State<SettingsPage> {
     final screenHeight = size.height;
     final smallScreen = screenHeight < 700;
 
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
+
     final bool busy = isLoggingOut || isDeletingAccount;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: dark ? const Color(0xFF121212) : const Color(0xFFF7F7F7),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F7F7),
+        backgroundColor:
+            dark ? const Color(0xFF121212) : const Color(0xFFF7F7F7),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
@@ -815,15 +778,15 @@ class _SettingsPageState extends State<SettingsPage> {
               : () {
                   Navigator.pop(context);
                 },
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Color(0xFF222222),
+            color: dark ? Colors.white : const Color(0xFF222222),
           ),
         ),
-        title: const Text(
+        title: Text(
           'Settings',
           style: TextStyle(
-            color: Color(0xFF222222),
+            color: dark ? Colors.white : const Color(0xFF222222),
             fontSize: 24,
             fontWeight: FontWeight.w700,
           ),
@@ -847,10 +810,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   height: smallScreen ? 4 : 8,
                 ),
 
-                // =================================================================
                 // ACCOUNT
-                // =================================================================
-
                 _sectionTitle('Account'),
 
                 const SizedBox(height: 10),
@@ -889,10 +849,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   height: smallScreen ? 18 : 22,
                 ),
 
-                // =================================================================
                 // PREFERENCES
-                // =================================================================
-
                 _sectionTitle('Preferences'),
 
                 const SizedBox(height: 10),
@@ -901,13 +858,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: Icons.dark_mode_outlined,
                   title: 'Dark Mode',
                   subtitle: 'Switch app appearance',
-                  value: darkMode,
+                  value: _themeService.isDarkMode,
                   onChanged: busy
                       ? (_) {}
-                      : (value) {
-                          setState(() {
-                            darkMode = value;
-                          });
+                      : (value) async {
+                          await _themeService.setDarkMode(value);
                         },
                 ),
 
@@ -938,10 +893,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   height: smallScreen ? 18 : 22,
                 ),
 
-                // =================================================================
                 // MORE
-                // =================================================================
-
                 _sectionTitle('More'),
 
                 const SizedBox(height: 10),
@@ -993,22 +945,16 @@ class _SettingsPageState extends State<SettingsPage> {
                   height: smallScreen ? 24 : 30,
                 ),
 
-                // =================================================================
                 // ACCOUNT ACTIONS
-                // =================================================================
-
                 _sectionTitle('Account Actions'),
 
                 const SizedBox(height: 10),
 
-                // -----------------------------------------------------------------
                 // DELETE ACCOUNT
-                // -----------------------------------------------------------------
-
                 SizedBox(
                   width: double.infinity,
                   child: Material(
-                    color: Colors.white,
+                    color: dark ? const Color(0xFF1E1E1E) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     child: InkWell(
                       onTap: busy ? null : _deleteAccount,
@@ -1018,11 +964,15 @@ class _SettingsPageState extends State<SettingsPage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: const Color(0xFFF0CACA),
+                            color: dark
+                                ? const Color(0xFF5A2929)
+                                : const Color(0xFFF0CACA),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
+                              color: Colors.black.withOpacity(
+                                dark ? 0.18 : 0.03,
+                              ),
                               blurRadius: 6,
                               offset: const Offset(0, 3),
                             ),
@@ -1034,7 +984,9 @@ class _SettingsPageState extends State<SettingsPage> {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFFEEEE),
+                                color: dark
+                                    ? const Color(0xFF351E1E)
+                                    : const Color(0xFFFFEEEE),
                                 borderRadius: BorderRadius.circular(14),
                               ),
                               child: const Icon(
@@ -1043,7 +995,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                             const SizedBox(width: 14),
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -1052,15 +1004,19 @@ class _SettingsPageState extends State<SettingsPage> {
                                     style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w700,
-                                      color: Color(0xFF8E2424),
+                                      color: dark
+                                          ? const Color(0xFFFF8A8A)
+                                          : const Color(0xFF8E2424),
                                     ),
                                   ),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 4),
                                   Text(
                                     'Permanently delete your account and profile data',
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: Color(0xFF777777),
+                                      color: dark
+                                          ? const Color(0xFFB0B0B0)
+                                          : const Color(0xFF777777),
                                       height: 1.3,
                                     ),
                                   ),
@@ -1083,22 +1039,21 @@ class _SettingsPageState extends State<SettingsPage> {
                   height: smallScreen ? 24 : 30,
                 ),
 
-                // =================================================================
                 // LOGOUT
-                // =================================================================
-
                 SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton.icon(
                     onPressed: busy ? null : _logout,
                     icon: isLoggingOut
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.2,
-                              color: Color(0xFF6E1E1E),
+                              color: dark
+                                  ? const Color(0xFFFFB4B4)
+                                  : const Color(0xFF6E1E1E),
                             ),
                           )
                         : const Icon(
@@ -1108,12 +1063,18 @@ class _SettingsPageState extends State<SettingsPage> {
                       isLoggingOut ? 'Logging Out...' : 'Logout',
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF4B1B1),
-                      disabledBackgroundColor:
-                          const Color(0xFFF4B1B1).withOpacity(0.6),
-                      foregroundColor: const Color(0xFF6E1E1E),
-                      disabledForegroundColor:
-                          const Color(0xFF6E1E1E).withOpacity(0.6),
+                      backgroundColor: dark
+                          ? const Color(0xFF4A2525)
+                          : const Color(0xFFF4B1B1),
+                      disabledBackgroundColor: dark
+                          ? const Color(0xFF3A2222)
+                          : const Color(0xFFF4B1B1).withOpacity(0.6),
+                      foregroundColor: dark
+                          ? const Color(0xFFFFB4B4)
+                          : const Color(0xFF6E1E1E),
+                      disabledForegroundColor: dark
+                          ? const Color(0xFF9A6A6A)
+                          : const Color(0xFF6E1E1E).withOpacity(0.6),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
@@ -1140,6 +1101,8 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       barrierDismissible: true,
       builder: (dialogContext) {
+        final dark = Theme.of(dialogContext).brightness == Brightness.dark;
+
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(
@@ -1155,7 +1118,7 @@ class _SettingsPageState extends State<SettingsPage> {
               18,
             ),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8F6F8),
+              color: dark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F6F8),
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
@@ -1168,15 +1131,14 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // =============================================================
                 // APP ICON
-                // =============================================================
-
                 Container(
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEAF6FA),
+                    color: dark
+                        ? const Color(0xFF20343A)
+                        : const Color(0xFFEAF6FA),
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: const Icon(
@@ -1188,53 +1150,48 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 const SizedBox(height: 14),
 
-                // =============================================================
                 // APP NAME
-                // =============================================================
-
-                const Text(
+                Text(
                   'Medelyra',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF292929),
+                    color: dark ? Colors.white : const Color(0xFF292929),
                     fontFamily: 'serif',
                   ),
                 ),
 
                 const SizedBox(height: 4),
 
-                // =============================================================
                 // VERSION
-                // =============================================================
-
                 Text(
                   appVersion.isEmpty ? 'Version 1.0.0' : 'Version $appVersion',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF8A8A8A),
+                    color: dark
+                        ? const Color(0xFF999999)
+                        : const Color(0xFF8A8A8A),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
 
                 const SizedBox(height: 18),
 
-                // =============================================================
                 // DESCRIPTION CARD
-                // =============================================================
-
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: dark ? const Color(0xFF292929) : Colors.white,
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
-                      color: const Color(0xFFE4E4E4),
+                      color: dark
+                          ? const Color(0xFF3A3A3A)
+                          : const Color(0xFFE4E4E4),
                       width: 1,
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Medelyra is a medication management and reminder app '
                     'designed to help users organize their medications, '
                     'reminders, schedules, and health-related information.',
@@ -1242,17 +1199,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.45,
-                      color: Color(0xFF505050),
+                      color: dark
+                          ? const Color(0xFFD0D0D0)
+                          : const Color(0xFF505050),
                     ),
                   ),
                 ),
 
                 const SizedBox(height: 18),
 
-                // =============================================================
                 // OPEN SOURCE LICENSES
-                // =============================================================
-
                 InkWell(
                   borderRadius: BorderRadius.circular(14),
                   onTap: () {
@@ -1272,17 +1228,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       vertical: 13,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEAF6FA),
+                      color: dark
+                          ? const Color(0xFF20343A)
+                          : const Color(0xFFEAF6FA),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.article_outlined,
                           color: Color(0xFF3D84A8),
                           size: 23,
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1292,15 +1250,19 @@ class _SettingsPageState extends State<SettingsPage> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF303030),
+                                  color: dark
+                                      ? Colors.white
+                                      : const Color(0xFF303030),
                                 ),
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
                                 'View licenses for software used by Medelyra',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Color(0xFF777777),
+                                  color: dark
+                                      ? const Color(0xFFB0B0B0)
+                                      : const Color(0xFF777777),
                                 ),
                               ),
                             ],
@@ -1308,7 +1270,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                         Icon(
                           Icons.chevron_right_rounded,
-                          color: Color(0xFF777777),
+                          color: dark
+                              ? const Color(0xFFB0B0B0)
+                              : const Color(0xFF777777),
                         ),
                       ],
                     ),
@@ -1317,10 +1281,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 const SizedBox(height: 18),
 
-                // =============================================================
                 // CLOSE
-                // =============================================================
-
                 SizedBox(
                   width: double.infinity,
                   height: 46,
@@ -1359,12 +1320,14 @@ class _SettingsPageState extends State<SettingsPage> {
   // ===========================================================================
 
   Widget _sectionTitle(String title) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w700,
-        color: Color(0xFF333333),
+        color: dark ? const Color(0xFFE0E0E0) : const Color(0xFF333333),
       ),
     );
   }
@@ -1389,8 +1352,10 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
     return Material(
-      color: Colors.white,
+      color: dark ? const Color(0xFF1E1E1E) : Colors.white,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
@@ -1400,11 +1365,13 @@ class _SettingsTile extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFFE3E3E3),
+              color: dark ? const Color(0xFF303030) : const Color(0xFFE3E3E3),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withOpacity(
+                  dark ? 0.18 : 0.03,
+                ),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -1416,7 +1383,8 @@ class _SettingsTile extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEAF6FA),
+                  color:
+                      dark ? const Color(0xFF20343A) : const Color(0xFFEAF6FA),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
@@ -1431,28 +1399,30 @@ class _SettingsTile extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF2A2A2A),
+                        color: dark ? Colors.white : const Color(0xFF2A2A2A),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF777777),
+                        color: dark
+                            ? const Color(0xFFB0B0B0)
+                            : const Color(0xFF777777),
                         height: 1.3,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 18,
-                color: Color(0xFF9A9A9A),
+                color: dark ? const Color(0xFF888888) : const Color(0xFF9A9A9A),
               ),
             ],
           ),
@@ -1483,17 +1453,21 @@ class _SwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: dark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFE3E3E3),
+          color: dark ? const Color(0xFF303030) : const Color(0xFFE3E3E3),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withOpacity(
+              dark ? 0.18 : 0.03,
+            ),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -1505,7 +1479,7 @@ class _SwitchTile extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF6FA),
+              color: dark ? const Color(0xFF20343A) : const Color(0xFFEAF6FA),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
@@ -1520,18 +1494,20 @@ class _SwitchTile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF2A2A2A),
+                    color: dark ? Colors.white : const Color(0xFF2A2A2A),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF777777),
+                    color: dark
+                        ? const Color(0xFFB0B0B0)
+                        : const Color(0xFF777777),
                     height: 1.3,
                   ),
                 ),
@@ -1543,7 +1519,7 @@ class _SwitchTile extends StatelessWidget {
             activeColor: Colors.white,
             activeTrackColor: const Color(0xFF67C0D7),
             inactiveThumbColor: Colors.white,
-            inactiveTrackColor: Colors.grey,
+            inactiveTrackColor: dark ? const Color(0xFF555555) : Colors.grey,
             onChanged: onChanged,
           ),
         ],
@@ -1575,17 +1551,21 @@ class _DropdownTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: dark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFE3E3E3),
+          color: dark ? const Color(0xFF303030) : const Color(0xFFE3E3E3),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withOpacity(
+              dark ? 0.18 : 0.03,
+            ),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -1597,7 +1577,7 @@ class _DropdownTile extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF6FA),
+              color: dark ? const Color(0xFF20343A) : const Color(0xFFEAF6FA),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
@@ -1612,18 +1592,20 @@ class _DropdownTile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF2A2A2A),
+                    color: dark ? Colors.white : const Color(0xFF2A2A2A),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF777777),
+                    color: dark
+                        ? const Color(0xFFB0B0B0)
+                        : const Color(0xFF777777),
                     height: 1.3,
                   ),
                 ),
@@ -1634,6 +1616,13 @@ class _DropdownTile extends StatelessWidget {
             value: value,
             underline: const SizedBox(),
             borderRadius: BorderRadius.circular(14),
+            dropdownColor: dark ? const Color(0xFF292929) : Colors.white,
+            iconEnabledColor:
+                dark ? const Color(0xFFBDBDBD) : const Color(0xFF555555),
+            style: TextStyle(
+              color: dark ? Colors.white : const Color(0xFF555555),
+              fontSize: 14,
+            ),
             items: items.map((item) {
               return DropdownMenuItem<String>(
                 value: item,

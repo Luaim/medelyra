@@ -19,6 +19,32 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isLoading = true;
 
   // ============================================================
+  // DARK MODE COLORS
+  // ============================================================
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : const Color(0xFFF7F7F7);
+
+  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _primaryTextColor =>
+      _isDark ? Colors.white : const Color(0xFF222222);
+
+  Color get _sectionTitleColor =>
+      _isDark ? Colors.white : const Color(0xFF333333);
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF777777);
+
+  Color get _borderColor =>
+      _isDark ? const Color(0xFF333333) : const Color(0xFFE3E3E3);
+
+  Color get _iconBackground =>
+      _isDark ? const Color(0xFF26343A) : const Color(0xFFEAF6FA);
+
+  // ============================================================
   // INIT
   // ============================================================
 
@@ -337,7 +363,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final emergencyContact = _getEmergencyContact();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: _pageBackground,
 
       // ==========================================================
       // BOTTOM NAVIGATION
@@ -383,12 +409,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         // PAGE TITLE
                         // ==================================================
 
-                        const Text(
+                        Text(
                           'Profile',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF222222),
+                            color: _primaryTextColor,
                           ),
                         ),
 
@@ -412,12 +438,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         // PERSONAL INFORMATION
                         // ==================================================
 
-                        const Text(
+                        Text(
                           'Personal Information',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF333333),
+                            color: _sectionTitleColor,
                           ),
                         ),
 
@@ -463,12 +489,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         // MEDICAL INFORMATION
                         // ==================================================
 
-                        const Text(
+                        Text(
                           'Medical Information',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF333333),
+                            color: _sectionTitleColor,
                           ),
                         ),
 
@@ -504,12 +530,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         // QUICK ACTIONS
                         // ==================================================
 
-                        const Text(
+                        Text(
                           'Quick Actions',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF333333),
+                            color: _sectionTitleColor,
                           ),
                         ),
 
@@ -606,23 +632,33 @@ class _ProfilePageState extends State<ProfilePage> {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF9ED8E8),
-            Color(0xFFDDF4F8),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: _isDark
+            ? const LinearGradient(
+                colors: [
+                  Color(0xFF1E2C31),
+                  Color(0xFF243A40),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : const LinearGradient(
+                colors: [
+                  Color(0xFF9ED8E8),
+                  Color(0xFFDDF4F8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(
-              0.06,
+          if (!_isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(
+                0.06,
+              ),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
         ],
       ),
       child: Row(
@@ -635,7 +671,9 @@ class _ProfilePageState extends State<ProfilePage> {
             width: 84,
             height: 84,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.85),
+              color: _isDark
+                  ? const Color(0xFFE0F2F5)
+                  : Colors.white.withOpacity(0.85),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -661,20 +699,22 @@ class _ProfilePageState extends State<ProfilePage> {
                   name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF222222),
+                    color: _isDark ? Colors.white : const Color(0xFF222222),
                   ),
                 ),
                 const SizedBox(
                   height: 6,
                 ),
-                const Text(
+                Text(
                   'Medelyra User',
                   style: TextStyle(
                     fontSize: 15,
-                    color: Color(0xFF4D4D4D),
+                    color: _isDark
+                        ? const Color(0xFFBDBDBD)
+                        : const Color(0xFF4D4D4D),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -721,19 +761,20 @@ class _ProfilePageState extends State<ProfilePage> {
         vertical: 6,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBackground,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: const Color(0xFFE3E3E3),
+          color: _borderColor,
         ),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(
-              0.04,
+          if (!_isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(
+                0.04,
+              ),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
         ],
       ),
       child: Column(
@@ -763,26 +804,39 @@ class ProfileInfoTile extends StatelessWidget {
   Widget build(
     BuildContext context,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final iconBackground =
+        isDark ? const Color(0xFF26343A) : const Color(0xFFEAF6FA);
+
+    final labelColor =
+        isDark ? const Color(0xFF9E9E9E) : const Color(0xFF777777);
+
+    final valueColor = isDark ? Colors.white : const Color(0xFF222222);
+
     return ListTile(
       leading: Container(
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: const Color(0xFFEAF6FA),
+          color: iconBackground,
           borderRadius: BorderRadius.circular(
             12,
           ),
         ),
         child: Icon(
+          // IMPORTANT:
+          // Keep the original icon passed by each ProfileInfoTile.
+          // This prevents every row from becoming a person icon.
           icon,
           color: const Color(0xFF3D84A8),
         ),
       ),
       title: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
-          color: Color(0xFF777777),
+          color: labelColor,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -794,9 +848,9 @@ class ProfileInfoTile extends StatelessWidget {
           value,
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
-            color: Color(0xFF222222),
+            color: valueColor,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -826,8 +880,26 @@ class _ActionTile extends StatelessWidget {
   Widget build(
     BuildContext context,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final cardBackground = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+    final borderColor =
+        isDark ? const Color(0xFF333333) : const Color(0xFFE3E3E3);
+
+    final titleColor = isDark ? Colors.white : const Color(0xFF2A2A2A);
+
+    final subtitleColor =
+        isDark ? const Color(0xFF9E9E9E) : const Color(0xFF777777);
+
+    final iconBackground =
+        isDark ? const Color(0xFF26343A) : const Color(0xFFEAF6FA);
+
+    final arrowColor =
+        isDark ? const Color(0xFF9E9E9E) : const Color(0xFF9A9A9A);
+
     return Material(
-      color: Colors.white,
+      color: cardBackground,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
@@ -839,16 +911,17 @@ class _ActionTile extends StatelessWidget {
               20,
             ),
             border: Border.all(
-              color: const Color(0xFFE3E3E3),
+              color: borderColor,
             ),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(
-                  0.03,
+              if (!isDark)
+                BoxShadow(
+                  color: Colors.black.withOpacity(
+                    0.03,
+                  ),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
                 ),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
             ],
           ),
           child: Row(
@@ -857,7 +930,7 @@ class _ActionTile extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEAF6FA),
+                  color: iconBackground,
                   borderRadius: BorderRadius.circular(
                     14,
                   ),
@@ -876,10 +949,10 @@ class _ActionTile extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF2A2A2A),
+                        color: titleColor,
                       ),
                     ),
                     const SizedBox(
@@ -887,19 +960,19 @@ class _ActionTile extends StatelessWidget {
                     ),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF777777),
+                        color: subtitleColor,
                         height: 1.3,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 18,
-                color: Color(0xFF9A9A9A),
+                color: arrowColor,
               ),
             ],
           ),

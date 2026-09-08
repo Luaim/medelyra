@@ -14,6 +14,47 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   bool isLoading = false;
   bool isPressed = false;
 
+  // ============================================================
+  // THEME COLORS
+  // ============================================================
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : const Color(0xFFF6F6F6);
+
+  Color get _primaryTextColor =>
+      _isDark ? Colors.white : const Color(0xFF2B2B2B);
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : Colors.grey;
+
+  Color get _labelTextColor =>
+      _isDark ? const Color(0xFFE0E0E0) : const Color(0xFF333333);
+
+  Color get _inputBackground =>
+      _isDark ? const Color(0xFF252525) : const Color(0xFFDDF2F7);
+
+  Color get _inputBorderColor =>
+      _isDark ? const Color(0xFF3A3A3A) : Colors.grey.shade400;
+
+  Color get _inputTextColor => _isDark ? Colors.white : const Color(0xFF303030);
+
+  Color get _hintTextColor => _isDark ? const Color(0xFF8E8E8E) : Colors.grey;
+
+  Color get _inputIconColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF555555);
+
+  Color get _backIconColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF4A4A4A);
+
+  Color get _signInTextColor =>
+      _isDark ? const Color(0xFFE0E0E0) : const Color(0xFF333333);
+
+  // ============================================================
+  // DISPOSE
+  // ============================================================
+
   @override
   void dispose() {
     emailController.dispose();
@@ -183,7 +224,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     final double w = size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: _pageBackground,
       body: SafeArea(
         child: Stack(
           children: [
@@ -223,12 +264,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         // TITLE
                         // ==================================================
 
-                        const Text(
+                        Text(
                           'Forgot Password',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF2B2B2B),
+                            color: _primaryTextColor,
                             fontFamily: 'serif',
                           ),
                         ),
@@ -239,8 +280,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         // DESCRIPTION
                         // ==================================================
 
-                        const Padding(
-                          padding: EdgeInsets.symmetric(
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
                             horizontal: 10,
                           ),
                           child: Text(
@@ -249,7 +290,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey,
+                              color: _secondaryTextColor,
                               height: 1.4,
                             ),
                           ),
@@ -318,7 +359,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 borderRadius: BorderRadius.circular(25),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
+                                    color: Colors.black.withOpacity(
+                                      _isDark ? 0.35 : 0.20,
+                                    ),
                                     blurRadius: 6,
                                     offset: const Offset(0, 3),
                                   ),
@@ -355,10 +398,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               'Remember your password? ',
                               style: TextStyle(
                                 fontSize: 14,
+                                color: _signInTextColor,
                               ),
                             ),
                             GestureDetector(
@@ -400,10 +444,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   minWidth: 40,
                   minHeight: 40,
                 ),
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back,
                   size: 28,
-                  color: Color(0xFF4A4A4A),
+                  color: _backIconColor,
                 ),
                 onPressed: isLoading
                     ? null
@@ -427,9 +471,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w500,
+          color: _labelTextColor,
         ),
       ),
     );
@@ -446,17 +491,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFDDF2F7),
+        color: _inputBackground,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withOpacity(
+              _isDark ? 0.28 : 0.15,
+            ),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
         ],
         border: Border.all(
-          color: Colors.grey.shade400,
+          color: _inputBorderColor,
         ),
       ),
       child: TextField(
@@ -464,10 +511,23 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         keyboardType: TextInputType.emailAddress,
         textInputAction: TextInputAction.done,
         autocorrect: false,
+        cursorColor:
+            _isDark ? const Color(0xFF8FC4DE) : const Color(0xFF4A4A4A),
+        style: TextStyle(
+          color: _inputTextColor,
+          fontSize: 14,
+        ),
         decoration: InputDecoration(
           isDense: true,
           hintText: hintText,
-          prefixIcon: Icon(prefixIcon),
+          hintStyle: TextStyle(
+            color: _hintTextColor,
+            fontSize: 14,
+          ),
+          prefixIcon: Icon(
+            prefixIcon,
+            color: _inputIconColor,
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             vertical: 12,

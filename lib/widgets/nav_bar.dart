@@ -37,6 +37,19 @@ class CustomBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     const accent = Color(0xFF2D6AE3);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final navBackground = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+    final navBorder =
+        isDark ? const Color(0xFF333333) : const Color(0xFFE3EAF5);
+
+    final inactiveColor =
+        isDark ? const Color(0xFFBDBDBD) : const Color(0xFF6B7280);
+
+    final selectedBackground =
+        isDark ? const Color(0xFF24334D) : const Color(0xFFE8F0FF);
+
     return SafeArea(
       top: false,
       child: Padding(
@@ -48,17 +61,18 @@ class CustomBottomNavBar extends StatelessWidget {
             vertical: 7,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: navBackground,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFFE3EAF5),
+              color: navBorder,
             ),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
+              if (!isDark)
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
             ],
           ),
           child: Row(
@@ -82,7 +96,7 @@ class CustomBottomNavBar extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFE8F0FF)
+                            ? selectedBackground
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -95,8 +109,7 @@ class CustomBottomNavBar extends StatelessWidget {
                             child: Icon(
                               item.icon,
                               size: 22,
-                              color:
-                                  isSelected ? accent : const Color(0xFF6B7280),
+                              color: isSelected ? accent : inactiveColor,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -107,8 +120,7 @@ class CustomBottomNavBar extends StatelessWidget {
                               fontWeight: isSelected
                                   ? FontWeight.w700
                                   : FontWeight.w500,
-                              color:
-                                  isSelected ? accent : const Color(0xFF6B7280),
+                              color: isSelected ? accent : inactiveColor,
                             ),
                             child: Text(
                               item.label,

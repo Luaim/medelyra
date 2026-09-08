@@ -69,28 +69,63 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
     },
   ];
 
+  // ===========================================================================
+  // THEME COLORS
+  // ===========================================================================
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : backgroundColor;
+
+  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _primaryTextColor => _isDark ? Colors.white : darkText;
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : secondaryText;
+
+  Color get _mutedTextColor =>
+      _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF777777);
+
+  Color get _lightBlueBackground =>
+      _isDark ? const Color(0xFF24343A) : lightBlue;
+
+  Color get _heroBorderColor =>
+      _isDark ? const Color(0xFF30484F) : const Color(0xFFD7E8EE);
+
+  Color get _faqBorderColor =>
+      _isDark ? const Color(0xFF333333) : const Color(0xFFE9E6E9);
+
+  Color get _faqOpenBorderColor =>
+      _isDark ? const Color(0xFF3D84A8) : const Color(0xFFC9E0E9);
+
+  // ===========================================================================
+  // BUILD
+  // ===========================================================================
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: _pageBackground,
 
       // =====================================================================
       // APP BAR
       // =====================================================================
 
       appBar: AppBar(
-        backgroundColor: backgroundColor,
-        foregroundColor: darkText,
+        backgroundColor: _pageBackground,
+        foregroundColor: _primaryTextColor,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Help & Support',
           style: TextStyle(
             fontSize: 21,
             fontWeight: FontWeight.w700,
-            color: darkText,
+            color: _primaryTextColor,
             fontFamily: 'serif',
           ),
         ),
@@ -141,7 +176,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -150,15 +185,15 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                               style: TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w700,
-                                color: darkText,
+                                color: _primaryTextColor,
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               'Quick answers to help you use Medelyra.',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: secondaryText,
+                                color: _secondaryTextColor,
                               ),
                             ),
                           ],
@@ -172,15 +207,15 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: lightBlue,
+                          color: _lightBlueBackground,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           '${faqs.length} topics',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: darkBlue,
+                            color: _isDark ? const Color(0xFF8FC7DA) : darkBlue,
                           ),
                         ),
                       ),
@@ -227,7 +262,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade600,
+                            color: _isDark
+                                ? const Color(0xFFB0B0B0)
+                                : Colors.grey.shade600,
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -235,7 +272,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                           'Medication reminders made simple.',
                           style: TextStyle(
                             fontSize: 11,
-                            color: Colors.grey.shade500,
+                            color: _isDark
+                                ? const Color(0xFF858585)
+                                : Colors.grey.shade500,
                           ),
                         ),
                       ],
@@ -264,17 +303,22 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
         20,
       ),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFEAF4F8),
-            Color(0xFFF5F9FB),
-          ],
+          colors: _isDark
+              ? const [
+                  Color(0xFF1F343A),
+                  Color(0xFF1C292D),
+                ]
+              : const [
+                  Color(0xFFEAF4F8),
+                  Color(0xFFF5F9FB),
+                ],
         ),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: const Color(0xFFD7E8EE),
+          color: _heroBorderColor,
           width: 1,
         ),
       ),
@@ -289,11 +333,12 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
               color: primaryBlue,
               borderRadius: BorderRadius.circular(18),
               boxShadow: [
-                BoxShadow(
-                  color: primaryBlue.withOpacity(0.20),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
+                if (!_isDark)
+                  BoxShadow(
+                    color: primaryBlue.withOpacity(0.20),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
               ],
             ),
             child: const Icon(
@@ -306,7 +351,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
           const SizedBox(width: 16),
 
           // Text
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -315,16 +360,16 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: darkText,
+                    color: _primaryTextColor,
                   ),
                 ),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Text(
                   'Find answers to common questions or get in touch with our support team.',
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
-                    color: secondaryText,
+                    color: _secondaryTextColor,
                   ),
                 ),
               ],
@@ -352,20 +397,21 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
       curve: Curves.easeOut,
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBackground,
         borderRadius: BorderRadius.circular(17),
         border: Border.all(
-          color: isOpen ? const Color(0xFFC9E0E9) : const Color(0xFFE9E6E9),
+          color: isOpen ? _faqOpenBorderColor : _faqBorderColor,
           width: 1,
         ),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(
-              isOpen ? 0.07 : 0.035,
+          if (!_isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(
+                isOpen ? 0.07 : 0.035,
+              ),
+              blurRadius: isOpen ? 10 : 6,
+              offset: const Offset(0, 3),
             ),
-            blurRadius: isOpen ? 10 : 6,
-            offset: const Offset(0, 3),
-          ),
         ],
       ),
       child: Material(
@@ -394,13 +440,15 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: isOpen ? primaryBlue : const Color(0xFFEAF4F8),
+                        color: isOpen ? primaryBlue : _lightBlueBackground,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         icon,
                         size: 21,
-                        color: isOpen ? Colors.white : darkBlue,
+                        color: isOpen
+                            ? Colors.white
+                            : (_isDark ? const Color(0xFF8FC7DA) : darkBlue),
                       ),
                     ),
 
@@ -410,10 +458,10 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                     Expanded(
                       child: Text(
                         question,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: darkText,
+                          color: _primaryTextColor,
                           height: 1.3,
                         ),
                       ),
@@ -425,10 +473,10 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                     AnimatedRotation(
                       turns: isOpen ? 0.5 : 0,
                       duration: const Duration(milliseconds: 220),
-                      child: const Icon(
+                      child: Icon(
                         Icons.keyboard_arrow_down_rounded,
                         size: 24,
-                        color: Color(0xFF777777),
+                        color: _mutedTextColor,
                       ),
                     ),
                   ],
@@ -454,10 +502,10 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         answer,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13.5,
                           height: 1.55,
-                          color: secondaryText,
+                          color: _secondaryTextColor,
                         ),
                       ),
                     ),
@@ -480,14 +528,15 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF2F6F8F),
+        color: darkBlue,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
-          BoxShadow(
-            color: darkBlue.withOpacity(0.18),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
+          if (!_isDark)
+            BoxShadow(
+              color: darkBlue.withOpacity(0.18),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
         ],
       ),
       child: Column(
@@ -671,14 +720,15 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
           child: Container(
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: _cardBackground,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 18,
-                  offset: const Offset(0, 7),
-                ),
+                if (!_isDark)
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 18,
+                    offset: const Offset(0, 7),
+                  ),
               ],
             ),
             child: Column(
@@ -692,13 +742,13 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                   width: 58,
                   height: 58,
                   decoration: BoxDecoration(
-                    color: lightBlue,
+                    color: _lightBlueBackground,
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.email_outlined,
                     size: 30,
-                    color: darkBlue,
+                    color: _isDark ? const Color(0xFF8FC7DA) : darkBlue,
                   ),
                 ),
 
@@ -708,25 +758,25 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                 // TITLE
                 // -----------------------------------------------------------
 
-                const Text(
+                Text(
                   'Contact Medelyra Support',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.w700,
-                    color: darkText,
+                    color: _primaryTextColor,
                   ),
                 ),
 
                 const SizedBox(height: 8),
 
-                const Text(
+                Text(
                   'For account, reminder, notification, or technical questions, contact us at:',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13.5,
                     height: 1.45,
-                    color: secondaryText,
+                    color: _secondaryTextColor,
                   ),
                 ),
 
@@ -743,16 +793,16 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: backgroundColor,
+                    color: _pageBackground,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
+                  child: Text(
                     'support@medelyra.app',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: darkBlue,
+                      color: _isDark ? const Color(0xFF8FC7DA) : darkBlue,
                     ),
                   ),
                 ),
@@ -816,10 +866,10 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                   onPressed: () {
                     Navigator.pop(dialogContext);
                   },
-                  child: const Text(
+                  child: Text(
                     'Close',
                     style: TextStyle(
-                      color: Color(0xFF777777),
+                      color: _mutedTextColor,
                       fontSize: 14,
                     ),
                   ),

@@ -18,6 +18,20 @@ class _OnboardingPageState extends State<OnboardingPage> {
   static const Color _textColor = Color(0xFF333333);
   static const Color _secondaryTextColor = Color(0xFF666666);
 
+  // ==========================================================================
+  // THEME COLORS
+  // ==========================================================================
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : _backgroundColor;
+
+  Color get _primaryTextColor => _isDark ? Colors.white : _textColor;
+
+  Color get _secondaryTextColorForTheme =>
+      _isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
   static const List<_OnboardingItem> _pages = [
     _OnboardingItem(
       title: 'Welcome to Medelyra',
@@ -81,7 +95,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final isSmallScreen = screenHeight < 700;
 
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      backgroundColor: _pageBackground,
       body: SafeArea(
         child: Column(
           children: [
@@ -99,17 +113,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       ? TextButton(
                           onPressed: _finishOnboarding,
                           style: TextButton.styleFrom(
-                            foregroundColor: _secondaryTextColor,
+                            foregroundColor: _secondaryTextColorForTheme,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 8,
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Skip',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
+                              color: _secondaryTextColorForTheme,
                             ),
                           ),
                         )
@@ -241,6 +256,14 @@ class _OnboardingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final Color primaryTextColor =
+        isDark ? Colors.white : const Color(0xFF333333);
+
+    final Color secondaryTextColor =
+        isDark ? const Color(0xFFBDBDBD) : const Color(0xFF666666);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -287,7 +310,7 @@ class _OnboardingContent extends StatelessWidget {
                           fontSize: isSmallScreen ? 25 : 28,
                           height: 1.2,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF333333),
+                          color: primaryTextColor,
                           fontFamily: 'serif',
                         ),
                       ),
@@ -305,7 +328,7 @@ class _OnboardingContent extends StatelessWidget {
                           fontSize: isSmallScreen ? 15.5 : 17,
                           height: 1.5,
                           fontWeight: FontWeight.w400,
-                          color: const Color(0xFF666666),
+                          color: secondaryTextColor,
                           fontFamily: 'serif',
                         ),
                       ),
@@ -414,20 +437,25 @@ class _FeatureRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final Color textColor =
+        isDark ? const Color(0xFFBDBDBD) : const Color(0xFF555555);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
-          icon,
+        const Icon(
+          Icons.alarm_outlined,
           size: 22,
-          color: const Color(0xFF3D84A8),
+          color: Color(0xFF3D84A8),
         ),
         const SizedBox(width: 10),
         Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
-            color: Color(0xFF555555),
+            color: textColor,
             fontFamily: 'serif',
           ),
         ),

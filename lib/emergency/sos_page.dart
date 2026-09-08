@@ -22,6 +22,42 @@ class _SosPageState extends State<SosPage> {
   bool isLoading = true;
   String? errorMessage;
 
+  // ---------------------------------------------------------------------------
+  // THEME COLORS
+  // ---------------------------------------------------------------------------
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : const Color(0xFFF6F6F6);
+
+  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _primaryTextColor =>
+      _isDark ? Colors.white : const Color(0xFF24232A);
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF77737A);
+
+  Color get _searchHintColor =>
+      _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6F6D75);
+
+  Color get _searchIconColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF4D4B54);
+
+  Color get _searchCloseColor =>
+      _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF77757D);
+
+  Color get _arrowColor =>
+      _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF8A8790);
+
+  Color get _cardBorderColor =>
+      _isDark ? const Color(0xFF333333) : Colors.transparent;
+
+  // ---------------------------------------------------------------------------
+  // LOAD GUIDES
+  // ---------------------------------------------------------------------------
+
   @override
   void initState() {
     super.initState();
@@ -33,10 +69,6 @@ class _SosPageState extends State<SosPage> {
     searchController.dispose();
     super.dispose();
   }
-
-  // ---------------------------------------------------------------------------
-  // LOAD GUIDES
-  // ---------------------------------------------------------------------------
 
   Future<void> _loadGuides() async {
     if (mounted) {
@@ -203,7 +235,7 @@ class _SosPageState extends State<SosPage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: _pageBackground,
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 3,
         onTap: (index) => _onBottomTap(context, index),
@@ -222,12 +254,12 @@ class _SosPageState extends State<SosPage> {
               // PAGE TITLE
               // ----------------------------------------------------------------
 
-              const Text(
+              Text(
                 'Emergency guide',
                 style: TextStyle(
                   fontSize: 27,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF24232A),
+                  color: _primaryTextColor,
                 ),
               ),
 
@@ -240,36 +272,42 @@ class _SosPageState extends State<SosPage> {
               Container(
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: _cardBackground,
                   borderRadius: BorderRadius.circular(26),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.045),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  boxShadow: _isDark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.045),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                 ),
                 child: TextField(
                   controller: searchController,
                   onChanged: _filterGuides,
                   textInputAction: TextInputAction.search,
+                  style: TextStyle(
+                    color: _primaryTextColor,
+                  ),
+                  cursorColor: _isDark ? Colors.white : const Color(0xFF4D4B54),
                   decoration: InputDecoration(
                     hintText: 'Search emergency help...',
-                    hintStyle: const TextStyle(
-                      color: Color(0xFF6F6D75),
+                    hintStyle: TextStyle(
+                      color: _searchHintColor,
                       fontSize: 16,
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search_rounded,
-                      color: Color(0xFF4D4B54),
+                      color: _searchIconColor,
                       size: 25,
                     ),
                     suffixIcon: searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.close_rounded,
-                              color: Color(0xFF77757D),
+                              color: _searchCloseColor,
                             ),
                             onPressed: () {
                               searchController.clear();
@@ -298,12 +336,14 @@ class _SosPageState extends State<SosPage> {
                   vertical: 13,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFDECEE),
+                  color: _isDark
+                      ? const Color(0xFF302023)
+                      : const Color(0xFFFDECEE),
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    CircleAvatar(
+                    const CircleAvatar(
                       radius: 20,
                       backgroundColor: Color(0xFFE96B6B),
                       child: Icon(
@@ -312,14 +352,15 @@ class _SosPageState extends State<SosPage> {
                         size: 23,
                       ),
                     ),
-                    SizedBox(width: 11),
+                    const SizedBox(width: 11),
                     Expanded(
                       child: Text(
                         'Quick first-aid help for common emergencies',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF29272D),
+                          color:
+                              _isDark ? Colors.white : const Color(0xFF29272D),
                           height: 1.3,
                         ),
                       ),
@@ -405,12 +446,19 @@ class _ErrorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(18),
+        border: isDark
+            ? Border.all(
+                color: const Color(0xFF333333),
+              )
+            : null,
       ),
       child: Column(
         children: [
@@ -423,9 +471,9 @@ class _ErrorCard extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
-              color: Color(0xFF55525A),
+              color: isDark ? const Color(0xFFBDBDBD) : const Color(0xFF55525A),
             ),
           ),
           const SizedBox(height: 14),
@@ -448,6 +496,8 @@ class _EmptySearchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(
@@ -455,33 +505,38 @@ class _EmptySearchCard extends StatelessWidget {
         vertical: 30,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(18),
+        border: isDark
+            ? Border.all(
+                color: const Color(0xFF333333),
+              )
+            : null,
       ),
-      child: const Column(
+      child: Column(
         children: [
           Icon(
             Icons.search_off_rounded,
             size: 42,
-            color: Color(0xFF8A8790),
+            color: isDark ? const Color(0xFF9E9E9E) : const Color(0xFF8A8790),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             'No emergency guide found.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF444149),
+              color: isDark ? Colors.white : const Color(0xFF444149),
             ),
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Text(
             'Try searching for a different emergency.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              color: Color(0xFF77737A),
+              color: isDark ? const Color(0xFFBDBDBD) : const Color(0xFF77737A),
             ),
           ),
         ],
@@ -511,13 +566,23 @@ class _EmergencyGuideCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Material(
-      color: Colors.white,
+      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
-        child: Padding(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: isDark
+                ? Border.all(
+                    color: const Color(0xFF333333),
+                  )
+                : null,
+          ),
           padding: const EdgeInsets.all(10),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -546,10 +611,10 @@ class _EmergencyGuideCard extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF29262D),
+                        color: isDark ? Colors.white : const Color(0xFF29262D),
                         height: 1.2,
                       ),
                     ),
@@ -558,10 +623,12 @@ class _EmergencyGuideCard extends StatelessWidget {
                       description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         height: 1.3,
-                        color: Color(0xFF77737A),
+                        color: isDark
+                            ? const Color(0xFFBDBDBD)
+                            : const Color(0xFF77737A),
                       ),
                     ),
                   ],
@@ -574,9 +641,10 @@ class _EmergencyGuideCard extends StatelessWidget {
               // ARROW
               // ---------------------------------------------------------------
 
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
-                color: Color(0xFF8A8790),
+                color:
+                    isDark ? const Color(0xFF9E9E9E) : const Color(0xFF8A8790),
                 size: 27,
               ),
             ],
@@ -602,6 +670,11 @@ class _GuideThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final fallbackColor =
+        isDark ? const Color(0xFF6FA9C5) : const Color(0xFF3D84A8);
+
     return SizedBox(
       width: 88,
       height: 88,
@@ -611,7 +684,7 @@ class _GuideThumbnail extends StatelessWidget {
               child: Icon(
                 fallbackIcon,
                 size: 34,
-                color: const Color(0xFF3D84A8),
+                color: fallbackColor,
               ),
             )
           : Image.asset(
@@ -624,7 +697,7 @@ class _GuideThumbnail extends StatelessWidget {
                   child: Icon(
                     fallbackIcon,
                     size: 34,
-                    color: const Color(0xFF3D84A8),
+                    color: fallbackColor,
                   ),
                 );
               },

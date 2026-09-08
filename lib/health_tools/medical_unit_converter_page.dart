@@ -30,6 +30,28 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
     'Glucose': ['mg/dL', 'mmol/L'],
   };
 
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _sheetBackground =>
+      _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _fieldBackground =>
+      _isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
+
+  Color get _resultBackground =>
+      _isDark ? const Color(0xFF252525) : _backgroundColor;
+
+  Color get _borderColor =>
+      _isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
+
+  Color get _primaryTextColor => _isDark ? Colors.white : _textColor;
+
+  Color get _secondaryTextColorForTheme =>
+      _isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
+  Color get _mutedTextColor =>
+      _isDark ? const Color(0xFF8E8E8E) : const Color(0xFF6B7280);
+
   @override
   void dispose() {
     _valueController.dispose();
@@ -210,7 +232,7 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
     return SafeArea(
       top: false,
       child: Material(
-        color: Colors.white,
+        color: _sheetBackground,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(26),
         ),
@@ -234,7 +256,9 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                     width: 38,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD5D9DF),
+                      color: _isDark
+                          ? const Color(0xFF555555)
+                          : const Color(0xFFD5D9DF),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -253,23 +277,23 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                   ),
                   child: Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Medical Unit Converter',
                           style: TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w600,
-                            color: _textColor,
+                            color: _primaryTextColor,
                           ),
                         ),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         splashRadius: 22,
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.close_rounded,
                           size: 23,
-                          color: Color(0xFF6B7280),
+                          color: _mutedTextColor,
                         ),
                       ),
                     ],
@@ -292,18 +316,20 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // DESCRIPTION
-                      const Text(
+
+                      Text(
                         'Convert common medical units',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
-                          color: _secondaryTextColor,
+                          color: _secondaryTextColorForTheme,
                         ),
                       ),
 
                       const SizedBox(height: 18),
 
                       // ICON
+
                       const Icon(
                         Icons.swap_horiz_rounded,
                         size: 50,
@@ -316,12 +342,12 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                       // CONVERSION TYPE
                       // ----------------------------------------------------------------
 
-                      const Text(
+                      Text(
                         'Convert',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: _textColor,
+                          color: _primaryTextColor,
                         ),
                       ),
 
@@ -339,12 +365,12 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                       // VALUE
                       // ----------------------------------------------------------------
 
-                      const Text(
+                      Text(
                         'Value',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: _textColor,
+                          color: _primaryTextColor,
                         ),
                       ),
 
@@ -445,21 +471,21 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                       Container(
                         padding: const EdgeInsets.all(13),
                         decoration: BoxDecoration(
-                          color: _backgroundColor,
+                          color: _resultBackground,
                           borderRadius: BorderRadius.circular(13),
                           border: Border.all(
-                            color: const Color(0xFFE3EAF5),
+                            color: _borderColor,
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.info_outline_rounded,
                               size: 18,
-                              color: _secondaryTextColor,
+                              color: _secondaryTextColorForTheme,
                             ),
-                            SizedBox(width: 9),
+                            const SizedBox(width: 9),
                             Expanded(
                               child: Text(
                                 'This tool provides unit conversions for '
@@ -468,7 +494,7 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                                 style: TextStyle(
                                   fontSize: 12.5,
                                   height: 1.4,
-                                  color: _secondaryTextColor,
+                                  color: _secondaryTextColorForTheme,
                                 ),
                               ),
                             ),
@@ -504,29 +530,42 @@ class _DropdownField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final fieldBackground =
+        isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
+
+    final borderColor =
+        isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
+
+    final textColor = isDark ? Colors.white : _textColor;
+
+    final secondaryColor =
+        isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
     return Container(
       height: 52,
       padding: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFC),
+        color: fieldBackground,
         borderRadius: BorderRadius.circular(13),
         border: Border.all(
-          color: const Color(0xFFE3EAF5),
+          color: borderColor,
         ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
           isExpanded: true,
-          icon: const Icon(
+          icon: Icon(
             Icons.keyboard_arrow_down_rounded,
-            color: _secondaryTextColor,
+            color: secondaryColor,
           ),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
-            color: _textColor,
+            color: textColor,
           ),
-          dropdownColor: Colors.white,
+          dropdownColor: isDark ? const Color(0xFF252525) : Colors.white,
           borderRadius: BorderRadius.circular(13),
           items: items.map((item) {
             return DropdownMenuItem<String>(
@@ -556,13 +595,15 @@ class _ValueInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFC),
+        color: isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC),
         borderRadius: BorderRadius.circular(13),
         border: Border.all(
-          color: const Color(0xFFE3EAF5),
+          color: isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5),
         ),
       ),
       child: TextField(
@@ -571,18 +612,18 @@ class _ValueInputField extends StatelessWidget {
           decimal: true,
         ),
         onChanged: onChanged,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
-          color: _textColor,
+          color: isDark ? Colors.white : _textColor,
         ),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           hintText: 'Enter a value',
           hintStyle: TextStyle(
             fontSize: 15,
-            color: Color(0xFF9CA3AF),
+            color: isDark ? const Color(0xFF8E8E8E) : const Color(0xFF9CA3AF),
           ),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
             horizontal: 15,
             vertical: 14,
           ),
@@ -611,15 +652,28 @@ class _UnitDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final fieldBackground =
+        isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
+
+    final borderColor =
+        isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
+
+    final textColor = isDark ? Colors.white : _textColor;
+
+    final secondaryColor =
+        isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: _textColor,
+            color: textColor,
           ),
         ),
         const SizedBox(height: 7),
@@ -627,26 +681,26 @@ class _UnitDropdown extends StatelessWidget {
           height: 52,
           padding: const EdgeInsets.symmetric(horizontal: 13),
           decoration: BoxDecoration(
-            color: const Color(0xFFFAFAFC),
+            color: fieldBackground,
             borderRadius: BorderRadius.circular(13),
             border: Border.all(
-              color: const Color(0xFFE3EAF5),
+              color: borderColor,
             ),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: value,
               isExpanded: true,
-              icon: const Icon(
+              icon: Icon(
                 Icons.keyboard_arrow_down_rounded,
                 size: 20,
-                color: _secondaryTextColor,
+                color: secondaryColor,
               ),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: _textColor,
+                color: textColor,
               ),
-              dropdownColor: Colors.white,
+              dropdownColor: isDark ? const Color(0xFF252525) : Colors.white,
               borderRadius: BorderRadius.circular(13),
               items: items.map((item) {
                 return DropdownMenuItem<String>(
@@ -676,25 +730,27 @@ class _ConverterResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 18,
         vertical: 18,
       ),
       decoration: BoxDecoration(
-        color: _backgroundColor,
+        color: isDark ? const Color(0xFF252525) : _backgroundColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFE3EAF5),
+          color: isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5),
         ),
       ),
       child: Column(
         children: [
-          const Text(
+          Text(
             'Converted value',
             style: TextStyle(
               fontSize: 14,
-              color: _secondaryTextColor,
+              color: isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor,
             ),
           ),
           const SizedBox(height: 7),

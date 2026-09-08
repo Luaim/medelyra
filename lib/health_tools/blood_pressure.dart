@@ -14,12 +14,36 @@ class BloodPressurePage extends StatefulWidget {
 
 class _BloodPressurePageState extends State<BloodPressurePage> {
   final TextEditingController _systolicController = TextEditingController();
-
   final TextEditingController _diastolicController = TextEditingController();
 
   String? _category;
   String? _message;
   String? _errorMessage;
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _sheetBackground =>
+      _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _fieldBackground =>
+      _isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
+
+  Color get _resultBackground =>
+      _isDark ? const Color(0xFF252525) : _backgroundColor;
+
+  Color get _borderColor =>
+      _isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
+
+  Color get _primaryTextColor => _isDark ? Colors.white : _textColor;
+
+  Color get _secondaryTextColorForTheme =>
+      _isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
+  Color get _mutedTextColor =>
+      _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280);
+
+  Color get _placeholderColor =>
+      _isDark ? const Color(0xFF8E8E8E) : const Color(0xFF9CA3AF);
 
   @override
   void dispose() {
@@ -43,7 +67,6 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
       _diastolicController.text.trim(),
     );
 
-    // Clear previous error.
     setState(() {
       _errorMessage = null;
     });
@@ -199,7 +222,7 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
     return SafeArea(
       top: false,
       child: Material(
-        color: Colors.white,
+        color: _sheetBackground,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(26),
         ),
@@ -223,7 +246,9 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                     width: 38,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD5D9DF),
+                      color: _isDark
+                          ? const Color(0xFF4A4A4A)
+                          : const Color(0xFFD5D9DF),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -242,23 +267,23 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                   ),
                   child: Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Blood Pressure',
                           style: TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w600,
-                            color: _textColor,
+                            color: _primaryTextColor,
                           ),
                         ),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
                         splashRadius: 22,
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.close_rounded,
                           size: 23,
-                          color: Color(0xFF6B7280),
+                          color: _mutedTextColor,
                         ),
                       ),
                     ],
@@ -284,12 +309,12 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                       // DESCRIPTION
                       // ----------------------------------------------------------
 
-                      const Text(
+                      Text(
                         'Understand your blood pressure',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
-                          color: _secondaryTextColor,
+                          color: _secondaryTextColorForTheme,
                         ),
                       ),
 
@@ -311,12 +336,12 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                       // SYSTOLIC
                       // ----------------------------------------------------------
 
-                      const Text(
+                      Text(
                         'Systolic',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: _textColor,
+                          color: _primaryTextColor,
                         ),
                       ),
 
@@ -335,12 +360,12 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                       // DIASTOLIC
                       // ----------------------------------------------------------
 
-                      const Text(
+                      Text(
                         'Diastolic',
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: _textColor,
+                          color: _primaryTextColor,
                         ),
                       ),
 
@@ -419,21 +444,21 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                       Container(
                         padding: const EdgeInsets.all(13),
                         decoration: BoxDecoration(
-                          color: _backgroundColor,
+                          color: _resultBackground,
                           borderRadius: BorderRadius.circular(13),
                           border: Border.all(
-                            color: const Color(0xFFE3EAF5),
+                            color: _borderColor,
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.info_outline_rounded,
                               size: 18,
-                              color: _secondaryTextColor,
+                              color: _secondaryTextColorForTheme,
                             ),
-                            SizedBox(width: 9),
+                            const SizedBox(width: 9),
                             Expanded(
                               child: Text(
                                 'Blood pressure can vary throughout '
@@ -443,7 +468,7 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                                 style: TextStyle(
                                   fontSize: 12.5,
                                   height: 1.4,
-                                  color: _secondaryTextColor,
+                                  color: _secondaryTextColorForTheme,
                                 ),
                               ),
                             ),
@@ -481,13 +506,26 @@ class _PressureInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final fieldBackground =
+        isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
+
+    final borderColor =
+        isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
+
+    final textColor = isDark ? Colors.white : _textColor;
+
+    final hintColor =
+        isDark ? const Color(0xFF8E8E8E) : const Color(0xFF9CA3AF);
+
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFC),
+        color: fieldBackground,
         borderRadius: BorderRadius.circular(13),
         border: Border.all(
-          color: const Color(0xFFE3EAF5),
+          color: borderColor,
         ),
       ),
       child: Row(
@@ -497,15 +535,15 @@ class _PressureInputField extends StatelessWidget {
               controller: controller,
               keyboardType: TextInputType.number,
               onChanged: onChanged,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
-                color: _textColor,
+                color: textColor,
               ),
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: const TextStyle(
+                hintStyle: TextStyle(
                   fontSize: 15,
-                  color: Color(0xFF9CA3AF),
+                  color: hintColor,
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
@@ -515,11 +553,11 @@ class _PressureInputField extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 15),
+          const Padding(
+            padding: EdgeInsets.only(right: 15),
             child: Text(
-              unit,
-              style: const TextStyle(
+              'mmHg',
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: _primaryColor,
@@ -545,16 +583,26 @@ class _ErrorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final errorBackground =
+        isDark ? const Color(0xFF2A1F20) : const Color(0xFFFFF7F7);
+
+    final errorBorder =
+        isDark ? const Color(0xFF5A3438) : const Color(0xFFF0C9CE);
+
+    final textColor = isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 13,
         vertical: 11,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF7F7),
+        color: errorBackground,
         borderRadius: BorderRadius.circular(13),
         border: Border.all(
-          color: const Color(0xFFF0C9CE),
+          color: errorBorder,
         ),
       ),
       child: Row(
@@ -569,10 +617,10 @@ class _ErrorCard extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12.5,
                 height: 1.4,
-                color: _secondaryTextColor,
+                color: textColor,
               ),
             ),
           ),
@@ -601,25 +649,38 @@ class _BloodPressureResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final resultBackground =
+        isDark ? const Color(0xFF252525) : _backgroundColor;
+
+    final borderColor =
+        isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
+
+    final primaryTextColor = isDark ? Colors.white : _textColor;
+
+    final secondaryTextColor =
+        isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 18,
         vertical: 18,
       ),
       decoration: BoxDecoration(
-        color: _backgroundColor,
+        color: resultBackground,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFE3EAF5),
+          color: borderColor,
         ),
       ),
       child: Column(
         children: [
-          const Text(
+          Text(
             'Your blood pressure',
             style: TextStyle(
               fontSize: 14,
-              color: _secondaryTextColor,
+              color: secondaryTextColor,
             ),
           ),
           const SizedBox(height: 5),
@@ -635,20 +696,20 @@ class _BloodPressureResultCard extends StatelessWidget {
           Text(
             category,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w600,
-              color: _textColor,
+              color: primaryTextColor,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12.5,
               height: 1.4,
-              color: _secondaryTextColor,
+              color: secondaryTextColor,
             ),
           ),
         ],

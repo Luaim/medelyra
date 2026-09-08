@@ -254,11 +254,28 @@ class _SignInPageState extends State<SignInPage>
     final h = size.height;
     final w = size.width;
 
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     final bool isSmall = h < 700;
     final bool busy = isLoading || isGoogleLoading;
 
+    // =========================================================================
+    // THEME COLORS
+    // =========================================================================
+
+    final Color pageBackground =
+        isDark ? const Color(0xFF121212) : const Color(0xFFF6F6F6);
+
+    final Color primaryText = isDark ? Colors.white : const Color(0xFF2B2B2B);
+
+    final Color labelText =
+        isDark ? const Color(0xFFE0E0E0) : const Color(0xFF2B2B2B);
+
+    final Color secondaryText =
+        isDark ? const Color(0xFFBDBDBD) : const Color(0xFF747373);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: pageBackground,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -291,12 +308,12 @@ class _SignInPageState extends State<SignInPage>
                     // TITLE
                     // =================================================================
 
-                    const Text(
+                    Text(
                       'Sign In',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF2B2B2B),
+                        color: primaryText,
                         fontFamily: 'serif',
                       ),
                     ),
@@ -309,15 +326,20 @@ class _SignInPageState extends State<SignInPage>
                     // EMAIL
                     // =================================================================
 
-                    _buildLabel('Email'),
+                    _buildLabel(
+                      'Email',
+                      isDark: isDark,
+                    ),
 
                     const SizedBox(height: 6),
 
                     _buildTextField(
+                      context: context,
                       controller: emailController,
                       hintText: 'Enter your Email',
                       prefixIcon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
+                      isDark: isDark,
                     ),
 
                     const SizedBox(height: 16),
@@ -326,16 +348,21 @@ class _SignInPageState extends State<SignInPage>
                     // PASSWORD
                     // =================================================================
 
-                    _buildLabel('Password'),
+                    _buildLabel(
+                      'Password',
+                      isDark: isDark,
+                    ),
 
                     const SizedBox(height: 6),
 
                     _buildTextField(
+                      context: context,
                       controller: passwordController,
                       hintText: 'Enter your Password',
                       prefixIcon: Icons.lock_outline,
                       obscureText: obscurePassword,
                       keyboardType: TextInputType.text,
+                      isDark: isDark,
                       suffixIcon: IconButton(
                         splashRadius: 20,
                         onPressed: busy
@@ -349,6 +376,9 @@ class _SignInPageState extends State<SignInPage>
                           obscurePassword
                               ? Icons.visibility_off_outlined
                               : Icons.visibility_outlined,
+                          color: isDark
+                              ? const Color(0xFFBDBDBD)
+                              : const Color(0xFF555555),
                         ),
                       ),
                     ),
@@ -431,7 +461,9 @@ class _SignInPageState extends State<SignInPage>
                             borderRadius: BorderRadius.circular(25),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.18),
+                                color: Colors.black.withOpacity(
+                                  isDark ? 0.35 : 0.18,
+                                ),
                                 blurRadius: 6,
                                 offset: const Offset(0, 3),
                               ),
@@ -467,28 +499,30 @@ class _SignInPageState extends State<SignInPage>
                     // DIVIDER
                     // =================================================================
 
-                    const Row(
+                    Row(
                       children: [
                         Expanded(
                           child: Divider(
-                            color: Colors.grey,
+                            color:
+                                isDark ? const Color(0xFF555555) : Colors.grey,
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                             horizontal: 10,
                           ),
                           child: Text(
                             'OR Continue with',
                             style: TextStyle(
-                              color: Color(0xFF747373),
+                              color: secondaryText,
                               fontSize: 13,
                             ),
                           ),
                         ),
                         Expanded(
                           child: Divider(
-                            color: Colors.grey,
+                            color:
+                                isDark ? const Color(0xFF555555) : Colors.grey,
                           ),
                         ),
                       ],
@@ -502,7 +536,10 @@ class _SignInPageState extends State<SignInPage>
                     // GOOGLE
                     // =================================================================
 
-                    _googleButton(),
+                    _googleButton(
+                      context,
+                      isDark: isDark,
+                    ),
 
                     const SizedBox(height: 18),
 
@@ -513,10 +550,13 @@ class _SignInPageState extends State<SignInPage>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'Don’t have an account? ',
                           style: TextStyle(
                             fontSize: 14,
+                            color: isDark
+                                ? const Color(0xFFBDBDBD)
+                                : Colors.black87,
                           ),
                         ),
                         GestureDetector(
@@ -555,15 +595,18 @@ class _SignInPageState extends State<SignInPage>
   // LABEL
   // ===========================================================================
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(
+    String text, {
+    required bool isDark,
+  }) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF2B2B2B),
+          color: isDark ? const Color(0xFFE0E0E0) : const Color(0xFF2B2B2B),
         ),
       ),
     );
@@ -574,10 +617,12 @@ class _SignInPageState extends State<SignInPage>
   // ===========================================================================
 
   Widget _buildTextField({
+    required BuildContext context,
     required TextEditingController controller,
     required String hintText,
     required IconData prefixIcon,
     required TextInputType keyboardType,
+    required bool isDark,
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
@@ -585,18 +630,23 @@ class _SignInPageState extends State<SignInPage>
       height: 47,
       child: Container(
         decoration: BoxDecoration(
-          // SAME COLOR AS SIGN UP PAGE
-          color: const Color(0xFFDDF2F7),
+          // =========================================================================
+          // LIGHT MODE: ORIGINAL COLOR
+          // DARK MODE: DARK INPUT
+          // =========================================================================
+          color: isDark ? const Color(0xFF252525) : const Color(0xFFDDF2F7),
 
           borderRadius: BorderRadius.circular(14),
 
           border: Border.all(
-            color: Colors.grey.shade400,
+            color: isDark ? const Color(0xFF3A3A3A) : Colors.grey.shade400,
           ),
 
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
+              color: Colors.black.withOpacity(
+                isDark ? 0.28 : 0.12,
+              ),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -606,10 +656,12 @@ class _SignInPageState extends State<SignInPage>
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
-            color: Color(0xFF4A4A4A),
+            color: isDark ? Colors.white : const Color(0xFF4A4A4A),
           ),
+          cursorColor:
+              isDark ? const Color(0xFF8FC4DE) : const Color(0xFF3D84A8),
           decoration: InputDecoration(
             isDense: true,
             border: InputBorder.none,
@@ -618,13 +670,13 @@ class _SignInPageState extends State<SignInPage>
               vertical: 13,
             ),
             hintText: hintText,
-            hintStyle: const TextStyle(
-              color: Colors.grey,
+            hintStyle: TextStyle(
+              color: isDark ? const Color(0xFF8E8E8E) : Colors.grey,
               fontSize: 14,
             ),
             prefixIcon: Icon(
               prefixIcon,
-              color: const Color(0xFF555555),
+              color: isDark ? const Color(0xFFBDBDBD) : const Color(0xFF555555),
             ),
             suffixIcon: suffixIcon,
           ),
@@ -637,7 +689,10 @@ class _SignInPageState extends State<SignInPage>
   // GOOGLE BUTTON
   // ===========================================================================
 
-  Widget _googleButton() {
+  Widget _googleButton(
+    BuildContext context, {
+    required bool isDark,
+  }) {
     final bool disabled = isLoading || isGoogleLoading;
 
     return Material(
@@ -654,19 +709,22 @@ class _SignInPageState extends State<SignInPage>
             width: double.infinity,
             height: 52,
             decoration: BoxDecoration(
-              // SAME GOOGLE STYLE AS SIGN UP
-              color: Colors.white,
+              // Keep Google's button white in both themes.
+              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
 
               borderRadius: BorderRadius.circular(26),
 
               border: Border.all(
-                color: const Color(0xFFE0E0E0),
+                color:
+                    isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE0E0E0),
                 width: 1,
               ),
 
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.10),
+                  color: Colors.black.withOpacity(
+                    isDark ? 0.30 : 0.10,
+                  ),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -691,12 +749,13 @@ class _SignInPageState extends State<SignInPage>
                           height: 23,
                         ),
                         const SizedBox(width: 10),
-                        const Text(
+                        Text(
                           'Continue with Google',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF333333),
+                            color:
+                                isDark ? Colors.white : const Color(0xFF333333),
                           ),
                         ),
                       ],

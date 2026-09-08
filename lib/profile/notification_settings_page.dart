@@ -27,6 +27,33 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   final Color primaryBlue = const Color(0xFF67C0D7);
 
   // ============================================================
+  // DARK MODE COLORS
+  // ============================================================
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : const Color(0xFFF6F6F6);
+
+  Color get _appBarBackground =>
+      _isDark ? const Color(0xFF121212) : Colors.white;
+
+  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _primaryTextColor => _isDark ? Colors.white : Colors.black87;
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : Colors.black54;
+
+  Color get _disabledTextColor =>
+      _isDark ? const Color(0xFF707070) : Colors.grey;
+
+  Color get _dropdownBackground =>
+      _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _dropdownTextColor => _isDark ? Colors.white : Colors.black87;
+
+  // ============================================================
   // LOAD SETTINGS
   // ============================================================
 
@@ -83,12 +110,17 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: _pageBackground,
       appBar: AppBar(
-        title: const Text("Notifications"),
-        backgroundColor: Colors.white,
+        title: Text(
+          "Notifications",
+          style: TextStyle(
+            color: _primaryTextColor,
+          ),
+        ),
+        backgroundColor: _appBarBackground,
         elevation: 0,
-        foregroundColor: Colors.black,
+        foregroundColor: _primaryTextColor,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -112,14 +144,23 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   value,
                 );
               },
-              title: const Text("Enable Notifications"),
-              subtitle: const Text(
+              title: Text(
+                "Enable Notifications",
+                style: TextStyle(
+                  color: _primaryTextColor,
+                ),
+              ),
+              subtitle: Text(
                 "Turn on/off all app notifications",
+                style: TextStyle(
+                  color: _secondaryTextColor,
+                ),
               ),
               activeColor: Colors.white,
               activeTrackColor: primaryBlue,
               inactiveThumbColor: Colors.white,
-              inactiveTrackColor: Colors.grey.shade300,
+              inactiveTrackColor:
+                  _isDark ? const Color(0xFF555555) : Colors.grey.shade300,
             ),
           ),
 
@@ -256,14 +297,22 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     required bool value,
     required ValueChanged<bool>? onChanged,
   }) {
+    final enabled = onChanged != null;
+
     return SwitchListTile(
       value: value,
       onChanged: onChanged,
-      title: Text(title),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: enabled ? _primaryTextColor : _disabledTextColor,
+        ),
+      ),
       activeColor: Colors.white,
       activeTrackColor: primaryBlue,
       inactiveThumbColor: Colors.white,
-      inactiveTrackColor: Colors.grey.shade300,
+      inactiveTrackColor:
+          _isDark ? const Color(0xFF555555) : Colors.grey.shade300,
     );
   }
 
@@ -279,10 +328,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
       ),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: Colors.grey,
+          color: _isDark ? const Color(0xFFBDBDBD) : Colors.grey,
         ),
       ),
     );
@@ -297,14 +346,15 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBackground,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
+          if (!_isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
         ],
       ),
       child: child,
@@ -321,16 +371,34 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     required List<String> items,
     required ValueChanged<String?>? onChanged,
   }) {
+    final enabled = onChanged != null;
+
     return ListTile(
-      title: Text(title),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: enabled ? _primaryTextColor : _disabledTextColor,
+        ),
+      ),
       trailing: DropdownButton<String>(
         value: value,
         underline: const SizedBox(),
+        dropdownColor: _dropdownBackground,
+        style: TextStyle(
+          color: enabled ? _dropdownTextColor : _disabledTextColor,
+        ),
+        iconEnabledColor: enabled ? _secondaryTextColor : _disabledTextColor,
+        iconDisabledColor: _disabledTextColor,
         items: items
             .map(
               (item) => DropdownMenuItem<String>(
                 value: item,
-                child: Text(item),
+                child: Text(
+                  item,
+                  style: TextStyle(
+                    color: _dropdownTextColor,
+                  ),
+                ),
               ),
             )
             .toList(),

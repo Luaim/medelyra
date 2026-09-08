@@ -19,6 +19,31 @@ class _AgePageState extends State<AgePage> {
   int? _months;
   int? _days;
 
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _sheetBackground =>
+      _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _fieldBackground =>
+      _isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
+
+  Color get _resultBackground =>
+      _isDark ? const Color(0xFF252525) : _backgroundColor;
+
+  Color get _borderColor =>
+      _isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
+
+  Color get _primaryTextColor => _isDark ? Colors.white : _textColor;
+
+  Color get _secondaryTextColorForTheme =>
+      _isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
+  Color get _mutedTextColor =>
+      _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280);
+
+  Color get _placeholderColor =>
+      _isDark ? const Color(0xFF8E8E8E) : const Color(0xFF9CA3AF);
+
   Future<void> _selectDateOfBirth() async {
     FocusScope.of(context).unfocus();
 
@@ -36,12 +61,19 @@ class _AgePageState extends State<AgePage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: _primaryColor,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: _textColor,
-            ),
+            colorScheme: _isDark
+                ? ColorScheme.dark(
+                    primary: _primaryColor,
+                    onPrimary: Colors.white,
+                    surface: const Color(0xFF1E1E1E),
+                    onSurface: Colors.white,
+                  )
+                : const ColorScheme.light(
+                    primary: _primaryColor,
+                    onPrimary: Colors.white,
+                    surface: Colors.white,
+                    onSurface: _textColor,
+                  ),
           ),
           child: child!,
         );
@@ -140,7 +172,7 @@ class _AgePageState extends State<AgePage> {
     return SafeArea(
       top: false,
       child: Material(
-        color: Colors.white,
+        color: _sheetBackground,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(26),
         ),
@@ -165,7 +197,9 @@ class _AgePageState extends State<AgePage> {
                   width: 38,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD5D9DF),
+                    color: _isDark
+                        ? const Color(0xFF555555)
+                        : const Color(0xFFD5D9DF),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -179,13 +213,13 @@ class _AgePageState extends State<AgePage> {
 
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Age Calculator',
                       style: TextStyle(
                         fontSize: 21,
                         fontWeight: FontWeight.w600,
-                        color: _textColor,
+                        color: _primaryTextColor,
                       ),
                     ),
                   ),
@@ -193,10 +227,10 @@ class _AgePageState extends State<AgePage> {
                     onPressed: () => Navigator.pop(context),
                     splashRadius: 22,
                     padding: EdgeInsets.zero,
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close_rounded,
                       size: 23,
-                      color: Color(0xFF6B7280),
+                      color: _mutedTextColor,
                     ),
                   ),
                 ],
@@ -208,12 +242,12 @@ class _AgePageState extends State<AgePage> {
 
               const SizedBox(height: 1),
 
-              const Text(
+              Text(
                 'Find your exact age',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 15,
-                  color: _secondaryTextColor,
+                  color: _secondaryTextColorForTheme,
                 ),
               ),
 
@@ -235,12 +269,12 @@ class _AgePageState extends State<AgePage> {
               // DATE OF BIRTH
               // ------------------------------------------------------------
 
-              const Text(
+              Text(
                 'Date of birth',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: _textColor,
+                  color: _primaryTextColor,
                 ),
               ),
 
@@ -251,10 +285,10 @@ class _AgePageState extends State<AgePage> {
                 child: Container(
                   height: 54,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFAFAFC),
+                    color: _fieldBackground,
                     borderRadius: BorderRadius.circular(13),
                     border: Border.all(
-                      color: const Color(0xFFE3EAF5),
+                      color: _borderColor,
                     ),
                   ),
                   child: Row(
@@ -269,8 +303,8 @@ class _AgePageState extends State<AgePage> {
                             style: TextStyle(
                               fontSize: 15,
                               color: _dateOfBirth == null
-                                  ? const Color(0xFF9CA3AF)
-                                  : _textColor,
+                                  ? _placeholderColor
+                                  : _primaryTextColor,
                             ),
                           ),
                         ),
@@ -338,21 +372,21 @@ class _AgePageState extends State<AgePage> {
               Container(
                 padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
-                  color: _backgroundColor,
+                  color: _isDark ? const Color(0xFF252525) : _backgroundColor,
                   borderRadius: BorderRadius.circular(13),
                   border: Border.all(
-                    color: const Color(0xFFE3EAF5),
+                    color: _borderColor,
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
                       Icons.info_outline_rounded,
                       size: 18,
-                      color: _secondaryTextColor,
+                      color: _secondaryTextColorForTheme,
                     ),
-                    SizedBox(width: 9),
+                    const SizedBox(width: 9),
                     Expanded(
                       child: Text(
                         'Age is calculated from your date of birth '
@@ -360,7 +394,7 @@ class _AgePageState extends State<AgePage> {
                         style: TextStyle(
                           fontSize: 12.5,
                           height: 1.4,
-                          color: _secondaryTextColor,
+                          color: _secondaryTextColorForTheme,
                         ),
                       ),
                     ),
@@ -392,25 +426,38 @@ class _AgeResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final Color resultBackground =
+        isDark ? const Color(0xFF252525) : _backgroundColor;
+
+    final Color borderColor =
+        isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
+
+    final Color primaryTextColor = isDark ? Colors.white : _textColor;
+
+    final Color secondaryTextColor =
+        isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 18,
         vertical: 18,
       ),
       decoration: BoxDecoration(
-        color: _backgroundColor,
+        color: resultBackground,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFE3EAF5),
+          color: borderColor,
         ),
       ),
       child: Column(
         children: [
-          const Text(
+          Text(
             'Your Age',
             style: TextStyle(
               fontSize: 14,
-              color: _secondaryTextColor,
+              color: secondaryTextColor,
             ),
           ),
           const SizedBox(height: 6),
@@ -423,21 +470,21 @@ class _AgeResultCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 1),
-          const Text(
+          Text(
             'years old',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w600,
-              color: _textColor,
+              color: primaryTextColor,
             ),
           ),
           const SizedBox(height: 12),
           Text(
             '$months months • $days days',
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: _secondaryTextColor,
+              color: secondaryTextColor,
             ),
           ),
         ],

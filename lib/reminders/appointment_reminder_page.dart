@@ -26,6 +26,29 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
   bool isSaving = false;
 
+  // ============================================================
+  // THEME COLORS
+  // Light mode values are kept exactly as before.
+  // ============================================================
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : const Color(0xFFF6F6F6);
+
+  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _fieldBackground =>
+      _isDark ? const Color(0xFF252525) : Colors.white;
+
+  Color get _borderColor =>
+      _isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE0E0E0);
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : Colors.black54;
+
+  Color get _primaryTextColor => _isDark ? Colors.white : Colors.black87;
+
   final List<Map<String, dynamic>> appointmentTypes = [
     {
       'label': 'General',
@@ -374,7 +397,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: _pageBackground,
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 1,
         onTap: (i) => _onBottomTap(context, i),
@@ -389,12 +412,17 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
             children: [
               const SizedBox(height: 16),
 
-              const Center(
+              // ==================================================
+              // TITLE
+              // ==================================================
+
+              Center(
                 child: Text(
                   'New Appointment',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
+                    color: _primaryTextColor,
                   ),
                 ),
               ),
@@ -405,11 +433,12 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               // APPOINTMENT TYPE
               // ==================================================
 
-              const Text(
+              Text(
                 'Appointment Type',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: _primaryTextColor,
                 ),
               ),
 
@@ -433,24 +462,27 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected ? primaryBlue : Colors.white,
+                        color: isSelected ? primaryBlue : _cardBackground,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: const Color(0xFFE0E0E0),
+                          color: _borderColor,
                         ),
                       ),
                       child: Column(
                         children: [
                           Icon(
                             item['icon'],
-                            color: isSelected ? Colors.white : Colors.grey,
+                            color:
+                                isSelected ? Colors.white : _secondaryTextColor,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             item['label'],
                             style: TextStyle(
                               fontSize: 12,
-                              color: isSelected ? Colors.white : Colors.black54,
+                              color: isSelected
+                                  ? Colors.white
+                                  : _secondaryTextColor,
                             ),
                           ),
                         ],
@@ -466,11 +498,12 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               // HOSPITAL
               // ==================================================
 
-              const Text(
+              Text(
                 'Hospital / Clinic',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: _primaryTextColor,
                 ),
               ),
 
@@ -480,8 +513,15 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                 child: TextField(
                   controller: hospitalController,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    color: _primaryTextColor,
+                  ),
+                  cursorColor: primaryBlue,
+                  decoration: InputDecoration(
                     hintText: 'Enter hospital or clinic name...',
+                    hintStyle: TextStyle(
+                      color: _secondaryTextColor,
+                    ),
                     border: InputBorder.none,
                   ),
                 ),
@@ -493,11 +533,12 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               // DATE
               // ==================================================
 
-              const Text(
+              Text(
                 'Select Date',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: _primaryTextColor,
                 ),
               ),
 
@@ -513,6 +554,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                         '${selectedDate.day}/'
                         '${selectedDate.month}/'
                         '${selectedDate.year}',
+                        style: TextStyle(
+                          color: _primaryTextColor,
+                        ),
                       ),
                       Icon(
                         Icons.calendar_today,
@@ -529,11 +573,12 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               // TIME
               // ==================================================
 
-              const Text(
+              Text(
                 'Select Time',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: _primaryTextColor,
                 ),
               ),
 
@@ -547,6 +592,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                     children: [
                       Text(
                         selectedTime.format(context),
+                        style: TextStyle(
+                          color: _primaryTextColor,
+                        ),
                       ),
                       Icon(
                         Icons.access_time,
@@ -563,11 +611,12 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               // REASON
               // ==================================================
 
-              const Text(
+              Text(
                 'Reason / Notes',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: _primaryTextColor,
                 ),
               ),
 
@@ -579,17 +628,24 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: _fieldBackground,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFFE0E0E0),
+                    color: _borderColor,
                   ),
                 ),
                 child: TextField(
                   controller: reasonController,
                   maxLines: 4,
-                  decoration: const InputDecoration(
+                  style: TextStyle(
+                    color: _primaryTextColor,
+                  ),
+                  cursorColor: primaryBlue,
+                  decoration: InputDecoration(
                     hintText: 'Example: Follow-up appointment...',
+                    hintStyle: TextStyle(
+                      color: _secondaryTextColor,
+                    ),
                     border: InputBorder.none,
                   ),
                 ),
@@ -655,10 +711,10 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       ),
       height: 50,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _fieldBackground,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFFE0E0E0),
+          color: _borderColor,
         ),
       ),
       alignment: Alignment.centerLeft,

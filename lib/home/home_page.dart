@@ -14,6 +14,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // ============================================================
+  // STATUS COLORS
+  // ============================================================
+
   final Color primaryBlue = const Color(0xFF3D84A8);
   final Color green = const Color(0xFF43A047);
   final Color red = const Color(0xFFEF5350);
@@ -25,6 +29,41 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = true;
 
   DateTime selectedDate = DateTime.now();
+
+  // ============================================================
+  // THEME COLORS
+  //
+  // These automatically change depending on light/dark mode.
+  // Light mode values are kept close to the original design.
+  // ============================================================
+
+  bool get _isDarkMode => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDarkMode ? const Color(0xFF121212) : const Color(0xFFF5F6FA);
+
+  Color get _cardColor => _isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _secondaryCardColor =>
+      _isDarkMode ? const Color(0xFF242424) : const Color(0xFFF8F9FC);
+
+  Color get _dateCardColor =>
+      _isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _iconBackgroundColor =>
+      _isDarkMode ? const Color(0xFF263B44) : const Color(0xFFEFF2FA);
+
+  Color get _primaryTextColor =>
+      _isDarkMode ? const Color(0xFFF2F2F2) : const Color(0xFF323232);
+
+  Color get _secondaryTextColor =>
+      _isDarkMode ? const Color(0xFFB5B5B5) : const Color(0xFF868686);
+
+  Color get _tabBackgroundColor =>
+      _isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _inactiveTabColor =>
+      _isDarkMode ? const Color(0xFFB0B0B0) : Colors.grey;
 
   // ============================================================
   // LOCAL DATA
@@ -504,11 +543,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ============================================================
-  // ORIGINAL MEDICINE NOTIFICATION ID
-  //
-  // IMPORTANT:
-  // This must match the ID used when the medicine reminder
-  // was originally scheduled.
+  // MEDICINE NOTIFICATION ID
   // ============================================================
 
   int _medicineNotificationId({
@@ -568,7 +603,8 @@ class _HomePageState extends State<HomePage> {
       );
 
       debugPrint(
-        'Cancelled original medicine notification: $notificationId',
+        'Cancelled original medicine notification: '
+        '$notificationId',
       );
     } catch (e) {
       debugPrint(
@@ -619,7 +655,8 @@ class _HomePageState extends State<HomePage> {
     );
 
     debugPrint(
-      'Cancelled previous postponed notification: $notificationId',
+      'Cancelled previous postponed notification: '
+      '$notificationId',
     );
   }
 
@@ -686,15 +723,12 @@ class _HomePageState extends State<HomePage> {
       }
 
       if (medicine != null) {
-        // Cancel the original scheduled notification.
         await _cancelOriginalDoseNotification(
           medicineId: medicineId,
           medicine: medicine,
           time: time,
         );
 
-        // If this dose had previously been postponed,
-        // cancel that postponed notification too.
         final existingStatus = _getDoseStatus(
           medicineId,
           time,
@@ -745,18 +779,25 @@ class _HomePageState extends State<HomePage> {
           title: const Text('Skip this dose?'),
           content: Text(
             'This will mark the $time dose as skipped for '
-            '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}.',
+            '${selectedDate.day}/${selectedDate.month}/'
+            '${selectedDate.year}.',
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(dialogContext, false);
+                Navigator.pop(
+                  dialogContext,
+                  false,
+                );
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(dialogContext, true);
+                Navigator.pop(
+                  dialogContext,
+                  true,
+                );
               },
               child: const Text(
                 'Skip Dose',
@@ -785,16 +826,12 @@ class _HomePageState extends State<HomePage> {
       }
 
       if (medicine != null) {
-        // IMPORTANT:
-        // Cancel the original reminder so it cannot fire
-        // after the user has skipped the dose.
         await _cancelOriginalDoseNotification(
           medicineId: medicineId,
           medicine: medicine,
           time: time,
         );
 
-        // Also cancel an existing postponed reminder, if any.
         final existingStatus = _getDoseStatus(
           medicineId,
           time,
@@ -868,8 +905,8 @@ class _HomePageState extends State<HomePage> {
     );
 
     debugPrint(
-      'Scheduled postponed notification: $notificationId '
-      'at $postponedUntil',
+      'Scheduled postponed notification: '
+      '$notificationId at $postponedUntil',
     );
   }
 
@@ -900,10 +937,6 @@ class _HomePageState extends State<HomePage> {
       selected.minute,
     );
 
-    // ------------------------------------------------------------
-    // Do not allow a postponed notification in the past.
-    // ------------------------------------------------------------
-
     if (!postponedUntil.isAfter(DateTime.now())) {
       if (!mounted) return;
 
@@ -926,7 +959,6 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      // Find the medicine.
       Map<String, dynamic>? medicine;
 
       for (final item in _medicines) {
@@ -936,12 +968,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
 
-      // ----------------------------------------------------------
-      // 1. Cancel the ORIGINAL reminder.
-      //
-      // This is the important fix.
-      // ----------------------------------------------------------
-
+      // Cancel original reminder.
       if (medicine != null) {
         await _cancelOriginalDoseNotification(
           medicineId: medicineId,
@@ -950,11 +977,7 @@ class _HomePageState extends State<HomePage> {
         );
       }
 
-      // ----------------------------------------------------------
-      // 2. Cancel an OLD postponed reminder if this dose
-      //    was already postponed before.
-      // ----------------------------------------------------------
-
+      // Cancel previous postponed reminder.
       final existingStatus = _getDoseStatus(
         medicineId,
         time,
@@ -965,10 +988,7 @@ class _HomePageState extends State<HomePage> {
         status: existingStatus,
       );
 
-      // ----------------------------------------------------------
-      // 3. Save postponed state locally.
-      // ----------------------------------------------------------
-
+      // Save postponed state.
       final date = _dateKey(selectedDate);
 
       await LocalDatabaseService.instance.upsertMedicineDoseStatus(
@@ -980,19 +1000,12 @@ class _HomePageState extends State<HomePage> {
         postponedUntil: postponedUntil,
       );
 
-      // ----------------------------------------------------------
-      // 4. Schedule ONLY the new postponed notification.
-      // ----------------------------------------------------------
-
+      // Schedule only the new notification.
       await _schedulePostponedNotification(
         medicineId: medicineId,
         medicineName: medicineName,
         postponedUntil: postponedUntil,
       );
-
-      // ----------------------------------------------------------
-      // 5. Refresh Home.
-      // ----------------------------------------------------------
 
       await _loadHomeData();
     } catch (e) {
@@ -1047,7 +1060,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: _pageBackground,
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 0,
         onTap: (index) => _onBottomTap(
@@ -1072,10 +1085,10 @@ class _HomePageState extends State<HomePage> {
               Text(
                 '${_monthName(selectedDate.month)} '
                 '${selectedDate.year}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF323232),
+                  color: _primaryTextColor,
                 ),
               ),
 
@@ -1093,9 +1106,15 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (_, index) {
                     final date = availableDates[index];
 
-                    final selected = _sameDate(date, selectedDate);
+                    final selected = _sameDate(
+                      date,
+                      selectedDate,
+                    );
 
-                    final isToday = _sameDate(date, DateTime.now());
+                    final isToday = _sameDate(
+                      date,
+                      DateTime.now(),
+                    );
 
                     return GestureDetector(
                       onTap: () async {
@@ -1113,9 +1132,14 @@ class _HomePageState extends State<HomePage> {
                           right: 10,
                         ),
                         decoration: BoxDecoration(
-                          color:
-                              selected ? const Color(0xFF5891FA) : Colors.white,
-                          borderRadius: BorderRadius.circular(16),
+                          color: selected
+                              ? const Color(
+                                  0xFF5891FA,
+                                )
+                              : _dateCardColor,
+                          borderRadius: BorderRadius.circular(
+                            16,
+                          ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1124,20 +1148,26 @@ class _HomePageState extends State<HomePage> {
                               _dayName(date),
                               style: TextStyle(
                                 fontSize: 14,
-                                color: selected ? Colors.white : Colors.black87,
+                                color:
+                                    selected ? Colors.white : _primaryTextColor,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(
+                              height: 4,
+                            ),
                             Text(
                               '${date.day}',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: selected ? Colors.white : Colors.black87,
+                                color:
+                                    selected ? Colors.white : _primaryTextColor,
                               ),
                             ),
                             if (isToday) ...[
-                              const SizedBox(height: 2),
+                              const SizedBox(
+                                height: 2,
+                              ),
                               Text(
                                 'Today',
                                 style: TextStyle(
@@ -1164,7 +1194,7 @@ class _HomePageState extends State<HomePage> {
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: _tabBackgroundColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -1296,19 +1326,21 @@ class _HomePageState extends State<HomePage> {
     final subtitle = subtitleParts.join(' • ');
 
     return Container(
-      margin: const EdgeInsets.only(
-        bottom: 14,
-      ),
+      margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardColor,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-          ),
-        ],
+        boxShadow: _isDarkMode
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(
+                    0.03,
+                  ),
+                  blurRadius: 8,
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1320,7 +1352,7 @@ class _HomePageState extends State<HomePage> {
                 width: 65,
                 height: 65,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEFF2FA),
+                  color: _iconBackgroundColor,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
@@ -1329,7 +1361,7 @@ class _HomePageState extends State<HomePage> {
                         item['medicineType'] ??
                         item['medicationType'],
                   ),
-                  color: const Color(0xFF3D84A8),
+                  color: primaryBlue,
                 ),
               ),
               const SizedBox(width: 12),
@@ -1339,18 +1371,19 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(
                       medicineName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
+                        color: _primaryTextColor,
                       ),
                     ),
                     if (subtitle.isNotEmpty) ...[
                       const SizedBox(height: 3),
                       Text(
                         subtitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF868686),
+                          color: _secondaryTextColor,
                         ),
                       ),
                     ],
@@ -1411,12 +1444,10 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Container(
-      margin: const EdgeInsets.only(
-        bottom: 8,
-      ),
+      margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FC),
+        color: _secondaryCardColor,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -1438,9 +1469,10 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(width: 7),
               Text(
                 time,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
+                  color: _primaryTextColor,
                 ),
               ),
               const Spacer(),
@@ -1507,15 +1539,15 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   borderRadius: BorderRadius.circular(8),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 7,
                       vertical: 8,
                     ),
                     child: Text(
                       'Postpone',
                       style: TextStyle(
-                        color: Color(0xFF3D84A8),
+                        color: primaryBlue,
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
                       ),
@@ -1796,21 +1828,21 @@ class _HomePageState extends State<HomePage> {
         item['completedAt'].toString().isNotEmpty;
 
     return Container(
-      margin: const EdgeInsets.only(
-        bottom: 14,
-      ),
+      margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardColor,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(
-              0.03,
-            ),
-            blurRadius: 8,
-          ),
-        ],
+        boxShadow: _isDarkMode
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(
+                    0.03,
+                  ),
+                  blurRadius: 8,
+                ),
+              ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1819,7 +1851,7 @@ class _HomePageState extends State<HomePage> {
             width: 65,
             height: 65,
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF2FA),
+              color: _iconBackgroundColor,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
@@ -1841,18 +1873,19 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 6),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
+                    color: _primaryTextColor,
                   ),
                 ),
                 if (hospital.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
                     hospital,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: Color(0xFF868686),
+                      color: _secondaryTextColor,
                     ),
                   ),
                 ],
@@ -1860,9 +1893,9 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 2),
                   Text(
                     reason,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: Color(0xFF868686),
+                      color: _secondaryTextColor,
                     ),
                   ),
                 ],
@@ -1971,7 +2004,7 @@ class _HomePageState extends State<HomePage> {
                     ? const Color(
                         0xFF5891FA,
                       )
-                    : Colors.grey,
+                    : _inactiveTabColor,
               ),
             ),
           ),
@@ -1996,7 +2029,7 @@ class _HomePageState extends State<HomePage> {
         vertical: 35,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardColor,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -2010,18 +2043,19 @@ class _HomePageState extends State<HomePage> {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
+              color: _primaryTextColor,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: Colors.grey,
+              color: _secondaryTextColor,
             ),
           ),
         ],

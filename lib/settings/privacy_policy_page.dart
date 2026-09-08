@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
@@ -15,19 +16,44 @@ class PrivacyPolicyPage extends StatelessWidget {
   static const Color secondaryText = Color(0xFF777777);
   static const Color dividerColor = Color(0xFFE6E3E6);
 
+  // ===========================================================================
+  // DARK MODE COLORS
+  // ===========================================================================
+
+  static const Color darkBackground = Color(0xFF121212);
+  static const Color darkCard = Color(0xFF1E1E1E);
+  static const Color darkInput = Color(0xFF252525);
+  static const Color darkBorder = Color(0xFF3A3A3A);
+  static const Color darkPrimaryText = Colors.white;
+  static const Color darkBodyText = Color(0xFFBDBDBD);
+  static const Color darkSecondaryText = Color(0xFF9E9E9E);
+  static const Color darkBlueTint = Color(0xFF24343A);
+  static const Color darkFooter = Color(0xFF252525);
+  static const Color darkFooterText = Color(0xFFBDBDBD);
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final pageBackground = isDark ? darkBackground : backgroundColor;
+
+    final primaryText = isDark ? darkPrimaryText : darkText;
+
+    final bodyTextColor = isDark ? darkBodyText : bodyText;
+
+    final secondaryTextColor = isDark ? darkSecondaryText : secondaryText;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: pageBackground,
 
       // =====================================================================
       // APP BAR
       // =====================================================================
 
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: pageBackground,
+        foregroundColor: primaryText,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
@@ -35,18 +61,18 @@ class PrivacyPolicyPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back,
             size: 26,
-            color: darkText,
+            color: primaryText,
           ),
         ),
-        title: const Text(
+        title: Text(
           'Privacy Policy',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
-            color: darkText,
+            color: primaryText,
             fontFamily: 'serif',
           ),
         ),
@@ -75,8 +101,8 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // PAGE INTRO
                   // ===========================================================
 
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
                       4,
                       8,
                       4,
@@ -85,15 +111,15 @@ class PrivacyPolicyPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 6),
+                        const SizedBox(height: 6),
                         Text(
                           'Last updated: August 2026',
                           style: TextStyle(
                             fontSize: 13,
-                            color: secondaryText,
+                            color: secondaryTextColor,
                           ),
                         ),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Text(
                           'Your privacy matters to us. This policy explains '
                           'what information Medelyra collects, how it is used, '
@@ -101,7 +127,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             height: 1.55,
-                            color: bodyText,
+                            color: bodyTextColor,
                           ),
                         ),
                       ],
@@ -113,6 +139,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '01',
                     title: 'What Medelyra Collects',
                     intro: 'Depending on how you use the application, Medelyra '
@@ -132,6 +159,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '02',
                     title: 'How We Use Your Information',
                     intro: 'The information you provide helps Medelyra provide '
@@ -153,6 +181,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '03',
                     title: 'Medication & Health Information',
                     intro: 'Medelyra allows you to enter medication, reminder, '
@@ -173,6 +202,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '04',
                     title: 'Emergency Contacts',
                     intro: 'Medelyra allows you to optionally add an emergency '
@@ -191,6 +221,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '05',
                     title: 'Data Storage & Security',
                     intro: 'Medelyra uses Firebase services to support account '
@@ -211,6 +242,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '06',
                     title: 'Third-Party Services',
                     intro: 'Medelyra may use trusted third-party services to '
@@ -230,6 +262,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '07',
                     title: 'Google Sign-In',
                     intro:
@@ -249,6 +282,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '08',
                     title: 'Your Privacy Choices',
                     intro: 'You have control over the information you provide '
@@ -269,6 +303,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '09',
                     title: 'Data Retention',
                     intro: 'We retain information for as long as necessary to '
@@ -287,6 +322,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '10',
                     title: 'Children’s Privacy',
                     paragraphs: const [
@@ -304,6 +340,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '11',
                     title: 'Changes to This Policy',
                     paragraphs: const [
@@ -320,6 +357,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                   // ===========================================================
 
                   _section(
+                    context: context,
                     number: '12',
                     title: 'Contact Us',
                     intro: 'If you have questions, concerns, or requests about '
@@ -337,18 +375,23 @@ class PrivacyPolicyPage extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEAF4F8),
+                      color: isDark ? darkBlueTint : const Color(0xFFEAF4F8),
                       borderRadius: BorderRadius.circular(14),
+                      border: isDark
+                          ? Border.all(
+                              color: const Color(0xFF35545D),
+                            )
+                          : null,
                     ),
-                    child: const Row(
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.info_outline,
                           size: 21,
                           color: primaryBlue,
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             'This Privacy Policy is intended to explain how '
@@ -356,7 +399,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13,
                               height: 1.45,
-                              color: Color(0xFF4B5A60),
+                              color: isDark
+                                  ? darkFooterText
+                                  : const Color(0xFF4B5A60),
                             ),
                           ),
                         ),
@@ -378,7 +423,8 @@ class PrivacyPolicyPage extends StatelessWidget {
   // SECTION CARD
   // ===========================================================================
 
-  static Widget _section({
+  Widget _section({
+    required BuildContext context,
     required String number,
     required String title,
     String? intro,
@@ -387,6 +433,18 @@ class PrivacyPolicyPage extends StatelessWidget {
     String? footer,
     String? email,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final sectionCardColor = isDark ? darkCard : cardColor;
+
+    final primaryText = isDark ? darkPrimaryText : darkText;
+
+    final bodyTextColor = isDark ? darkBodyText : bodyText;
+
+    final borderColor = isDark ? darkBorder : dividerColor;
+
+    final secondaryTextColor = isDark ? darkSecondaryText : secondaryText;
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 14),
@@ -397,18 +455,19 @@ class PrivacyPolicyPage extends StatelessWidget {
         17,
       ),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: sectionCardColor,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: dividerColor,
+          color: borderColor,
           width: 1,
         ),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.035),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.035),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
         ],
       ),
       child: Column(
@@ -426,7 +485,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                 height: 36,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEAF4F8),
+                  color: isDark ? darkBlueTint : const Color(0xFFEAF4F8),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -441,15 +500,13 @@ class PrivacyPolicyPage extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 5,
-                  ),
+                  padding: const EdgeInsets.only(top: 5),
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
-                      color: darkText,
+                      color: primaryText,
                     ),
                   ),
                 ),
@@ -465,10 +522,10 @@ class PrivacyPolicyPage extends StatelessWidget {
             const SizedBox(height: 14),
             Text(
               intro,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 height: 1.5,
-                color: bodyText,
+                color: bodyTextColor,
               ),
             ),
           ],
@@ -482,10 +539,10 @@ class PrivacyPolicyPage extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 paragraph,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   height: 1.5,
-                  color: bodyText,
+                  color: bodyTextColor,
                 ),
               ),
             ],
@@ -519,10 +576,10 @@ class PrivacyPolicyPage extends StatelessWidget {
                     Expanded(
                       child: Text(
                         bullet,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           height: 1.45,
-                          color: bodyText,
+                          color: bodyTextColor,
                         ),
                       ),
                     ),
@@ -543,15 +600,20 @@ class PrivacyPolicyPage extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(11),
               decoration: BoxDecoration(
-                color: const Color(0xFFF7FAFB),
+                color: isDark ? darkFooter : const Color(0xFFF7FAFB),
                 borderRadius: BorderRadius.circular(10),
+                border: isDark
+                    ? Border.all(
+                        color: const Color(0xFF333333),
+                      )
+                    : null,
               ),
               child: Text(
                 footer,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   height: 1.45,
-                  color: Color(0xFF555555),
+                  color: isDark ? darkBodyText : const Color(0xFF555555),
                 ),
               ),
             ),
@@ -570,8 +632,13 @@ class PrivacyPolicyPage extends StatelessWidget {
                 vertical: 12,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFFEAF4F8),
+                color: isDark ? darkBlueTint : const Color(0xFFEAF4F8),
                 borderRadius: BorderRadius.circular(10),
+                border: isDark
+                    ? Border.all(
+                        color: const Color(0xFF35545D),
+                      )
+                    : null,
               ),
               child: Row(
                 children: [

@@ -506,9 +506,28 @@ class _PillReminderPageState extends State<PillReminderPage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final backgroundColor =
+        isDark ? const Color(0xFF121212) : const Color(0xFFF6F6F6);
+
+    final cardColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+    final inputColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+    final borderColor =
+        isDark ? const Color(0xFF383838) : const Color(0xFFE0E0E0);
+
+    final primaryTextColor = isDark ? Colors.white : const Color(0xFF2D2D2D);
+
+    final secondaryTextColor = isDark ? Colors.white70 : Colors.black54;
+
+    final helperBackgroundColor =
+        isDark ? const Color(0xFF1D3037) : const Color(0xFFEAF4F8);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: backgroundColor,
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 1,
         onTap: (i) => _onBottomTap(context, i),
@@ -523,12 +542,17 @@ class _PillReminderPageState extends State<PillReminderPage> {
             children: [
               const SizedBox(height: 16),
 
-              const Center(
+              // --------------------------------------------------
+              // TITLE
+              // --------------------------------------------------
+
+              Center(
                 child: Text(
                   'New Reminder',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
+                    color: primaryTextColor,
                   ),
                 ),
               ),
@@ -539,11 +563,12 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // MEDICINE TYPE
               // --------------------------------------------------
 
-              const Text(
+              Text(
                 'Medicine Type',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: primaryTextColor,
                 ),
               ),
 
@@ -567,25 +592,27 @@ class _PillReminderPageState extends State<PillReminderPage> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color:
-                            isSelected ? const Color(0xFF3D84A8) : Colors.white,
+                        color: isSelected ? const Color(0xFF3D84A8) : cardColor,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: const Color(0xFFE0E0E0),
+                          color: borderColor,
                         ),
                       ),
                       child: Column(
                         children: [
                           Icon(
                             item['icon'],
-                            color: isSelected ? Colors.white : Colors.grey,
+                            color:
+                                isSelected ? Colors.white : secondaryTextColor,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             item['label'],
                             style: TextStyle(
                               fontSize: 11,
-                              color: isSelected ? Colors.white : Colors.black54,
+                              color: isSelected
+                                  ? Colors.white
+                                  : secondaryTextColor,
                             ),
                           ),
                         ],
@@ -601,17 +628,20 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // MEDICINE NAME
               // --------------------------------------------------
 
-              const Text(
+              Text(
                 'Medicine Name',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: primaryTextColor,
                 ),
               ),
 
               const SizedBox(height: 8),
 
               _input(
+                color: inputColor,
+                borderColor: borderColor,
                 child: TextField(
                   controller: medicineNameController,
                   textCapitalization: TextCapitalization.words,
@@ -628,17 +658,20 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // DOSE
               // --------------------------------------------------
 
-              const Text(
+              Text(
                 'Dose / Amount',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: primaryTextColor,
                 ),
               ),
 
               const SizedBox(height: 8),
 
               _input(
+                color: inputColor,
+                borderColor: borderColor,
                 child: TextField(
                   controller: doseController,
                   textCapitalization: TextCapitalization.sentences,
@@ -655,11 +688,12 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // FREQUENCY
               // --------------------------------------------------
 
-              const Text(
+              Text(
                 'Frequency',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: primaryTextColor,
                 ),
               ),
 
@@ -669,6 +703,8 @@ class _PillReminderPageState extends State<PillReminderPage> {
                 frequencyOptions,
                 selectedFrequency,
                 _changeFrequency,
+                color: inputColor,
+                borderColor: borderColor,
               ),
 
               const SizedBox(height: 20),
@@ -678,11 +714,12 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // --------------------------------------------------
 
               if (selectedFrequency != 'As Needed') ...[
-                const Text(
+                Text(
                   'Reminder Time',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
+                    color: primaryTextColor,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -690,13 +727,21 @@ class _PillReminderPageState extends State<PillReminderPage> {
                   _infoBox(
                     'Choose the starting time. '
                     'The next reminders will be 8 hours apart.',
+                    backgroundColor: helperBackgroundColor,
                   ),
                 if (selectedFrequency == 'Every 12 Hours')
                   _infoBox(
                     'Choose the starting time. '
                     'The second reminder will be 12 hours later.',
+                    backgroundColor: helperBackgroundColor,
                   ),
-                ..._buildTimeFields(),
+                ..._buildTimeFields(
+                  inputColor: inputColor,
+                  borderColor: borderColor,
+                  primaryTextColor: primaryTextColor,
+                  secondaryTextColor: secondaryTextColor,
+                  helperBackgroundColor: helperBackgroundColor,
+                ),
                 if (selectedFrequency == 'Custom Schedule') ...[
                   const SizedBox(height: 8),
                   _addTimeButton(),
@@ -706,6 +751,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
                   'This medicine does not have a fixed time. '
                   'Use the instructions provided by your doctor '
                   'or pharmacist.',
+                  backgroundColor: helperBackgroundColor,
                 ),
               ],
 
@@ -715,11 +761,12 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // START DATE
               // --------------------------------------------------
 
-              const Text(
+              Text(
                 'Start Date',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: primaryTextColor,
                 ),
               ),
 
@@ -728,6 +775,8 @@ class _PillReminderPageState extends State<PillReminderPage> {
               GestureDetector(
                 onTap: _pickStartDate,
                 child: _input(
+                  color: inputColor,
+                  borderColor: borderColor,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -735,10 +784,14 @@ class _PillReminderPageState extends State<PillReminderPage> {
                         '${selectedStartDate.day}/'
                         '${selectedStartDate.month}/'
                         '${selectedStartDate.year}',
+                        style: TextStyle(
+                          color: primaryTextColor,
+                        ),
                       ),
-                      const Icon(
+                      Icon(
                         Icons.calendar_today,
                         size: 21,
+                        color: secondaryTextColor,
                       ),
                     ],
                   ),
@@ -751,11 +804,12 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // DURATION
               // --------------------------------------------------
 
-              const Text(
+              Text(
                 'Duration',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: primaryTextColor,
                 ),
               ),
 
@@ -769,6 +823,8 @@ class _PillReminderPageState extends State<PillReminderPage> {
                     selectedDuration = value;
                   });
                 },
+                color: inputColor,
+                borderColor: borderColor,
               ),
 
               const SizedBox(height: 20),
@@ -777,11 +833,12 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // INSTRUCTIONS
               // --------------------------------------------------
 
-              const Text(
+              Text(
                 'Instructions (Optional)',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: primaryTextColor,
                 ),
               ),
 
@@ -790,10 +847,10 @@ class _PillReminderPageState extends State<PillReminderPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: inputColor,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFFE0E0E0),
+                    color: borderColor,
                   ),
                 ),
                 child: TextField(
@@ -858,7 +915,13 @@ class _PillReminderPageState extends State<PillReminderPage> {
   // TIME FIELDS
   // ------------------------------------------------------------
 
-  List<Widget> _buildTimeFields() {
+  List<Widget> _buildTimeFields({
+    required Color inputColor,
+    required Color borderColor,
+    required Color primaryTextColor,
+    required Color secondaryTextColor,
+    required Color helperBackgroundColor,
+  }) {
     final List<Widget> widgets = [];
 
     if (selectedFrequency == 'Every 8 Hours' ||
@@ -867,6 +930,10 @@ class _PillReminderPageState extends State<PillReminderPage> {
         _timeField(
           index: 0,
           label: 'Starting Time',
+          inputColor: inputColor,
+          borderColor: borderColor,
+          primaryTextColor: primaryTextColor,
+          secondaryTextColor: secondaryTextColor,
         ),
       );
 
@@ -878,7 +945,11 @@ class _PillReminderPageState extends State<PillReminderPage> {
         );
 
         widgets.add(
-          _schedulePreview(finalTimes),
+          _schedulePreview(
+            finalTimes,
+            backgroundColor: helperBackgroundColor,
+            primaryTextColor: primaryTextColor,
+          ),
         );
       }
 
@@ -899,6 +970,10 @@ class _PillReminderPageState extends State<PillReminderPage> {
           index: i,
           label: label,
           allowDelete: selectedFrequency == 'Custom Schedule',
+          inputColor: inputColor,
+          borderColor: borderColor,
+          primaryTextColor: primaryTextColor,
+          secondaryTextColor: secondaryTextColor,
         ),
       );
 
@@ -915,6 +990,10 @@ class _PillReminderPageState extends State<PillReminderPage> {
   Widget _timeField({
     required int index,
     required String label,
+    required Color inputColor,
+    required Color borderColor,
+    required Color primaryTextColor,
+    required Color secondaryTextColor,
     bool allowDelete = false,
   }) {
     return Column(
@@ -922,16 +1001,18 @@ class _PillReminderPageState extends State<PillReminderPage> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Colors.black54,
+            color: secondaryTextColor,
           ),
         ),
         const SizedBox(height: 6),
         GestureDetector(
           onTap: () => _pickTime(index),
           child: _input(
+            color: inputColor,
+            borderColor: borderColor,
             child: Row(
               children: [
                 const Icon(
@@ -942,14 +1023,17 @@ class _PillReminderPageState extends State<PillReminderPage> {
                 Expanded(
                   child: Text(
                     selectedTimes[index].format(context),
+                    style: TextStyle(
+                      color: primaryTextColor,
+                    ),
                   ),
                 ),
                 if (allowDelete)
                   IconButton(
                     onPressed: () => _removeCustomTime(index),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close,
-                      color: Colors.grey,
+                      color: secondaryTextColor,
                     ),
                   ),
               ],
@@ -960,14 +1044,22 @@ class _PillReminderPageState extends State<PillReminderPage> {
     );
   }
 
+  // ------------------------------------------------------------
+  // SCHEDULE PREVIEW
+  // ------------------------------------------------------------
+
   Widget _schedulePreview(
-    List<TimeOfDay> times,
-  ) {
+    List<TimeOfDay> times, {
+    required Color backgroundColor,
+    required Color primaryTextColor,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFEAF4F8),
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -991,13 +1083,14 @@ class _PillReminderPageState extends State<PillReminderPage> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   time.format(context),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w500,
+                    color: primaryTextColor,
                   ),
                 ),
               );
@@ -1007,6 +1100,10 @@ class _PillReminderPageState extends State<PillReminderPage> {
       ),
     );
   }
+
+  // ------------------------------------------------------------
+  // ADD TIME BUTTON
+  // ------------------------------------------------------------
 
   Widget _addTimeButton() {
     return SizedBox(
@@ -1040,13 +1137,16 @@ class _PillReminderPageState extends State<PillReminderPage> {
   // INFO BOX
   // ------------------------------------------------------------
 
-  Widget _infoBox(String text) {
+  Widget _infoBox(
+    String text, {
+    required Color backgroundColor,
+  }) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFEAF4F8),
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -1079,15 +1179,17 @@ class _PillReminderPageState extends State<PillReminderPage> {
 
   Widget _input({
     required Widget child,
+    required Color color,
+    required Color borderColor,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       height: 50,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: color,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFFE0E0E0),
+          color: borderColor,
         ),
       ),
       child: child,
@@ -1101,13 +1203,18 @@ class _PillReminderPageState extends State<PillReminderPage> {
   Widget _dropdown(
     List<String> items,
     String value,
-    Function(String) onChanged,
-  ) {
+    Function(String) onChanged, {
+    required Color color,
+    required Color borderColor,
+  }) {
     return _input(
+      color: color,
+      borderColor: borderColor,
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
           isExpanded: true,
+          dropdownColor: color,
           items: items
               .map(
                 (e) => DropdownMenuItem(

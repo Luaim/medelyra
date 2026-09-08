@@ -15,6 +15,7 @@ import 'package:medelyra/settings/help_support_page.dart';
 import 'package:medelyra/settings/privacy_policy_page.dart';
 
 import 'services/notification_service.dart';
+import 'services/theme_service.dart';
 
 import 'auth/signin_page.dart';
 import 'auth/signup_page.dart';
@@ -79,7 +80,7 @@ Future<void> main() async {
   FlutterNativeSplash.remove();
 }
 
-class MedelyraApp extends StatelessWidget {
+class MedelyraApp extends StatefulWidget {
   final Widget initialPage;
 
   const MedelyraApp({
@@ -88,10 +89,40 @@ class MedelyraApp extends StatelessWidget {
   });
 
   @override
+  State<MedelyraApp> createState() => _MedelyraAppState();
+}
+
+class _MedelyraAppState extends State<MedelyraApp> {
+  final ThemeService _themeService = ThemeService.instance;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _themeService.addListener(_onThemeChanged);
+    _themeService.loadTheme();
+  }
+
+  void _onThemeChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _themeService.removeListener(_onThemeChanged);
+    _themeService.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Medelyra',
+
+      // Existing light theme — intentionally unchanged.
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
@@ -100,7 +131,23 @@ class MedelyraApp extends StatelessWidget {
           seedColor: const Color(0xFF08007C),
         ),
       ),
-      home: initialPage,
+
+      // Global dark theme foundation.
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        fontFamily: 'Roboto',
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF08007C),
+          brightness: Brightness.dark,
+        ),
+      ),
+
+      // Use the saved theme preference.
+      themeMode: _themeService.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+
+      home: widget.initialPage,
+
       routes: {
         '/onboarding': (context) => const OnboardingPage(),
         '/signin': (context) => const SignInPage(),

@@ -74,6 +74,62 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
   }
 
   // ============================================================
+  // THEME HELPERS
+  // ============================================================
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : const Color(0xFFF6F6F6);
+
+  Color get _appBarBackground =>
+      _isDark ? const Color(0xFF121212) : Colors.white;
+
+  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _fieldBackground =>
+      _isDark ? const Color(0xFF252525) : Colors.white;
+
+  Color get _borderColor =>
+      _isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE7E4E7);
+
+  Color get _primaryTextColor =>
+      _isDark ? Colors.white : const Color(0xFF222222);
+
+  Color get _headingTextColor =>
+      _isDark ? Colors.white : const Color(0xFF292929);
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF888888);
+
+  Color get _hintColor =>
+      _isDark ? const Color(0xFF8E8E8E) : const Color(0xFFA5A3A5);
+
+  Color get _iconColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF9B999B);
+
+  Color get _errorBackground =>
+      _isDark ? const Color(0xFF302020) : const Color(0xFFFFEEEE);
+
+  Color get _errorTextColor =>
+      _isDark ? const Color(0xFFFFB4B4) : const Color(0xFF9B3A3A);
+
+  Color get _googleCardBackground =>
+      _isDark ? const Color(0xFF1E3035) : const Color(0xFFEAF6FA);
+
+  Color get _googleCardBorder =>
+      _isDark ? const Color(0xFF31515A) : const Color(0xFFD4EAF0);
+
+  Color get _googleIconBackground =>
+      _isDark ? const Color(0xFF252525) : Colors.white;
+
+  Color get _googleTitleColor =>
+      _isDark ? Colors.white : const Color(0xFF303030);
+
+  Color get _googleDescriptionColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF666666);
+
+  // ============================================================
   // DISPOSE
   // ============================================================
 
@@ -317,23 +373,23 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
     final googleOnlyAccount = isGoogleAccount && !hasPasswordProvider;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: _pageBackground,
 
       // ==========================================================
       // APP BAR
       // ==========================================================
 
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF222222),
+        backgroundColor: _appBarBackground,
+        foregroundColor: _primaryTextColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           'Change Password',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF222222),
+            color: _primaryTextColor,
           ),
         ),
         centerTitle: false,
@@ -363,12 +419,12 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                   // HEADER
                   // =================================================
 
-                  const Text(
+                  Text(
                     'Update your password',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF292929),
+                      color: _headingTextColor,
                     ),
                   ),
 
@@ -378,9 +434,9 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                     googleOnlyAccount
                         ? 'Your account uses Google Sign-In'
                         : 'Make sure your new password is secure',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF888888),
+                      color: _secondaryTextColor,
                     ),
                   ),
 
@@ -391,7 +447,13 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                   // =================================================
 
                   if (googleOnlyAccount) ...[
-                    _GoogleAccountCard(),
+                    _GoogleAccountCard(
+                      backgroundColor: _googleCardBackground,
+                      borderColor: _googleCardBorder,
+                      iconBackground: _googleIconBackground,
+                      titleColor: _googleTitleColor,
+                      descriptionColor: _googleDescriptionColor,
+                    ),
                     const SizedBox(height: 22),
                     SizedBox(
                       width: double.infinity,
@@ -471,8 +533,8 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                     // PASSWORD REQUIREMENT
                     // =================================================
 
-                    const Padding(
-                      padding: EdgeInsets.only(
+                    Padding(
+                      padding: const EdgeInsets.only(
                         left: 4,
                         top: 0,
                         bottom: 4,
@@ -481,7 +543,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                         'Password must contain at least 6 characters.',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF888888),
+                          color: _secondaryTextColor,
                         ),
                       ),
                     ),
@@ -499,7 +561,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFEEEE),
+                          color: _errorBackground,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -514,10 +576,10 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                             Expanded(
                               child: Text(
                                 error!,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
                                   height: 1.35,
-                                  color: Color(0xFF9B3A3A),
+                                  color: _errorTextColor,
                                 ),
                               ),
                             ),
@@ -592,17 +654,18 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
         height: 52,
         padding: const EdgeInsets.only(left: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _fieldBackground,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color(0xFFE7E4E7),
+            color: _borderColor,
           ),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.035),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
+            if (!_isDark)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.035),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
           ],
         ),
         child: TextField(
@@ -610,6 +673,11 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
           obscureText: !show,
           enabled: !isLoading,
           textInputAction: TextInputAction.next,
+          style: TextStyle(
+            color: _primaryTextColor,
+            fontSize: 16,
+          ),
+          cursorColor: const Color(0xFF3D84A8),
           onChanged: (_) {
             if (error != null) {
               setState(() {
@@ -619,9 +687,9 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
           },
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(
+            hintStyle: TextStyle(
               fontSize: 16,
-              color: Color(0xFFA5A3A5),
+              color: _hintColor,
               fontWeight: FontWeight.w500,
             ),
             border: InputBorder.none,
@@ -632,7 +700,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                 show
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
-                color: const Color(0xFF9B999B),
+                color: _iconColor,
                 size: 22,
               ),
             ),
@@ -648,16 +716,30 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
 // ===========================================================================
 
 class _GoogleAccountCard extends StatelessWidget {
+  final Color backgroundColor;
+  final Color borderColor;
+  final Color iconBackground;
+  final Color titleColor;
+  final Color descriptionColor;
+
+  const _GoogleAccountCard({
+    required this.backgroundColor,
+    required this.borderColor,
+    required this.iconBackground,
+    required this.titleColor,
+    required this.descriptionColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFEAF6FA),
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: const Color(0xFFD4EAF0),
+          color: borderColor,
         ),
       ),
       child: Row(
@@ -667,7 +749,7 @@ class _GoogleAccountCard extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: iconBackground,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -677,7 +759,7 @@ class _GoogleAccountCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -686,16 +768,16 @@ class _GoogleAccountCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF303030),
+                    color: titleColor,
                   ),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(
                   'Your password is managed by Google, so it cannot be changed from Medelyra.',
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
-                    color: Color(0xFF666666),
+                    color: descriptionColor,
                   ),
                 ),
               ],

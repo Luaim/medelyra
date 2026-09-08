@@ -22,24 +22,45 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
   bool isLoading = true;
   String? errorMessage;
 
+  // ---------------------------------------------------------------------------
+  // THEME COLORS
+  // ---------------------------------------------------------------------------
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : const Color(0xFFF6F6F6);
+
+  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _primaryTextColor =>
+      _isDark ? Colors.white : const Color(0xFF29262D);
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF77737A);
+
+  Color get _borderColor =>
+      _isDark ? const Color(0xFF333333) : Colors.transparent;
+
+  // ---------------------------------------------------------------------------
+  // LOAD GUIDE
+  // ---------------------------------------------------------------------------
+
   @override
   void initState() {
     super.initState();
     _loadGuide();
   }
 
-  // ---------------------------------------------------------------------------
-  // LOAD GUIDE
-  // ---------------------------------------------------------------------------
-
   Future<void> _loadGuide() async {
-    setState(() {
-      isLoading = true;
-      errorMessage = null;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        errorMessage = null;
+      });
+    }
 
     try {
-      // Load the same bundled JSON used by the Emergency Guide list.
       final jsonString = await rootBundle.loadString(
         'assets/emergency_guides/emergency_guides.json',
       );
@@ -96,22 +117,22 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: _pageBackground,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF6F6F6),
+        backgroundColor: _pageBackground,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new,
-            color: Color(0xFF29262D),
+            color: _primaryTextColor,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Emergency guide',
           style: TextStyle(
-            color: Color(0xFF29262D),
+            color: _primaryTextColor,
             fontSize: 22,
             fontWeight: FontWeight.w700,
           ),
@@ -167,20 +188,20 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF29262D),
+              color: _primaryTextColor,
             ),
           ),
           if (shortDescription.isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
               shortDescription,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 height: 1.45,
-                color: Color(0xFF77737A),
+                color: _secondaryTextColor,
               ),
             ),
           ],
@@ -237,13 +258,30 @@ class _GuideStepCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final cardBackground = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+    final primaryTextColor = isDark ? Colors.white : const Color(0xFF29262D);
+
+    final descriptionColor =
+        isDark ? const Color(0xFFB8B8B8) : const Color(0xFF65616A);
+
+    final stepCircleBackground =
+        isDark ? const Color(0xFF26343A) : const Color(0xFFE9F2F6);
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBackground,
         borderRadius: BorderRadius.circular(18),
+        border: isDark
+            ? Border.all(
+                color: const Color(0xFF333333),
+              )
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,8 +296,8 @@ class _GuideStepCard extends StatelessWidget {
               Container(
                 width: 34,
                 height: 34,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE9F2F6),
+                decoration: BoxDecoration(
+                  color: stepCircleBackground,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
@@ -276,10 +314,10 @@ class _GuideStepCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF29262D),
+                    color: primaryTextColor,
                     height: 1.25,
                   ),
                 ),
@@ -295,10 +333,10 @@ class _GuideStepCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               description,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 height: 1.5,
-                color: Color(0xFF65616A),
+                color: descriptionColor,
               ),
             ),
           ],
@@ -309,10 +347,6 @@ class _GuideStepCard extends StatelessWidget {
 
           if (image.isNotEmpty) ...[
             const SizedBox(height: 16),
-
-            // Keep the same image size as the old design.
-            // BoxFit.contain shows the COMPLETE image without cropping
-            // or zooming.
             SizedBox(
               width: double.infinity,
               height: 190,
@@ -321,12 +355,12 @@ class _GuideStepCard extends StatelessWidget {
                 fit: BoxFit.contain,
                 alignment: Alignment.center,
                 errorBuilder: (_, __, ___) {
-                  return const Center(
-                    child: Icon(
-                      Icons.image_not_supported_outlined,
-                      size: 38,
-                      color: Color(0xFF9A979F),
-                    ),
+                  return Icon(
+                    Icons.image_not_supported_outlined,
+                    size: 38,
+                    color: isDark
+                        ? const Color(0xFF9E9E9E)
+                        : const Color(0xFF9A979F),
                   );
                 },
               ),
@@ -347,19 +381,26 @@ class _NoStepsState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(18),
+        border: isDark
+            ? Border.all(
+                color: const Color(0xFF333333),
+              )
+            : null,
       ),
-      child: const Text(
+      child: Text(
         'No instructions are available for this guide.',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 15,
-          color: Color(0xFF77737A),
+          color: isDark ? const Color(0xFFBDBDBD) : const Color(0xFF77737A),
         ),
       ),
     );
@@ -381,6 +422,8 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -388,8 +431,13 @@ class _ErrorState extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.circular(18),
+            border: isDark
+                ? Border.all(
+                    color: const Color(0xFF333333),
+                  )
+                : null,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -403,9 +451,11 @@ class _ErrorState extends StatelessWidget {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
-                  color: Color(0xFF55525A),
+                  color: isDark
+                      ? const Color(0xFFBDBDBD)
+                      : const Color(0xFF55525A),
                   height: 1.4,
                 ),
               ),

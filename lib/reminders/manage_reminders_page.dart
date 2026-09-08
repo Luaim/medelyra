@@ -5,6 +5,7 @@ import '../widgets/nav_bar.dart';
 import '../services/notification_service.dart';
 import '../services/local_database_service.dart';
 import '../services/local_appointment_service.dart';
+import '../services/theme_service.dart';
 
 class Managereminderspage extends StatefulWidget {
   const Managereminderspage({super.key});
@@ -15,6 +16,40 @@ class Managereminderspage extends StatefulWidget {
 
 class _ManagereminderspageState extends State<Managereminderspage> {
   final Color primaryBlue = const Color(0xFF3D84A8);
+
+  final ThemeService _themeService = ThemeService.instance;
+
+  bool get _isDark => _themeService.isDarkMode;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : const Color(0xFFF5F6FA);
+
+  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _dialogBackground =>
+      _isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF9F7FC);
+
+  Color get _fieldBackground =>
+      _isDark ? const Color(0xFF252525) : Colors.white;
+
+  Color get _borderColor =>
+      _isDark ? const Color(0xFF3A3A3A) : Colors.grey.shade300;
+
+  Color get _secondaryTextColor =>
+      _isDark ? const Color(0xFFBDBDBD) : Colors.grey;
+
+  Color get _dialogLabelColor =>
+      _isDark ? const Color(0xFFBDBDBD) : Colors.grey.shade700;
+
+  Color get _iconBackground =>
+      _isDark ? const Color(0xFF26343A) : const Color(0xFFEFF2FA);
+
+  Color get _timeBadgeBackground => _isDark
+      ? const Color(0xFF2D2D2D)
+      : const Color.fromARGB(87, 207, 207, 207);
+
+  Color get _cardShadowColor =>
+      _isDark ? Colors.black.withOpacity(0.22) : Colors.black.withOpacity(0.03);
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -723,7 +758,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                   maxHeight: 720,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9F7FC),
+                  color: _dialogBackground,
                   borderRadius: BorderRadius.circular(28),
                 ),
                 child: Column(
@@ -918,7 +953,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                         18,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF9F7FC),
+                        color: _dialogBackground,
                         borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(28),
                           bottomRight: Radius.circular(28),
@@ -942,7 +977,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               style: OutlinedButton.styleFrom(
                                 minimumSize: const Size(0, 50),
                                 side: BorderSide(
-                                  color: Colors.grey.shade300,
+                                  color: _borderColor,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
@@ -1269,10 +1304,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           horizontal: 13,
         ),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _fieldBackground,
           borderRadius: BorderRadius.circular(13),
           border: Border.all(
-            color: Colors.grey.shade300,
+            color: _borderColor,
           ),
         ),
         child: Row(
@@ -1306,7 +1341,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
             else
               Icon(
                 Icons.chevron_right,
-                color: Colors.grey.shade500,
+                color: _secondaryTextColor,
               ),
           ],
         ),
@@ -1349,7 +1384,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: _cardBackground,
                       borderRadius: BorderRadius.circular(
                         9,
                       ),
@@ -1531,7 +1566,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                   maxHeight: 650,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9F7FC),
+                  color: _dialogBackground,
                   borderRadius: BorderRadius.circular(28),
                 ),
                 child: Column(
@@ -1702,8 +1737,8 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                         22,
                         18,
                       ),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF9F7FC),
+                      decoration: BoxDecoration(
+                        color: _dialogBackground,
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(28),
                           bottomRight: Radius.circular(28),
@@ -1720,7 +1755,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               style: OutlinedButton.styleFrom(
                                 minimumSize: const Size(0, 50),
                                 side: BorderSide(
-                                  color: Colors.grey.shade300,
+                                  color: _borderColor,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
@@ -1866,7 +1901,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w700,
-        color: Colors.grey.shade700,
+        color: _dialogLabelColor,
         letterSpacing: 0.2,
       ),
     );
@@ -1901,7 +1936,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           ),
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: _fieldBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 14,
@@ -1909,13 +1944,13 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(13),
           borderSide: BorderSide(
-            color: Colors.grey.shade300,
+            color: _borderColor,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(13),
           borderSide: BorderSide(
-            color: Colors.grey.shade300,
+            color: _borderColor,
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -1951,7 +1986,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           size: 20,
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: _fieldBackground,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 10,
           vertical: 4,
@@ -1959,13 +1994,13 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(13),
           borderSide: BorderSide(
-            color: Colors.grey.shade300,
+            color: _borderColor,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(13),
           borderSide: BorderSide(
-            color: Colors.grey.shade300,
+            color: _borderColor,
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -2017,10 +2052,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           ),
           suffixIcon: Icon(
             Icons.chevron_right,
-            color: Colors.grey.shade500,
+            color: _secondaryTextColor,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: _fieldBackground,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,
             vertical: 4,
@@ -2028,13 +2063,13 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(13),
             borderSide: BorderSide(
-              color: Colors.grey.shade300,
+              color: _borderColor,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(13),
             borderSide: BorderSide(
-              color: Colors.grey.shade300,
+              color: _borderColor,
             ),
           ),
         ),
@@ -2136,7 +2171,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       case 2:
         Navigator.pushReplacementNamed(
           context,
-          '/health-tools',
+          '/finder',
         );
         break;
 
@@ -2165,7 +2200,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: _pageBackground,
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 1,
         onTap: (i) => _onBottomTap(context, i),
@@ -2190,10 +2225,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Manage your reminders',
                   style: TextStyle(
-                    color: Colors.grey,
+                    color: _secondaryTextColor,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -2229,7 +2264,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBackground,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -2270,7 +2305,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         vertical: 35,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBackground,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -2318,7 +2353,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       ),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardBackground,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -2340,7 +2375,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF2FA),
+              color: _iconBackground,
               borderRadius: BorderRadius.circular(
                 14,
               ),
@@ -2369,12 +2404,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(
-                      87,
-                      207,
-                      207,
-                      207,
-                    ),
+                    color: _timeBadgeBackground,
                     borderRadius: BorderRadius.circular(
                       10,
                     ),
@@ -2399,9 +2429,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                 const SizedBox(height: 2),
                 Text(
                   item['subtitle'],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Colors.grey,
+                    color: _secondaryTextColor,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -2439,7 +2469,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       activeColor: Colors.white,
                       activeTrackColor: primaryBlue,
                       inactiveThumbColor: Colors.white,
-                      inactiveTrackColor: Colors.grey.shade300,
+                      inactiveTrackColor: _isDark
+                          ? const Color(0xFF4A4A4A)
+                          : Colors.grey.shade300,
                     ),
                   ],
                 ),

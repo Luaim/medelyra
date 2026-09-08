@@ -24,6 +24,28 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
   final TextEditingController _searchController = TextEditingController();
 
   // --------------------------------------------------------------------------
+  // DARK MODE COLORS
+  // --------------------------------------------------------------------------
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Color get _pageBackground =>
+      _isDark ? const Color(0xFF121212) : _backgroundColor;
+
+  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  Color get _fieldBackground =>
+      _isDark ? const Color(0xFF252525) : Colors.white;
+
+  Color get _borderColor =>
+      _isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
+
+  Color get _primaryTextColor => _isDark ? Colors.white : _textColor;
+
+  Color get _secondaryTextColorForTheme =>
+      _isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
+  // --------------------------------------------------------------------------
   // HEALTH TOOLS
   // --------------------------------------------------------------------------
 
@@ -163,6 +185,8 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
           return const HeartRatePage();
         },
       );
+
+      return;
     }
 
     if (tool.title == 'Medical Unit Converter') {
@@ -227,7 +251,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _backgroundColor,
+      backgroundColor: _pageBackground,
 
       // ----------------------------------------------------------------------
       // BODY
@@ -256,12 +280,12 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                     // TITLE
                     // ----------------------------------------------------------
 
-                    const Text(
+                    Text(
                       'Health Tools',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w600,
-                        color: _textColor,
+                        color: _primaryTextColor,
                         fontFamily: 'serif',
                       ),
                     ),
@@ -272,13 +296,13 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                     // DESCRIPTION
                     // ----------------------------------------------------------
 
-                    const Text(
+                    Text(
                       'Simple tools to help you understand '
                       'and manage your health.',
                       style: TextStyle(
                         fontSize: 15,
                         height: 1.45,
-                        color: _secondaryTextColor,
+                        color: _secondaryTextColorForTheme,
                       ),
                     ),
 
@@ -291,14 +315,16 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                     Container(
                       height: 50,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: _fieldBackground,
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
-                          color: const Color(0xFFE3EAF5),
+                          color: _borderColor,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.035),
+                            color: Colors.black.withOpacity(
+                              _isDark ? 0.20 : 0.035,
+                            ),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -307,30 +333,37 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                       child: TextField(
                         controller: _searchController,
                         textInputAction: TextInputAction.search,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
-                          color: _textColor,
+                          color: _primaryTextColor,
                         ),
+                        cursorColor: _primaryColor,
                         decoration: InputDecoration(
                           hintText: 'Search health tools',
-                          hintStyle: const TextStyle(
+                          hintStyle: TextStyle(
                             fontSize: 15,
-                            color: Color(0xFF9CA3AF),
+                            color: _isDark
+                                ? const Color(0xFF8E8E8E)
+                                : const Color(0xFF9CA3AF),
                           ),
-                          prefixIcon: const Icon(
+                          prefixIcon: Icon(
                             Icons.search_rounded,
                             size: 22,
-                            color: Color(0xFF7B8491),
+                            color: _isDark
+                                ? const Color(0xFFAAAAAA)
+                                : const Color(0xFF7B8491),
                           ),
                           suffixIcon: _searchController.text.isNotEmpty
                               ? IconButton(
                                   onPressed: () {
                                     _searchController.clear();
                                   },
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.close_rounded,
                                     size: 20,
-                                    color: Color(0xFF7B8491),
+                                    color: _isDark
+                                        ? const Color(0xFFAAAAAA)
+                                        : const Color(0xFF7B8491),
                                   ),
                                 )
                               : null,
@@ -349,12 +382,12 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                     // SECTION TITLE
                     // ----------------------------------------------------------
 
-                    const Text(
+                    Text(
                       'Tools',
                       style: TextStyle(
                         fontSize: 19,
                         fontWeight: FontWeight.w600,
-                        color: _textColor,
+                        color: _primaryTextColor,
                       ),
                     ),
 
@@ -407,35 +440,35 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
               // NO RESULTS
               // =================================================================
 
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 45,
                   ),
                   child: Column(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.search_off_rounded,
                         size: 42,
                         color: _primaryColor,
                       ),
-                      SizedBox(height: 14),
+                      const SizedBox(height: 14),
                       Text(
                         'No tools found',
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
-                          color: _textColor,
+                          color: _primaryTextColor,
                         ),
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text(
                         'Try searching for another health tool.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
-                          color: _secondaryTextColor,
+                          color: _secondaryTextColorForTheme,
                         ),
                       ),
                     ],
@@ -473,8 +506,21 @@ class _HealthToolCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final Color cardBackground =
+        isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+    final Color borderColor =
+        isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
+
+    final Color titleColor = isDark ? Colors.white : _textColor;
+
+    final Color descriptionColor =
+        isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
+
     return Material(
-      color: Colors.white,
+      color: cardBackground,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         onTap: onTap,
@@ -489,14 +535,16 @@ class _HealthToolCard extends StatelessWidget {
             10,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: cardBackground,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: const Color(0xFFE3EAF5),
+              color: borderColor,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.035),
+                color: Colors.black.withOpacity(
+                  isDark ? 0.20 : 0.035,
+                ),
                 blurRadius: 9,
                 offset: const Offset(0, 3),
               ),
@@ -532,11 +580,11 @@ class _HealthToolCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13.5,
                   height: 1.2,
                   fontWeight: FontWeight.w600,
-                  color: _textColor,
+                  color: titleColor,
                 ),
               ),
 
@@ -552,10 +600,10 @@ class _HealthToolCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     height: 1.35,
-                    color: _secondaryTextColor,
+                    color: descriptionColor,
                   ),
                 ),
               ),
