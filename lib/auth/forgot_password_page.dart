@@ -252,7 +252,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         Transform.translate(
                           offset: const Offset(0, -5),
                           child: Image.asset(
-                            'assets/medelyraLogo.png',
+                            _isDark
+                                ? 'assets/medelyraLogoDark.png'
+                                : 'assets/medelyraLogo.png',
                             width: w * 0.44,
                             height: h * 0.15,
                           ),

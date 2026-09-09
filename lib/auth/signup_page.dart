@@ -703,7 +703,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   // =================================================================
 
                   Image.asset(
-                    'assets/medelyraLogo.png',
+                    _isDark
+                        ? 'assets/medelyraLogoDark.png'
+                        : 'assets/medelyraLogo.png',
                     width: w * 0.44,
                     height: h * 0.15,
                   ),

@@ -55,6 +55,8 @@ flutter:
     - assets/medelyraIconLauncher.png 
     - assets/onboarding_reminders.png
     - assets/onboarding_health.png
+    - assets/medelyraDark.png
+    - assets/medelyraLogoDark.png  
   
   # Emergency guide data
     - assets/emergency_guides/emergency_guides.json
@@ -75,10 +77,15 @@ flutter_native_splash:
   color: "#FAF9FC"
   image: assets/medelyraIcon.png
 
+  color_dark: "#121212"
+  image_dark: assets/medelyraDark.png
+
   android_12:
     color: "#FAF9FC"
     image: assets/medelyraSplashFull.png
 
+    color_dark: "#121212"
+    image_dark: assets/medelyraDark.png
 
 flutter_launcher_icons:
   android: true

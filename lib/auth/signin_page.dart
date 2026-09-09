@@ -296,7 +296,9 @@ class _SignInPageState extends State<SignInPage>
                     Transform.translate(
                       offset: const Offset(0, -10),
                       child: Image.asset(
-                        'assets/medelyraLogo.png',
+                        isDark
+                            ? 'assets/medelyraLogoDark.png'
+                            : 'assets/medelyraLogo.png',
                         width: w * 0.44,
                         height: h * 0.15,
                       ),
@@ -630,18 +632,11 @@ class _SignInPageState extends State<SignInPage>
       height: 47,
       child: Container(
         decoration: BoxDecoration(
-          // =========================================================================
-          // LIGHT MODE: ORIGINAL COLOR
-          // DARK MODE: DARK INPUT
-          // =========================================================================
           color: isDark ? const Color(0xFF252525) : const Color(0xFFDDF2F7),
-
           borderRadius: BorderRadius.circular(14),
-
           border: Border.all(
             color: isDark ? const Color(0xFF3A3A3A) : Colors.grey.shade400,
           ),
-
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(
@@ -709,17 +704,13 @@ class _SignInPageState extends State<SignInPage>
             width: double.infinity,
             height: 52,
             decoration: BoxDecoration(
-              // Keep Google's button white in both themes.
               color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-
               borderRadius: BorderRadius.circular(26),
-
               border: Border.all(
                 color:
                     isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE0E0E0),
                 width: 1,
               ),
-
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(

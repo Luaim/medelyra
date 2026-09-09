@@ -47,6 +47,12 @@ Future<void> main() async {
   // Initialize local notifications.
   await NotificationService.initialize();
 
+  // Load the saved theme BEFORE runApp().
+  //
+  // This prevents the app from showing the light theme
+  // for a moment before switching to dark mode.
+  await ThemeService.instance.loadTheme();
+
   // Check whether onboarding has already been completed.
   final prefs = await SharedPreferences.getInstance();
 
@@ -99,8 +105,8 @@ class _MedelyraAppState extends State<MedelyraApp> {
   void initState() {
     super.initState();
 
+    // Listen for theme changes made while the app is running.
     _themeService.addListener(_onThemeChanged);
-    _themeService.loadTheme();
   }
 
   void _onThemeChanged() {
@@ -112,7 +118,6 @@ class _MedelyraAppState extends State<MedelyraApp> {
   @override
   void dispose() {
     _themeService.removeListener(_onThemeChanged);
-    _themeService.dispose();
     super.dispose();
   }
 
@@ -143,7 +148,8 @@ class _MedelyraAppState extends State<MedelyraApp> {
         ),
       ),
 
-      // Use the saved theme preference.
+      // Theme has already been loaded before runApp(),
+      // so the first Flutter frame uses the correct theme.
       themeMode: _themeService.isDarkMode ? ThemeMode.dark : ThemeMode.light,
 
       home: widget.initialPage,

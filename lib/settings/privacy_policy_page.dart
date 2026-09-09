@@ -5,7 +5,7 @@ class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
 
   // ===========================================================================
-  // COLORS
+  // LIGHT MODE COLORS
   // ===========================================================================
 
   static const Color backgroundColor = Color(0xFFF8F6F8);
@@ -24,12 +24,18 @@ class PrivacyPolicyPage extends StatelessWidget {
   static const Color darkCard = Color(0xFF1E1E1E);
   static const Color darkInput = Color(0xFF252525);
   static const Color darkBorder = Color(0xFF3A3A3A);
+
   static const Color darkPrimaryText = Colors.white;
   static const Color darkBodyText = Color(0xFFBDBDBD);
   static const Color darkSecondaryText = Color(0xFF9E9E9E);
+
   static const Color darkBlueTint = Color(0xFF24343A);
   static const Color darkFooter = Color(0xFF252525);
   static const Color darkFooterText = Color(0xFFBDBDBD);
+
+  // Readable accent color for dark mode.
+  // The light-mode primaryBlue remains completely unchanged.
+  static const Color darkAccent = Color(0xFF6FA9C5);
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +50,14 @@ class PrivacyPolicyPage extends StatelessWidget {
 
     final secondaryTextColor = isDark ? darkSecondaryText : secondaryText;
 
+    final accentColor = isDark ? darkAccent : primaryBlue;
+
     return Scaffold(
       backgroundColor: pageBackground,
 
-      // =====================================================================
+      // =========================================================================
       // APP BAR
-      // =====================================================================
+      // =========================================================================
 
       appBar: AppBar(
         backgroundColor: pageBackground,
@@ -78,9 +86,9 @@ class PrivacyPolicyPage extends StatelessWidget {
         ),
       ),
 
-      // =====================================================================
+      // =========================================================================
       // BODY
-      // =====================================================================
+      // =========================================================================
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -97,9 +105,9 @@ class PrivacyPolicyPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ===========================================================
+                  // =================================================================
                   // PAGE INTRO
-                  // ===========================================================
+                  // =================================================================
 
                   Padding(
                     padding: const EdgeInsets.fromLTRB(
@@ -134,9 +142,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     ),
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 1. WHAT WE COLLECT
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -154,9 +162,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     ],
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 2. HOW WE USE IT
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -176,9 +184,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     footer: 'We do not sell your personal information.',
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 3. HEALTH INFORMATION
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -197,9 +205,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     ],
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 4. EMERGENCY CONTACTS
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -216,9 +224,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     ],
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 5. DATA STORAGE
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -237,9 +245,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     ],
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 6. THIRD PARTY
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -257,9 +265,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                         'may also be governed by their own privacy policies.',
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 7. GOOGLE SIGN IN
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -277,9 +285,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     ],
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 8. YOUR CONTROL
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -298,9 +306,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                         'through the appropriate account or settings options.',
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 9. DATA RETENTION
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -317,9 +325,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     ],
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 10. CHILDREN
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -335,9 +343,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     ],
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 11. CHANGES
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -352,9 +360,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     ],
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // 12. CONTACT
-                  // ===========================================================
+                  // =================================================================
 
                   _section(
                     context: context,
@@ -365,9 +373,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     email: 'support@Medelyra.app',
                   ),
 
-                  // ===========================================================
+                  // =================================================================
                   // BOTTOM NOTE
-                  // ===========================================================
+                  // =================================================================
 
                   const SizedBox(height: 4),
 
@@ -386,10 +394,10 @@ class PrivacyPolicyPage extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.info_outline,
                           size: 21,
-                          color: primaryBlue,
+                          color: accentColor,
                         ),
                         const SizedBox(width: 10),
                         Expanded(
@@ -443,7 +451,7 @@ class PrivacyPolicyPage extends StatelessWidget {
 
     final borderColor = isDark ? darkBorder : dividerColor;
 
-    final secondaryTextColor = isDark ? darkSecondaryText : secondaryText;
+    final accentColor = isDark ? darkAccent : primaryBlue;
 
     return Container(
       width: double.infinity,
@@ -473,9 +481,9 @@ class PrivacyPolicyPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // -------------------------------------------------------------------
+          // ===================================================================
           // NUMBER + TITLE
-          // -------------------------------------------------------------------
+          // ===================================================================
 
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -490,10 +498,10 @@ class PrivacyPolicyPage extends StatelessWidget {
                 ),
                 child: Text(
                   number,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: primaryBlue,
+                    color: accentColor,
                   ),
                 ),
               ),
@@ -514,9 +522,9 @@ class PrivacyPolicyPage extends StatelessWidget {
             ],
           ),
 
-          // -------------------------------------------------------------------
+          // ===================================================================
           // INTRO
-          // -------------------------------------------------------------------
+          // ===================================================================
 
           if (intro != null) ...[
             const SizedBox(height: 14),
@@ -530,9 +538,9 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
           ],
 
-          // -------------------------------------------------------------------
+          // ===================================================================
           // PARAGRAPHS
-          // -------------------------------------------------------------------
+          // ===================================================================
 
           if (paragraphs != null)
             for (final paragraph in paragraphs) ...[
@@ -547,9 +555,9 @@ class PrivacyPolicyPage extends StatelessWidget {
               ),
             ],
 
-          // -------------------------------------------------------------------
+          // ===================================================================
           // BULLET LIST
-          // -------------------------------------------------------------------
+          // ===================================================================
 
           if (bullets != null) ...[
             const SizedBox(height: 10),
@@ -568,8 +576,8 @@ class PrivacyPolicyPage extends StatelessWidget {
                         top: 7,
                         right: 10,
                       ),
-                      decoration: const BoxDecoration(
-                        color: primaryBlue,
+                      decoration: BoxDecoration(
+                        color: accentColor,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -588,9 +596,9 @@ class PrivacyPolicyPage extends StatelessWidget {
               ),
           ],
 
-          // -------------------------------------------------------------------
+          // ===================================================================
           // FOOTER
-          // -------------------------------------------------------------------
+          // ===================================================================
 
           if (footer != null) ...[
             const SizedBox(height: 5),
@@ -619,9 +627,9 @@ class PrivacyPolicyPage extends StatelessWidget {
             ),
           ],
 
-          // -------------------------------------------------------------------
+          // ===================================================================
           // EMAIL
-          // -------------------------------------------------------------------
+          // ===================================================================
 
           if (email != null) ...[
             const SizedBox(height: 13),
@@ -642,19 +650,19 @@ class PrivacyPolicyPage extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.email_outlined,
                     size: 19,
-                    color: primaryBlue,
+                    color: accentColor,
                   ),
                   const SizedBox(width: 9),
                   Expanded(
                     child: Text(
                       email,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: primaryBlue,
+                        color: accentColor,
                       ),
                     ),
                   ),
