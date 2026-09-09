@@ -35,14 +35,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Color get _sectionTitleColor =>
       _isDark ? Colors.white : const Color(0xFF333333);
 
-  Color get _secondaryTextColor =>
-      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF777777);
-
   Color get _borderColor =>
       _isDark ? const Color(0xFF333333) : const Color(0xFFE3E3E3);
-
-  Color get _iconBackground =>
-      _isDark ? const Color(0xFF26343A) : const Color(0xFFEAF6FA);
 
   // ============================================================
   // INIT

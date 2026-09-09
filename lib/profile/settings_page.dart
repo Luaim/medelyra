@@ -697,9 +697,9 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: Text(
+              child: const Text(
                 'Keep My Account',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Color(0xFF3D84A8),
                   fontWeight: FontWeight.w600,
                 ),

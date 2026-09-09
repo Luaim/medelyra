@@ -15,7 +15,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   static const Color _backgroundColor = Color(0xFFFAF9FC);
   static const Color _primaryColor = Color(0xFF3D84A8);
-  static const Color _textColor = Color(0xFF333333);
   static const Color _secondaryTextColor = Color(0xFF666666);
 
   // ==========================================================================
@@ -26,8 +25,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   Color get _pageBackground =>
       _isDark ? const Color(0xFF121212) : _backgroundColor;
-
-  Color get _primaryTextColor => _isDark ? Colors.white : _textColor;
 
   Color get _secondaryTextColorForTheme =>
       _isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;

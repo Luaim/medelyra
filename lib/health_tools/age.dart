@@ -27,9 +27,6 @@ class _AgePageState extends State<AgePage> {
   Color get _fieldBackground =>
       _isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
 
-  Color get _resultBackground =>
-      _isDark ? const Color(0xFF252525) : _backgroundColor;
-
   Color get _borderColor =>
       _isDark ? const Color(0xFF3A3A3A) : const Color(0xFFE3EAF5);
 
@@ -62,10 +59,10 @@ class _AgePageState extends State<AgePage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: _isDark
-                ? ColorScheme.dark(
+                ? const ColorScheme.dark(
                     primary: _primaryColor,
                     onPrimary: Colors.white,
-                    surface: const Color(0xFF1E1E1E),
+                    surface: Color(0xFF1E1E1E),
                     onSurface: Colors.white,
                   )
                 : const ColorScheme.light(

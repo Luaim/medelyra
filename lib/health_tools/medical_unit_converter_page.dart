@@ -35,9 +35,6 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
   Color get _sheetBackground =>
       _isDark ? const Color(0xFF1E1E1E) : Colors.white;
 
-  Color get _fieldBackground =>
-      _isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
-
   Color get _resultBackground =>
       _isDark ? const Color(0xFF252525) : _backgroundColor;
 

@@ -31,16 +31,11 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
   Color get _pageBackground =>
       _isDark ? const Color(0xFF121212) : const Color(0xFFF6F6F6);
 
-  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
-
   Color get _primaryTextColor =>
       _isDark ? Colors.white : const Color(0xFF29262D);
 
   Color get _secondaryTextColor =>
       _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF77737A);
-
-  Color get _borderColor =>
-      _isDark ? const Color(0xFF333333) : Colors.transparent;
 
   // ---------------------------------------------------------------------------
   // LOAD GUIDE

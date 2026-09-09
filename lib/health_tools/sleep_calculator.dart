@@ -64,10 +64,10 @@ class _SleepCalculatorPageState extends State<SleepCalculatorPage> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: _isDark
-                ? ColorScheme.dark(
+                ? const ColorScheme.dark(
                     primary: _primaryColor,
                     onPrimary: Colors.white,
-                    surface: const Color(0xFF1E1E1E),
+                    surface: Color(0xFF1E1E1E),
                     onSurface: Colors.white,
                   )
                 : const ColorScheme.light(

@@ -269,9 +269,6 @@ class _SignUpPageState extends State<SignUpPage> {
     final Color dialogPrimaryText =
         isDark ? Colors.white : const Color(0xFF292929);
 
-    final Color dialogBodyText =
-        isDark ? const Color(0xFFBDBDBD) : const Color(0xFF555555);
-
     final Color dialogCloseIcon =
         isDark ? const Color(0xFFBDBDBD) : const Color(0xFF555555);
 

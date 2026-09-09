@@ -85,8 +85,6 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
   Color get _appBarBackground =>
       _isDark ? const Color(0xFF121212) : Colors.white;
 
-  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
-
   Color get _fieldBackground =>
       _isDark ? const Color(0xFF252525) : Colors.white;
 

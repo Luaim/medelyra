@@ -26,9 +26,6 @@ class _HeartRatePageState extends State<HeartRatePage> {
   Color get _sheetBackground =>
       _isDark ? const Color(0xFF1E1E1E) : Colors.white;
 
-  Color get _fieldBackground =>
-      _isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
-
   Color get _resultBackground =>
       _isDark ? const Color(0xFF252525) : _backgroundColor;
 
@@ -42,9 +39,6 @@ class _HeartRatePageState extends State<HeartRatePage> {
 
   Color get _mutedTextColor =>
       _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280);
-
-  Color get _placeholderColor =>
-      _isDark ? const Color(0xFF8E8E8E) : const Color(0xFF9CA3AF);
 
   @override
   void dispose() {

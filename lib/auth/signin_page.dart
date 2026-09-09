@@ -268,9 +268,6 @@ class _SignInPageState extends State<SignInPage>
 
     final Color primaryText = isDark ? Colors.white : const Color(0xFF2B2B2B);
 
-    final Color labelText =
-        isDark ? const Color(0xFFE0E0E0) : const Color(0xFF2B2B2B);
-
     final Color secondaryText =
         isDark ? const Color(0xFFBDBDBD) : const Color(0xFF747373);
 

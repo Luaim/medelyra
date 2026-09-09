@@ -36,9 +36,6 @@ class _SosPageState extends State<SosPage> {
   Color get _primaryTextColor =>
       _isDark ? Colors.white : const Color(0xFF24232A);
 
-  Color get _secondaryTextColor =>
-      _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF77737A);
-
   Color get _searchHintColor =>
       _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6F6D75);
 
@@ -47,12 +44,6 @@ class _SosPageState extends State<SosPage> {
 
   Color get _searchCloseColor =>
       _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF77757D);
-
-  Color get _arrowColor =>
-      _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF8A8790);
-
-  Color get _cardBorderColor =>
-      _isDark ? const Color(0xFF333333) : Colors.transparent;
 
   // ---------------------------------------------------------------------------
   // LOAD GUIDES

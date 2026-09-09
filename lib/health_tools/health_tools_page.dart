@@ -32,8 +32,6 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
   Color get _pageBackground =>
       _isDark ? const Color(0xFF121212) : _backgroundColor;
 
-  Color get _cardBackground => _isDark ? const Color(0xFF1E1E1E) : Colors.white;
-
   Color get _fieldBackground =>
       _isDark ? const Color(0xFF252525) : Colors.white;
 

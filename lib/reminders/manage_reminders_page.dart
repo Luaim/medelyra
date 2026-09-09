@@ -48,9 +48,6 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       ? const Color(0xFF2D2D2D)
       : const Color.fromARGB(87, 207, 207, 207);
 
-  Color get _cardShadowColor =>
-      _isDark ? Colors.black.withOpacity(0.22) : Colors.black.withOpacity(0.03);
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool _loading = true;
@@ -1739,7 +1736,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       ),
                       decoration: BoxDecoration(
                         color: _dialogBackground,
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(28),
                           bottomRight: Radius.circular(28),
                         ),
