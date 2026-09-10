@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 const Color _backgroundColor = Color(0xFFFAF9FC);
 const Color _primaryColor = Color(0xFF3D84A8);
@@ -52,6 +53,8 @@ class _BmiPageState extends State<BmiPage> {
   void _calculateBmi() {
     FocusScope.of(context).unfocus();
 
+    final l10n = AppLocalizations.of(context)!;
+
     final height = double.tryParse(
       _heightController.text.trim().replaceAll(',', '.'),
     );
@@ -61,22 +64,22 @@ class _BmiPageState extends State<BmiPage> {
     );
 
     if (height == null || height <= 0) {
-      _showError('Please enter a valid height.');
+      _showError(l10n.validHeight);
       return;
     }
 
     if (weight == null || weight <= 0) {
-      _showError('Please enter a valid weight.');
+      _showError(l10n.validWeight);
       return;
     }
 
     if (height < 50 || height > 300) {
-      _showError('Please enter a realistic height.');
+      _showError(l10n.realisticHeight);
       return;
     }
 
     if (weight < 1 || weight > 500) {
-      _showError('Please enter a realistic weight.');
+      _showError(l10n.realisticWeight);
       return;
     }
 
@@ -90,14 +93,16 @@ class _BmiPageState extends State<BmiPage> {
   }
 
   String _getCategory(double bmi) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (bmi < 18.5) {
-      return 'Underweight';
+      return l10n.underweight;
     } else if (bmi < 25) {
-      return 'Healthy weight';
+      return l10n.healthyWeight;
     } else if (bmi < 30) {
-      return 'Overweight';
+      return l10n.overweight;
     } else {
-      return 'Obesity';
+      return l10n.obesity;
     }
   }
 
@@ -137,6 +142,8 @@ class _BmiPageState extends State<BmiPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SafeArea(
       top: false,
       child: Material(
@@ -187,7 +194,7 @@ class _BmiPageState extends State<BmiPage> {
                   children: [
                     Expanded(
                       child: Text(
-                        'BMI Calculator',
+                        l10n.bmiCalculator,
                         style: TextStyle(
                           fontSize: 21,
                           fontWeight: FontWeight.w600,
@@ -218,7 +225,7 @@ class _BmiPageState extends State<BmiPage> {
                 // ----------------------------------------------------------------
 
                 Text(
-                  'Check your body mass index',
+                  l10n.checkBodyMassIndex,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
@@ -247,7 +254,7 @@ class _BmiPageState extends State<BmiPage> {
                 // ----------------------------------------------------------------
 
                 Text(
-                  'Height',
+                  l10n.height,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -259,7 +266,7 @@ class _BmiPageState extends State<BmiPage> {
 
                 _InputField(
                   controller: _heightController,
-                  hintText: 'Enter your height',
+                  hintText: l10n.enterYourHeight,
                   unit: 'cm',
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
@@ -274,7 +281,7 @@ class _BmiPageState extends State<BmiPage> {
                 // ----------------------------------------------------------------
 
                 Text(
-                  'Weight',
+                  l10n.weight,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -286,7 +293,7 @@ class _BmiPageState extends State<BmiPage> {
 
                 _InputField(
                   controller: _weightController,
-                  hintText: 'Enter your weight',
+                  hintText: l10n.enterYourWeight,
                   unit: 'kg',
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
@@ -312,9 +319,9 @@ class _BmiPageState extends State<BmiPage> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'Calculate BMI',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.calculateBmi,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -363,9 +370,7 @@ class _BmiPageState extends State<BmiPage> {
                       const SizedBox(width: 9),
                       Expanded(
                         child: Text(
-                          'BMI is a screening measure and does not '
-                          'diagnose health conditions. It may not be '
-                          'suitable for everyone.',
+                          l10n.bmiDisclaimer,
                           style: TextStyle(
                             fontSize: 12.5,
                             height: 1.4,
@@ -486,6 +491,7 @@ class _BmiResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     final resultBackground =
         isDark ? const Color(0xFF252525) : _backgroundColor;
@@ -513,7 +519,7 @@ class _BmiResultCard extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Your BMI',
+            l10n.yourBmi,
             style: TextStyle(
               fontSize: 14,
               color: secondaryTextColor,
@@ -540,8 +546,7 @@ class _BmiResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 7),
           Text(
-            'Adult BMI categories are used as a general '
-            'screening reference.',
+            l10n.adultBmiReference,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12.5,

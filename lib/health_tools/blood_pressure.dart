@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 const Color _backgroundColor = Color(0xFFFAF9FC);
 const Color _primaryColor = Color(0xFFD95C68);
@@ -53,6 +54,8 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
   void _checkBloodPressure() {
     FocusScope.of(context).unfocus();
 
+    final l10n = AppLocalizations.of(context)!;
+
     final systolic = int.tryParse(
       _systolicController.text.trim(),
     );
@@ -70,12 +73,12 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
     // ------------------------------------------------------------------------
 
     if (systolic == null || systolic <= 0) {
-      _showError('Please enter a valid systolic pressure.');
+      _showError(l10n.validSystolicPressure);
       return;
     }
 
     if (diastolic == null || diastolic <= 0) {
-      _showError('Please enter a valid diastolic pressure.');
+      _showError(l10n.validDiastolicPressure);
       return;
     }
 
@@ -84,16 +87,12 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
     // ------------------------------------------------------------------------
 
     if (systolic < 50 || systolic > 300) {
-      _showError(
-        'Please enter a realistic systolic pressure between 50 and 300 mmHg.',
-      );
+      _showError(l10n.realisticSystolicPressure);
       return;
     }
 
     if (diastolic < 30 || diastolic > 200) {
-      _showError(
-        'Please enter a realistic diastolic pressure between 30 and 200 mmHg.',
-      );
+      _showError(l10n.realisticDiastolicPressure);
       return;
     }
 
@@ -102,9 +101,7 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
     // ------------------------------------------------------------------------
 
     if (diastolic >= systolic) {
-      _showError(
-        'Diastolic pressure should be lower than systolic pressure.',
-      );
+      _showError(l10n.diastolicLowerThanSystolic);
       return;
     }
 
@@ -132,48 +129,44 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
     int systolic,
     int diastolic,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Very high / crisis range.
     if (systolic > 180 || diastolic > 120) {
       return (
-        'Very high',
-        'This reading is very high. If you have symptoms such as '
-            'chest pain, difficulty breathing, weakness, vision changes, '
-            'or severe headache, seek emergency medical help.'
+        l10n.veryHigh,
+        l10n.veryHighBloodPressureMessage,
       );
     }
 
     // Stage 2.
     if (systolic >= 140 || diastolic >= 90) {
       return (
-        'High blood pressure',
-        'This reading is above the usual range. Consider discussing '
-            'your readings with a healthcare professional.'
+        l10n.highBloodPressure,
+        l10n.highBloodPressureMessage,
       );
     }
 
     // Stage 1.
     if (systolic >= 130 || diastolic >= 80) {
       return (
-        'Elevated',
-        'This reading is above the usual range. Consider monitoring '
-            'your blood pressure and discussing repeated readings '
-            'with a healthcare professional.'
+        l10n.elevated,
+        l10n.elevatedBloodPressureMessage,
       );
     }
 
     // Elevated systolic.
     if (systolic >= 120 && diastolic < 80) {
       return (
-        'Elevated',
-        'Your systolic pressure is above the usual range. Consider '
-            'monitoring your blood pressure over time.'
+        l10n.elevated,
+        l10n.elevatedSystolicMessage,
       );
     }
 
     // Normal.
     return (
-      'Normal range',
-      'This reading is within the usual range for blood pressure.'
+      l10n.normalRange,
+      l10n.normalBloodPressureMessage,
     );
   }
 
@@ -211,6 +204,8 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final hasResult = _category != null && _message != null;
 
     return SafeArea(
@@ -263,7 +258,7 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Blood Pressure',
+                          l10n.bloodPressure,
                           style: TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w600,
@@ -304,7 +299,7 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                       // ----------------------------------------------------------
 
                       Text(
-                        'Understand your blood pressure',
+                        l10n.understandBloodPressure,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
@@ -331,7 +326,7 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                       // ----------------------------------------------------------
 
                       Text(
-                        'Systolic',
+                        l10n.systolic,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -343,7 +338,7 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
 
                       _PressureInputField(
                         controller: _systolicController,
-                        hintText: 'Enter systolic pressure',
+                        hintText: l10n.enterSystolicPressure,
                         unit: 'mmHg',
                         onChanged: (_) => _clearResult(),
                       ),
@@ -355,7 +350,7 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                       // ----------------------------------------------------------
 
                       Text(
-                        'Diastolic',
+                        l10n.diastolic,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -367,7 +362,7 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
 
                       _PressureInputField(
                         controller: _diastolicController,
-                        hintText: 'Enter diastolic pressure',
+                        hintText: l10n.enterDiastolicPressure,
                         unit: 'mmHg',
                         onChanged: (_) => _clearResult(),
                       ),
@@ -390,9 +385,9 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Text(
-                            'Check Blood Pressure',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.checkBloodPressure,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -455,10 +450,7 @@ class _BloodPressurePageState extends State<BloodPressurePage> {
                             const SizedBox(width: 9),
                             Expanded(
                               child: Text(
-                                'Blood pressure can vary throughout '
-                                'the day. This tool is for general '
-                                'information and does not diagnose '
-                                'medical conditions.',
+                                l10n.bloodPressureDisclaimer,
                                 style: TextStyle(
                                   fontSize: 12.5,
                                   height: 1.4,
@@ -547,11 +539,11 @@ class _PressureInputField extends StatelessWidget {
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(right: 15),
+          Padding(
+            padding: const EdgeInsets.only(right: 15),
             child: Text(
-              'mmHg',
-              style: TextStyle(
+              unit,
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: _primaryColor,
@@ -644,6 +636,7 @@ class _BloodPressureResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     final resultBackground =
         isDark ? const Color(0xFF252525) : _backgroundColor;
@@ -671,7 +664,7 @@ class _BloodPressureResultCard extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Your blood pressure',
+            l10n.yourBloodPressure,
             style: TextStyle(
               fontSize: 14,
               color: secondaryTextColor,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 const Color _backgroundColor = Color(0xFFFAF9FC);
 const Color _primaryColor = Color(0xFF7167B7);
@@ -98,9 +99,11 @@ class _SleepCalculatorPageState extends State<SleepCalculatorPage> {
   void _calculateSleepTimes() {
     FocusScope.of(context).unfocus();
 
+    final l10n = AppLocalizations.of(context)!;
+
     if (_selectedTime == null) {
       setState(() {
-        _errorMessage = 'Please select your wake-up time.';
+        _errorMessage = l10n.selectWakeUpTime;
         _sleepSuggestions = null;
         _resultTitle = null;
         _resultMessage = null;
@@ -144,10 +147,8 @@ class _SleepCalculatorPageState extends State<SleepCalculatorPage> {
 
     setState(() {
       _sleepSuggestions = suggestions;
-      _resultTitle = 'Suggested bedtimes';
-      _resultMessage =
-          'These times are based on approximate sleep-cycle lengths. '
-          'Your actual sleep needs can vary.';
+      _resultTitle = l10n.suggestedBedtimes;
+      _resultMessage = l10n.sleepSuggestionMessage;
       _errorMessage = null;
     });
   }
@@ -199,6 +200,8 @@ class _SleepCalculatorPageState extends State<SleepCalculatorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final hasResult = _sleepSuggestions != null &&
         _resultTitle != null &&
         _resultMessage != null;
@@ -253,7 +256,7 @@ class _SleepCalculatorPageState extends State<SleepCalculatorPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Sleep Calculator',
+                          l10n.sleepCalculator,
                           style: TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w600,
@@ -296,7 +299,7 @@ class _SleepCalculatorPageState extends State<SleepCalculatorPage> {
                       // ----------------------------------------------------------
 
                       Text(
-                        'Find suggested bedtimes',
+                        l10n.findSuggestedBedtimes,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
@@ -323,7 +326,7 @@ class _SleepCalculatorPageState extends State<SleepCalculatorPage> {
                       // ----------------------------------------------------------
 
                       Text(
-                        'Wake-up time',
+                        l10n.wakeUpTime,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -363,7 +366,7 @@ class _SleepCalculatorPageState extends State<SleepCalculatorPage> {
                               Expanded(
                                 child: Text(
                                   _selectedTime == null
-                                      ? 'Select your wake-up time'
+                                      ? l10n.selectYourWakeUpTime
                                       : _formatTime(
                                           _selectedTime!,
                                         ),
@@ -457,9 +460,9 @@ class _SleepCalculatorPageState extends State<SleepCalculatorPage> {
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Text(
-                            'Calculate Bedtimes',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.calculateBedtimes,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -508,9 +511,7 @@ class _SleepCalculatorPageState extends State<SleepCalculatorPage> {
                             const SizedBox(width: 9),
                             Expanded(
                               child: Text(
-                                'Sleep needs vary from person to person. '
-                                'These suggestions are based on approximate '
-                                'sleep-cycle lengths and are not medical advice.',
+                                l10n.sleepCalculatorDisclaimer,
                                 style: TextStyle(
                                   fontSize: 12.5,
                                   height: 1.4,
@@ -584,6 +585,8 @@ class _SleepResultCard extends StatelessWidget {
     final secondaryTextColor =
         isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 18,
@@ -646,8 +649,10 @@ class _SleepResultCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        formatDuration(
+                        _localizedDuration(
                           suggestion.duration,
+                          l10n,
+                          formatDuration,
                         ),
                         style: TextStyle(
                           fontSize: 12.5,
@@ -672,6 +677,29 @@ class _SleepResultCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  String _localizedDuration(
+    Duration duration,
+    AppLocalizations l10n,
+    String Function(Duration) fallbackFormatter,
+  ) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+
+    if (minutes == 0) {
+      if (hours == 1) {
+        return l10n.oneHour;
+      }
+
+      return l10n.hoursCount(hours);
+    }
+
+    final decimalHours = duration.inMinutes / 60;
+
+    return l10n.decimalHours(
+      decimalHours.toStringAsFixed(1),
     );
   }
 }

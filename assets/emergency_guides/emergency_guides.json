@@ -1,316 +1,652 @@
 [
   {
     "id": "cpr",
-    "title": "CPR / Cardiac Arrest",
-    "shortDescription": "When someone is unresponsive and not breathing normally, start CPR immediately.",
+    "title": {
+      "en": "CPR / Cardiac Arrest",
+      "ar": "الإنعاش القلبي الرئوي / توقف القلب"
+    },
+    "shortDescription": {
+      "en": "When someone is unresponsive and not breathing normally, start CPR immediately.",
+      "ar": "عندما يكون شخص ما فاقدًا للاستجابة ولا يتنفس بشكل طبيعي، ابدأ الإنعاش القلبي الرئوي فورًا."
+    },
     "thumbnail": "assets/emergency_guides/cpr/thumbnail.png",
     "order": 1,
     "steps": [
       {
-        "title": "Check the person",
-        "description": "Tap their shoulders and ask loudly, “Are you OK?”",
+        "title": {
+          "en": "Check the person",
+          "ar": "تحقق من حالة الشخص"
+        },
+        "description": {
+          "en": "Tap their shoulders and ask loudly, “Are you OK?”",
+          "ar": "اضغط على كتفيه واسأله بصوت عالٍ: «هل أنت بخير؟»"
+        },
         "image": "assets/emergency_guides/cpr/step_01.png"
       },
       {
-        "title": "Check breathing",
-        "description": "Look for normal breathing. Gasping is not normal breathing.",
+        "title": {
+          "en": "Check breathing",
+          "ar": "تحقق من التنفس"
+        },
+        "description": {
+          "en": "Look for normal breathing. Gasping is not normal breathing.",
+          "ar": "تحقق من وجود تنفس طبيعي. اللهاث ليس تنفسًا طبيعيًا."
+        },
         "image": "assets/emergency_guides/cpr/step_02.png"
       },
       {
-        "title": "Call emergency services",
-        "description": "Call your local emergency number. Ask someone to get an AED if one is nearby.",
+        "title": {
+          "en": "Call emergency services",
+          "ar": "اتصل بخدمات الطوارئ"
+        },
+        "description": {
+          "en": "Call your local emergency number. Ask someone to get an AED if one is nearby.",
+          "ar": "اتصل برقم الطوارئ المحلي. اطلب من شخص آخر إحضار جهاز مزيل الرجفان الخارجي الآلي (AED) إذا كان قريبًا."
+        },
         "image": "assets/emergency_guides/cpr/step_03.png"
       },
       {
-        "title": "Start chest compressions",
-        "description": "Put both hands in the center of the chest. Push hard and fast.",
+        "title": {
+          "en": "Start chest compressions",
+          "ar": "ابدأ الضغطات الصدرية"
+        },
+        "description": {
+          "en": "Put both hands in the center of the chest. Push hard and fast.",
+          "ar": "ضع كلتا يديك في منتصف الصدر. اضغط بقوة وبسرعة."
+        },
         "image": "assets/emergency_guides/cpr/step_04.png"
       },
       {
-        "title": "Keep CPR going",
-        "description": "Push about 5–6 cm deep at 100–120 compressions per minute. Let the chest come back up after each push.",
+        "title": {
+          "en": "Keep CPR going",
+          "ar": "استمر في الإنعاش القلبي الرئوي"
+        },
+        "description": {
+          "en": "Push about 5–6 cm deep at 100–120 compressions per minute. Let the chest come back up after each push.",
+          "ar": "اضغط إلى عمق حوالي 5–6 سم بمعدل 100–120 ضغطة في الدقيقة. اسمح للصدر بالعودة إلى وضعه الطبيعي بعد كل ضغطة."
+        },
         "image": "assets/emergency_guides/cpr/step_05.png"
       },
       {
-        "title": "Use an AED",
-        "description": "Turn on the AED and follow its voice instructions. Do not touch the person when the AED tells you to stand clear.",
+        "title": {
+          "en": "Use an AED",
+          "ar": "استخدم جهاز AED"
+        },
+        "description": {
+          "en": "Turn on the AED and follow its voice instructions. Do not touch the person when the AED tells you to stand clear.",
+          "ar": "شغّل جهاز AED واتبع تعليماته الصوتية. لا تلمس الشخص عندما يطلب منك الجهاز الابتعاد عنه."
+        },
         "image": "assets/emergency_guides/cpr/step_06.png"
       }
     ]
   },
   {
     "id": "choking",
-    "title": "Choking",
-    "shortDescription": "Help someone who is choking and cannot breathe normally.",
+    "title": {
+      "en": "Choking",
+      "ar": "الاختناق"
+    },
+    "shortDescription": {
+      "en": "Help someone who is choking and cannot breathe normally.",
+      "ar": "ساعد شخصًا يعاني من الاختناق ولا يستطيع التنفس بشكل طبيعي."
+    },
     "thumbnail": "assets/emergency_guides/choking/thumbnail.png",
     "order": 2,
     "steps": [
       {
-        "title": "Check if they can cough",
-        "description": "Ask if the person is choking. If they can cough or speak, encourage them to keep coughing.",
+        "title": {
+          "en": "Check if they can cough",
+          "ar": "تحقق مما إذا كان يستطيع السعال"
+        },
+        "description": {
+          "en": "Ask if the person is choking. If they can cough or speak, encourage them to keep coughing.",
+          "ar": "اسأل الشخص عما إذا كان يعاني من الاختناق. إذا كان يستطيع السعال أو الكلام، شجعه على الاستمرار في السعال."
+        },
         "image": "assets/emergency_guides/choking/step_01.png"
       },
       {
-        "title": "Give back blows",
-        "description": "If they cannot cough, speak, or breathe normally, lean them forward and give up to 5 firm back blows between the shoulder blades.",
+        "title": {
+          "en": "Give back blows",
+          "ar": "أعطه ضربات على الظهر"
+        },
+        "description": {
+          "en": "If they cannot cough, speak, or breathe normally, lean them forward and give up to 5 firm back blows between the shoulder blades.",
+          "ar": "إذا لم يستطع السعال أو الكلام أو التنفس بشكل طبيعي، اجعله يميل إلى الأمام وأعطه ما يصل إلى 5 ضربات قوية بين لوحي الكتف."
+        },
         "image": "assets/emergency_guides/choking/step_02.png"
       },
       {
-        "title": "Give abdominal thrusts",
-        "description": "If the blockage does not clear, give up to 5 abdominal thrusts.",
+        "title": {
+          "en": "Give abdominal thrusts",
+          "ar": "أجرِ ضغطات البطن"
+        },
+        "description": {
+          "en": "If the blockage does not clear, give up to 5 abdominal thrusts.",
+          "ar": "إذا لم يزُل الانسداد، أجرِ ما يصل إلى 5 ضغطات على البطن."
+        },
         "image": "assets/emergency_guides/choking/step_03.png"
       },
       {
-        "title": "Repeat if needed",
-        "description": "Continue alternating back blows and abdominal thrusts until the object is cleared or the person becomes unresponsive.",
+        "title": {
+          "en": "Repeat if needed",
+          "ar": "كرر إذا لزم الأمر"
+        },
+        "description": {
+          "en": "Continue alternating back blows and abdominal thrusts until the object is cleared or the person becomes unresponsive.",
+          "ar": "استمر في التناوب بين ضربات الظهر وضغطات البطن حتى يخرج الجسم العالق أو يفقد الشخص استجابته."
+        },
         "image": "assets/emergency_guides/choking/step_04.png"
       },
       {
-        "title": "If they become unresponsive",
-        "description": "Carefully lower them to the ground and begin CPR. Get emergency medical help immediately.",
+        "title": {
+          "en": "If they become unresponsive",
+          "ar": "إذا أصبح فاقدًا للاستجابة"
+        },
+        "description": {
+          "en": "Carefully lower them to the ground and begin CPR. Get emergency medical help immediately.",
+          "ar": "أنزله بحذر إلى الأرض وابدأ الإنعاش القلبي الرئوي. اطلب المساعدة الطبية الطارئة فورًا."
+        },
         "image": "assets/emergency_guides/choking/step_05.png"
       }
     ]
   },
   {
     "id": "severe_bleeding",
-    "title": "Severe Bleeding",
-    "shortDescription": "Heavy or continuous bleeding can become life-threatening within minutes.",
+    "title": {
+      "en": "Severe Bleeding",
+      "ar": "النزيف الشديد"
+    },
+    "shortDescription": {
+      "en": "Heavy or continuous bleeding can become life-threatening within minutes.",
+      "ar": "يمكن أن يصبح النزيف الغزير أو المستمر مهددًا للحياة خلال دقائق."
+    },
     "thumbnail": "assets/emergency_guides/Severe Bleeding/thumbnail.png",
     "order": 3,
     "steps": [
       {
-        "title": "Make the area safe",
-        "description": "Protect yourself if possible. Look for heavy, continuous, or spurting bleeding.",
+        "title": {
+          "en": "Make the area safe",
+          "ar": "اجعل المكان آمنًا"
+        },
+        "description": {
+          "en": "Protect yourself if possible. Look for heavy, continuous, or spurting bleeding.",
+          "ar": "احمِ نفسك إن أمكن. ابحث عن نزيف غزير أو مستمر أو متدفق."
+        },
         "image": "assets/emergency_guides/Severe Bleeding/step_01.png"
       },
       {
-        "title": "Apply firm pressure",
-        "description": "Place clean gauze or cloth directly on the wound. Press firmly and continuously.",
+        "title": {
+          "en": "Apply firm pressure",
+          "ar": "اضغط بقوة"
+        },
+        "description": {
+          "en": "Place clean gauze or cloth directly on the wound. Press firmly and continuously.",
+          "ar": "ضع شاشًا أو قطعة قماش نظيفة مباشرة على الجرح. اضغط بقوة وباستمرار."
+        },
         "image": "assets/emergency_guides/Severe Bleeding/step_02.png"
       },
       {
-        "title": "Keep pressure on",
-        "description": "Do not keep lifting the cloth to check the wound. Keep pressing until bleeding stops or help takes over.",
+        "title": {
+          "en": "Keep pressure on",
+          "ar": "استمر في الضغط"
+        },
+        "description": {
+          "en": "Do not keep lifting the cloth to check the wound. Keep pressing until bleeding stops or help takes over.",
+          "ar": "لا ترفع قطعة القماش باستمرار لفحص الجرح. استمر في الضغط حتى يتوقف النزيف أو تصل المساعدة."
+        },
         "image": "assets/emergency_guides/Severe Bleeding/step_03.png"
       },
       {
-        "title": "Use a tourniquet when needed",
-        "description": "For life-threatening bleeding from an arm or leg that is not controlled by direct pressure, use a commercial tourniquet if available and follow its instructions.",
+        "title": {
+          "en": "Use a tourniquet when needed",
+          "ar": "استخدم العاصبة عند الحاجة"
+        },
+        "description": {
+          "en": "For life-threatening bleeding from an arm or leg that is not controlled by direct pressure, use a commercial tourniquet if available and follow its instructions.",
+          "ar": "في حالة النزيف المهدد للحياة من الذراع أو الساق الذي لا يمكن السيطرة عليه بالضغط المباشر، استخدم عاصبة تجارية إذا كانت متوفرة واتبع تعليماتها."
+        },
         "image": "assets/emergency_guides/Severe Bleeding/step_04.png"
       },
       {
-        "title": "Call emergency services",
-        "description": "Get emergency medical help immediately for severe bleeding.",
+        "title": {
+          "en": "Call emergency services",
+          "ar": "اتصل بخدمات الطوارئ"
+        },
+        "description": {
+          "en": "Get emergency medical help immediately for severe bleeding.",
+          "ar": "اطلب المساعدة الطبية الطارئة فورًا في حالة النزيف الشديد."
+        },
         "image": "assets/emergency_guides/Severe Bleeding/step_05.png"
       }
     ]
   },
   {
     "id": "burns",
-    "title": "Burns",
-    "shortDescription": "Cool a thermal burn quickly and safely.",
+    "title": {
+      "en": "Burns",
+      "ar": "الحروق"
+    },
+    "shortDescription": {
+      "en": "Cool a thermal burn quickly and safely.",
+      "ar": "برّد الحرق الحراري بسرعة وأمان."
+    },
     "thumbnail": "assets/emergency_guides/Burns/thumbnail.png",
     "order": 4,
     "steps": [
       {
-        "title": "Stop the burning",
-        "description": "Move away from the heat or danger if it is safe to do so.",
+        "title": {
+          "en": "Stop the burning",
+          "ar": "أوقف مصدر الحرق"
+        },
+        "description": {
+          "en": "Move away from the heat or danger if it is safe to do so.",
+          "ar": "ابتعد عن مصدر الحرارة أو الخطر إذا كان ذلك آمنًا."
+        },
         "image": "assets/emergency_guides/Burns/step_01.png"
       },
       {
-        "title": "Cool the burn",
-        "description": "Cool the burn under cool, clean running water.",
+        "title": {
+          "en": "Cool the burn",
+          "ar": "برّد الحرق"
+        },
+        "description": {
+          "en": "Cool the burn under cool, clean running water.",
+          "ar": "برّد الحرق تحت ماء جارٍ بارد ونظيف."
+        },
         "image": "assets/emergency_guides/Burns/step_02.png"
       },
       {
-        "title": "Remove tight items",
-        "description": "Remove rings, watches, belts, or tight clothing near the burn before swelling starts. Do not pull away anything stuck to the skin.",
+        "title": {
+          "en": "Remove tight items",
+          "ar": "أزل الأشياء الضيقة"
+        },
+        "description": {
+          "en": "Remove rings, watches, belts, or tight clothing near the burn before swelling starts. Do not pull away anything stuck to the skin.",
+          "ar": "أزل الخواتم والساعات والأحزمة أو الملابس الضيقة القريبة من الحرق قبل بدء التورم. لا تنزع أي شيء ملتصق بالجلد."
+        },
         "image": "assets/emergency_guides/Burns/step_03.png"
       },
       {
-        "title": "Cover the burn",
-        "description": "After cooling, loosely cover the burn with a clean, non-stick dressing or clean cloth.",
+        "title": {
+          "en": "Cover the burn",
+          "ar": "غطِّ الحرق"
+        },
+        "description": {
+          "en": "After cooling, loosely cover the burn with a clean, non-stick dressing or clean cloth.",
+          "ar": "بعد التبريد، غطِّ الحرق بشكل غير محكم بضمادة نظيفة غير لاصقة أو قطعة قماش نظيفة."
+        },
         "image": "assets/emergency_guides/Burns/step_04.png"
       },
       {
-        "title": "Get medical help when needed",
-        "description": "Get urgent medical help for large or deep burns, burns on the face, hands, feet, genitals or major joints, electrical/chemical burns, or difficulty breathing.",
+        "title": {
+          "en": "Get medical help when needed",
+          "ar": "اطلب المساعدة الطبية عند الحاجة"
+        },
+        "description": {
+          "en": "Get urgent medical help for large or deep burns, burns on the face, hands, feet, genitals or major joints, electrical/chemical burns, or difficulty breathing.",
+          "ar": "اطلب المساعدة الطبية العاجلة للحروق الكبيرة أو العميقة، أو الحروق في الوجه أو اليدين أو القدمين أو الأعضاء التناسلية أو المفاصل الرئيسية، أو الحروق الكهربائية أو الكيميائية، أو عند وجود صعوبة في التنفس."
+        },
         "image": "assets/emergency_guides/Burns/step_05.png"
       }
     ]
   },
   {
     "id": "fainting",
-    "title": "Fainting / Unconscious Person",
-    "shortDescription": "First determine whether the person is breathing normally.",
+    "title": {
+      "en": "Fainting / Unconscious Person",
+      "ar": "الإغماء / الشخص فاقد الوعي"
+    },
+    "shortDescription": {
+      "en": "First determine whether the person is breathing normally.",
+      "ar": "حدد أولًا ما إذا كان الشخص يتنفس بشكل طبيعي."
+    },
     "thumbnail": "assets/emergency_guides/Fainting/thumbnail.png",
     "order": 5,
     "steps": [
       {
-        "title": "Check for a response",
-        "description": "Tap their shoulders and ask loudly, “Are you OK?”",
+        "title": {
+          "en": "Check for a response",
+          "ar": "تحقق من الاستجابة"
+        },
+        "description": {
+          "en": "Tap their shoulders and ask loudly, “Are you OK?”",
+          "ar": "اضغط على كتفيه واسأله بصوت عالٍ: «هل أنت بخير؟»"
+        },
         "image": "assets/emergency_guides/Fainting/step_01.png"
       },
       {
-        "title": "Check breathing",
-        "description": "Check whether they are breathing normally.",
+        "title": {
+          "en": "Check breathing",
+          "ar": "تحقق من التنفس"
+        },
+        "description": {
+          "en": "Check whether they are breathing normally.",
+          "ar": "تحقق مما إذا كان يتنفس بشكل طبيعي."
+        },
         "image": "assets/emergency_guides/Fainting/step_02.png"
       },
       {
-        "title": "If they are breathing",
-        "description": "If they are unconscious but breathing normally, place them in the recovery position and monitor them.",
+        "title": {
+          "en": "If they are breathing",
+          "ar": "إذا كان يتنفس"
+        },
+        "description": {
+          "en": "If they are unconscious but breathing normally, place them in the recovery position and monitor them.",
+          "ar": "إذا كان فاقدًا للوعي لكنه يتنفس بشكل طبيعي، ضعه في وضعية الإفاقة وراقبه."
+        },
         "image": "assets/emergency_guides/Fainting/step_03.png"
       },
       {
-        "title": "If they are NOT breathing normally",
-        "description": "Call emergency services and start CPR immediately.",
+        "title": {
+          "en": "If they are NOT breathing normally",
+          "ar": "إذا كان لا يتنفس بشكل طبيعي"
+        },
+        "description": {
+          "en": "Call emergency services and start CPR immediately.",
+          "ar": "اتصل بخدمات الطوارئ وابدأ الإنعاش القلبي الرئوي فورًا."
+        },
         "image": "assets/emergency_guides/Fainting/step_04.png"
       },
       {
-        "title": "Stay with them",
-        "description": "Keep checking their breathing until emergency help arrives.",
+        "title": {
+          "en": "Stay with them",
+          "ar": "ابقَ معه"
+        },
+        "description": {
+          "en": "Keep checking their breathing until emergency help arrives.",
+          "ar": "استمر في فحص تنفسه حتى وصول المساعدة الطارئة."
+        },
         "image": "assets/emergency_guides/Fainting/step_05.png"
       }
     ]
   },
   {
     "id": "fracture",
-    "title": "Broken Bone / Suspected Fracture",
-    "shortDescription": "Treat a serious injury as a possible fracture. Do not try to straighten it.",
+    "title": {
+      "en": "Broken Bone / Suspected Fracture",
+      "ar": "كسر العظام / الاشتباه بوجود كسر"
+    },
+    "shortDescription": {
+      "en": "Treat a serious injury as a possible fracture. Do not try to straighten it.",
+      "ar": "تعامل مع الإصابة الخطيرة على أنها كسر محتمل. لا تحاول تقويمها."
+    },
     "thumbnail": "assets/emergency_guides/Fracture/thumbnail.png",
     "order": 6,
     "steps": [
       {
-        "title": "Keep the person still",
-        "description": "Tell them not to move the injured area.",
+        "title": {
+          "en": "Keep the person still",
+          "ar": "أبقِ الشخص ثابتًا"
+        },
+        "description": {
+          "en": "Tell them not to move the injured area.",
+          "ar": "اطلب منه عدم تحريك المنطقة المصابة."
+        },
         "image": "assets/emergency_guides/Fracture/step_01.png"
       },
       {
-        "title": "Do not straighten it",
-        "description": "Do not push the bone back or try to straighten a deformed limb.",
+        "title": {
+          "en": "Do not straighten it",
+          "ar": "لا تحاول تقويمها"
+        },
+        "description": {
+          "en": "Do not push the bone back or try to straighten a deformed limb.",
+          "ar": "لا تدفع العظم إلى مكانه ولا تحاول تقويم الطرف المشوه."
+        },
         "image": "assets/emergency_guides/Fracture/step_02.png"
       },
       {
-        "title": "Support the injury",
-        "description": "Support the injured area in the position you found it.",
+        "title": {
+          "en": "Support the injury",
+          "ar": "ادعم الإصابة"
+        },
+        "description": {
+          "en": "Support the injured area in the position you found it.",
+          "ar": "ادعم المنطقة المصابة في الوضعية التي وجدتها عليها."
+        },
         "image": "assets/emergency_guides/Fracture/step_03.png"
       },
       {
-        "title": "Control bleeding",
-        "description": "If there is bleeding, cover the wound and apply pressure around the wound. Do not press directly on a bone sticking through the skin.",
+        "title": {
+          "en": "Control bleeding",
+          "ar": "سيطر على النزيف"
+        },
+        "description": {
+          "en": "If there is bleeding, cover the wound and apply pressure around the wound. Do not press directly on a bone sticking through the skin.",
+          "ar": "إذا كان هناك نزيف، غطِّ الجرح واضغط حوله. لا تضغط مباشرة على عظم بارز من خلال الجلد."
+        },
         "image": "assets/emergency_guides/Fracture/step_04.png"
       },
       {
-        "title": "Get medical help",
-        "description": "Get urgent medical help for severe pain, deformity, numbness, heavy bleeding, an open fracture, or injuries involving the head, neck, spine, pelvis, or thigh.",
+        "title": {
+          "en": "Get medical help",
+          "ar": "اطلب المساعدة الطبية"
+        },
+        "description": {
+          "en": "Get urgent medical help for severe pain, deformity, numbness, heavy bleeding, an open fracture, or injuries involving the head, neck, spine, pelvis, or thigh.",
+          "ar": "اطلب المساعدة الطبية العاجلة عند وجود ألم شديد أو تشوه أو خدر أو نزيف غزير أو كسر مفتوح، أو إصابات في الرأس أو الرقبة أو العمود الفقري أو الحوض أو الفخذ."
+        },
         "image": "assets/emergency_guides/Fracture/step_05.png"
       },
       {
-        "title": "Monitor the person",
-        "description": "Keep them comfortable and watch for signs of shock while waiting for help.",
+        "title": {
+          "en": "Monitor the person",
+          "ar": "راقب الشخص"
+        },
+        "description": {
+          "en": "Keep them comfortable and watch for signs of shock while waiting for help.",
+          "ar": "اجعله في وضع مريح وراقب علامات الصدمة أثناء انتظار المساعدة."
+        },
         "image": "assets/emergency_guides/Fracture/step_06.png"
       }
     ]
   },
   {
     "id": "suspected_poisoning",
-    "title": "Suspected Poisoning",
-    "shortDescription": "Do not wait for symptoms if you suspect a serious poisoning.",
+    "title": {
+      "en": "Suspected Poisoning",
+      "ar": "الاشتباه بالتسمم"
+    },
+    "shortDescription": {
+      "en": "Do not wait for symptoms if you suspect a serious poisoning.",
+      "ar": "لا تنتظر ظهور الأعراض إذا كنت تشتبه في حدوث تسمم خطير."
+    },
     "thumbnail": "assets/emergency_guides/Suspected Poisoning/thumbnail.png",
     "order": 8,
     "steps": [
       {
-        "title": "Get away from the poison",
-        "description": "Move away from the source if it is safe. Do not expose yourself to fumes or chemicals.",
+        "title": {
+          "en": "Get away from the poison",
+          "ar": "ابتعد عن مصدر السم"
+        },
+        "description": {
+          "en": "Move away from the source if it is safe. Do not expose yourself to fumes or chemicals.",
+          "ar": "ابتعد عن المصدر إذا كان ذلك آمنًا. لا تعرض نفسك للأبخرة أو المواد الكيميائية."
+        },
         "image": "assets/emergency_guides/Suspected Poisoning/step_01.png"
       },
       {
-        "title": "Call for expert help",
-        "description": "Call your local emergency service or poison-control service if available.",
+        "title": {
+          "en": "Call for expert help",
+          "ar": "اطلب مساعدة متخصصة"
+        },
+        "description": {
+          "en": "Call your local emergency service or poison-control service if available.",
+          "ar": "اتصل بخدمة الطوارئ المحلية أو بخدمة مكافحة السموم إذا كانت متوفرة."
+        },
         "image": "assets/emergency_guides/Suspected Poisoning/step_02.png"
       },
       {
-        "title": "Do NOT make them vomit",
-        "description": "Do not make the person vomit unless a medical professional specifically tells you to.",
+        "title": {
+          "en": "Do NOT make them vomit",
+          "ar": "لا تجعله يتقيأ"
+        },
+        "description": {
+          "en": "Do not make the person vomit unless a medical professional specifically tells you to.",
+          "ar": "لا تجعل الشخص يتقيأ إلا إذا طلب منك أحد المختصين في الرعاية الطبية ذلك صراحةً."
+        },
         "image": "assets/emergency_guides/Suspected Poisoning/step_03.png"
       },
       {
-        "title": "Keep the container",
-        "description": "Keep the medicine, chemical container, label, or packaging if it is safe. Tell medical professionals what was taken, how much, and when.",
+        "title": {
+          "en": "Keep the container",
+          "ar": "احتفظ بالعبوة"
+        },
+        "description": {
+          "en": "Keep the medicine, chemical container, label, or packaging if it is safe. Tell medical professionals what was taken, how much, and when.",
+          "ar": "احتفظ بالدواء أو عبوة المادة الكيميائية أو الملصق أو الغلاف إذا كان ذلك آمنًا. أخبر المختصين بما تم تناوله والكمية ووقت حدوث ذلك."
+        },
         "image": "assets/emergency_guides/Suspected Poisoning/step_04.png"
       },
       {
-        "title": "If they become unconscious",
-        "description": "If they are unconscious but breathing normally, place them in the recovery position. If they are not breathing normally, start CPR.",
+        "title": {
+          "en": "If they become unconscious",
+          "ar": "إذا أصبح فاقدًا للوعي"
+        },
+        "description": {
+          "en": "If they are unconscious but breathing normally, place them in the recovery position. If they are not breathing normally, start CPR.",
+          "ar": "إذا كان فاقدًا للوعي لكنه يتنفس بشكل طبيعي، ضعه في وضعية الإفاقة. إذا لم يكن يتنفس بشكل طبيعي، ابدأ الإنعاش القلبي الرئوي."
+        },
         "image": "assets/emergency_guides/Suspected Poisoning/step_05.png"
       }
     ]
   },
   {
     "id": "seizure",
-    "title": "Seizure",
-    "shortDescription": "Protect the person from injury. Do not try to stop the seizure.",
+    "title": {
+      "en": "Seizure",
+      "ar": "نوبة تشنج"
+    },
+    "shortDescription": {
+      "en": "Protect the person from injury. Do not try to stop the seizure.",
+      "ar": "احمِ الشخص من الإصابة. لا تحاول إيقاف النوبة."
+    },
     "thumbnail": "assets/emergency_guides/Seizure/thumbnail.png",
     "order": 9,
     "steps": [
       {
-        "title": "Keep them safe",
-        "description": "Move dangerous objects away. If they are falling, help them safely to the ground.",
+        "title": {
+          "en": "Keep them safe",
+          "ar": "حافظ على سلامته"
+        },
+        "description": {
+          "en": "Move dangerous objects away. If they are falling, help them safely to the ground.",
+          "ar": "أبعد الأشياء الخطرة. إذا كان يسقط، ساعده على الوصول إلى الأرض بأمان."
+        },
         "image": "assets/emergency_guides/Seizure/step_01.png"
       },
       {
-        "title": "Protect their head",
-        "description": "Place something soft under their head if possible.",
+        "title": {
+          "en": "Protect their head",
+          "ar": "احمِ رأسه"
+        },
+        "description": {
+          "en": "Place something soft under their head if possible.",
+          "ar": "ضع شيئًا ناعمًا تحت رأسه إذا أمكن."
+        },
         "image": "assets/emergency_guides/Seizure/step_02.png"
       },
       {
-        "title": "Do not restrain them",
-        "description": "Do not hold their arms or legs down. Let the seizure run its course.",
+        "title": {
+          "en": "Do not restrain them",
+          "ar": "لا تثبته بالقوة"
+        },
+        "description": {
+          "en": "Do not hold their arms or legs down. Let the seizure run its course.",
+          "ar": "لا تمسك ذراعيه أو ساقيه لتقييد حركته. اترك النوبة تمر بشكل طبيعي."
+        },
         "image": "assets/emergency_guides/Seizure/step_03.png"
       },
       {
-        "title": "Nothing in the mouth",
-        "description": "Do not put anything in their mouth. Do not give food, drink, or medicine during the seizure.",
+        "title": {
+          "en": "Nothing in the mouth",
+          "ar": "لا تضع شيئًا في الفم"
+        },
+        "description": {
+          "en": "Do not put anything in their mouth. Do not give food, drink, or medicine during the seizure.",
+          "ar": "لا تضع أي شيء في فمه. لا تعطِه طعامًا أو شرابًا أو دواءً أثناء النوبة."
+        },
         "image": "assets/emergency_guides/Seizure/step_04.png"
       },
       {
-        "title": "Call emergency services if needed",
-        "description": "Call emergency services if it is their first seizure, lasts more than 5 minutes, happens repeatedly without recovery, happens in water, causes injury or breathing problems, occurs during pregnancy, or they do not return to normal within about 5–10 minutes.",
+        "title": {
+          "en": "Call emergency services if needed",
+          "ar": "اتصل بخدمات الطوارئ عند الحاجة"
+        },
+        "description": {
+          "en": "Call emergency services if it is their first seizure, lasts more than 5 minutes, happens repeatedly without recovery, happens in water, causes injury or breathing problems, occurs during pregnancy, or they do not return to normal within about 5–10 minutes.",
+          "ar": "اتصل بخدمات الطوارئ إذا كانت هذه أول نوبة له، أو استمرت أكثر من 5 دقائق، أو تكررت دون استعادة الوعي، أو حدثت في الماء، أو سببت إصابة أو مشاكل في التنفس، أو حدثت أثناء الحمل، أو لم يعد إلى حالته الطبيعية خلال حوالي 5–10 دقائق."
+        },
         "image": "assets/emergency_guides/Seizure/step_06.png"
       }
     ]
   },
   {
     "id": "severe_allergic_reaction",
-    "title": "Severe Allergic Reaction",
-    "shortDescription": "A severe allergic reaction can become life-threatening very quickly.",
+    "title": {
+      "en": "Severe Allergic Reaction",
+      "ar": "رد فعل تحسسي شديد"
+    },
+    "shortDescription": {
+      "en": "A severe allergic reaction can become life-threatening very quickly.",
+      "ar": "يمكن أن يصبح رد الفعل التحسسي الشديد مهددًا للحياة بسرعة كبيرة."
+    },
     "thumbnail": "assets/emergency_guides/Severe Allergic Reaction/thumbnail.png",
     "order": 10,
     "steps": [
       {
-        "title": "Recognize the signs",
-        "description": "Look for difficulty breathing, swelling of the face or throat, wheezing, widespread hives, dizziness, vomiting, or collapse.",
+        "title": {
+          "en": "Recognize the signs",
+          "ar": "تعرف على العلامات"
+        },
+        "description": {
+          "en": "Look for difficulty breathing, swelling of the face or throat, wheezing, widespread hives, dizziness, vomiting, or collapse.",
+          "ar": "ابحث عن صعوبة في التنفس، أو تورم في الوجه أو الحلق، أو صفير أثناء التنفس، أو شرى منتشر، أو دوخة، أو قيء، أو انهيار."
+        },
         "image": "assets/emergency_guides/Severe Allergic Reaction/step_01.png"
       },
       {
-        "title": "Call emergency services",
-        "description": "Call emergency services",
+        "title": {
+          "en": "Call emergency services",
+          "ar": "اتصل بخدمات الطوارئ"
+        },
+        "description": {
+          "en": "Call emergency services",
+          "ar": "اتصل بخدمات الطوارئ."
+        },
         "image": "assets/emergency_guides/Severe Allergic Reaction/step_02.png"
       },
       {
-        "title": "Help with their epinephrine",
-        "description": "If they have a prescribed epinephrine auto-injector, help them use it according to its instructions.",
+        "title": {
+          "en": "Help with their epinephrine",
+          "ar": "ساعده في استخدام الإبينفرين"
+        },
+        "description": {
+          "en": "If they have a prescribed epinephrine auto-injector, help them use it according to its instructions.",
+          "ar": "إذا كان لديه حاقن إبينفرين ذاتي موصوف له، ساعده على استخدامه وفقًا لتعليماته."
+        },
         "image": "assets/emergency_guides/Severe Allergic Reaction/step_03.png"
       },
       {
-        "title": "Keep them in a comfortable position",
-        "description": "Help them sit or lie down. If they are faint or showing signs of shock, keep them lying down unless breathing is easier sitting up.",
+        "title": {
+          "en": "Keep them in a comfortable position",
+          "ar": "أبقِه في وضع مريح"
+        },
+        "description": {
+          "en": "Help them sit or lie down. If they are faint or showing signs of shock, keep them lying down unless breathing is easier sitting up.",
+          "ar": "ساعده على الجلوس أو الاستلقاء. إذا كان يشعر بالإغماء أو تظهر عليه علامات الصدمة، أبقه مستلقيًا ما لم يكن التنفس أسهل أثناء الجلوس."
+        },
         "image": "assets/emergency_guides/Severe Allergic Reaction/step_04.png"
       },
       {
-        "title": "Monitor them",
-        "description": "Stay with them and watch their breathing and responsiveness. If they become unresponsive and are not breathing normally, start CPR.",
+        "title": {
+          "en": "Monitor them",
+          "ar": "راقبه"
+        },
+        "description": {
+          "en": "Stay with them and watch their breathing and responsiveness. If they become unresponsive and are not breathing normally, start CPR.",
+          "ar": "ابقَ معه وراقب تنفسه واستجابته. إذا أصبح فاقدًا للاستجابة ولا يتنفس بشكل طبيعي، ابدأ الإنعاش القلبي الرئوي."
+        },
         "image": "assets/emergency_guides/Severe Allergic Reaction/step_05.png"
       }
     ]

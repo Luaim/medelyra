@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 const Color _backgroundColor = Color(0xFFFAF9FC);
 const Color _primaryColor = Color(0xFFD18B3C);
@@ -92,15 +93,17 @@ class _AgePageState extends State<AgePage> {
   void _calculateAge() {
     FocusScope.of(context).unfocus();
 
+    final l10n = AppLocalizations.of(context)!;
+
     if (_dateOfBirth == null) {
-      _showError('Please select your date of birth.');
+      _showError(l10n.pleaseSelectDateOfBirth);
       return;
     }
 
     final today = DateTime.now();
 
     if (_dateOfBirth!.isAfter(today)) {
-      _showError('Date of birth cannot be in the future.');
+      _showError(l10n.dateOfBirthFuture);
       return;
     }
 
@@ -151,8 +154,10 @@ class _AgePageState extends State<AgePage> {
   }
 
   String _formattedDate() {
+    final l10n = AppLocalizations.of(context)!;
+
     if (_dateOfBirth == null) {
-      return 'Select your date of birth';
+      return l10n.selectDateOfBirth;
     }
 
     final day = _dateOfBirth!.day.toString().padLeft(2, '0');
@@ -166,6 +171,8 @@ class _AgePageState extends State<AgePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SafeArea(
       top: false,
       child: Material(
@@ -212,7 +219,7 @@ class _AgePageState extends State<AgePage> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Age Calculator',
+                      l10n.ageCalculator,
                       style: TextStyle(
                         fontSize: 21,
                         fontWeight: FontWeight.w600,
@@ -240,7 +247,7 @@ class _AgePageState extends State<AgePage> {
               const SizedBox(height: 1),
 
               Text(
-                'Find your exact age',
+                l10n.findExactAge,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 15,
@@ -267,7 +274,7 @@ class _AgePageState extends State<AgePage> {
               // ------------------------------------------------------------
 
               Text(
-                'Date of birth',
+                l10n.dateOfBirth,
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -337,9 +344,9 @@ class _AgePageState extends State<AgePage> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Calculate Age',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.calculateAge,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -386,8 +393,7 @@ class _AgePageState extends State<AgePage> {
                     const SizedBox(width: 9),
                     Expanded(
                       child: Text(
-                        'Age is calculated from your date of birth '
-                        'using today\'s date.',
+                        l10n.ageDisclaimer,
                         style: TextStyle(
                           fontSize: 12.5,
                           height: 1.4,
@@ -424,6 +430,7 @@ class _AgeResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     final Color resultBackground =
         isDark ? const Color(0xFF252525) : _backgroundColor;
@@ -451,7 +458,7 @@ class _AgeResultCard extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Your Age',
+            l10n.yourAge,
             style: TextStyle(
               fontSize: 14,
               color: secondaryTextColor,
@@ -468,7 +475,7 @@ class _AgeResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 1),
           Text(
-            'years old',
+            l10n.yearsOld,
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w600,
@@ -477,7 +484,10 @@ class _AgeResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            '$months months • $days days',
+            l10n.ageResultDetails(
+              months.toString(),
+              days.toString(),
+            ),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,

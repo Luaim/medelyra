@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../widgets/nav_bar.dart';
 import 'emergency_guide_details_page.dart';
@@ -46,6 +47,26 @@ class _SosPageState extends State<SosPage> {
       _isDark ? const Color(0xFF9E9E9E) : const Color(0xFF77757D);
 
   // ---------------------------------------------------------------------------
+  // LANGUAGE HELPERS
+  // ---------------------------------------------------------------------------
+
+  bool get _isArabic => Localizations.localeOf(context).languageCode == 'ar';
+
+  String _localizedText(dynamic value) {
+    if (value is Map) {
+      final language = _isArabic ? 'ar' : 'en';
+
+      return value[language]?.toString() ??
+          value['en']?.toString() ??
+          value['ar']?.toString() ??
+          '';
+    }
+
+    // Keeps compatibility with old JSON values if any exist.
+    return value?.toString() ?? '';
+  }
+
+  // ---------------------------------------------------------------------------
   // LOAD GUIDES
   // ---------------------------------------------------------------------------
 
@@ -70,7 +91,6 @@ class _SosPageState extends State<SosPage> {
     }
 
     try {
-      // Load the emergency guides directly from the bundled JSON file.
       final jsonString = await rootBundle.loadString(
         'assets/emergency_guides/emergency_guides.json',
       );
@@ -102,12 +122,18 @@ class _SosPageState extends State<SosPage> {
         filteredGuides = guides;
         isLoading = false;
       });
+
+      // Apply the current search after loading.
+      if (searchController.text.trim().isNotEmpty) {
+        _filterGuides(searchController.text);
+      }
     } catch (e) {
       if (!mounted) return;
 
       setState(() {
         isLoading = false;
-        errorMessage = 'Could not load emergency guides.';
+        errorMessage =
+            AppLocalizations.of(context)!.couldNotLoadEmergencyGuides;
       });
     }
   }
@@ -126,10 +152,10 @@ class _SosPageState extends State<SosPage> {
       }
 
       filteredGuides = allGuides.where((guide) {
-        final title = guide['title']?.toString().toLowerCase() ?? '';
+        final title = _localizedText(guide['title']).toLowerCase();
 
         final description =
-            guide['shortDescription']?.toString().toLowerCase() ?? '';
+            _localizedText(guide['shortDescription']).toLowerCase();
 
         return title.contains(searchText) || description.contains(searchText);
       }).toList();
@@ -224,6 +250,7 @@ class _SosPageState extends State<SosPage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: _pageBackground,
@@ -246,7 +273,7 @@ class _SosPageState extends State<SosPage> {
               // ----------------------------------------------------------------
 
               Text(
-                'Emergency guide',
+                l10n.emergencyGuide,
                 style: TextStyle(
                   fontSize: 27,
                   fontWeight: FontWeight.w700,
@@ -284,7 +311,7 @@ class _SosPageState extends State<SosPage> {
                   ),
                   cursorColor: _isDark ? Colors.white : const Color(0xFF4D4B54),
                   decoration: InputDecoration(
-                    hintText: 'Search emergency help...',
+                    hintText: l10n.searchEmergencyHelp,
                     hintStyle: TextStyle(
                       color: _searchHintColor,
                       fontSize: 16,
@@ -346,7 +373,7 @@ class _SosPageState extends State<SosPage> {
                     const SizedBox(width: 11),
                     Expanded(
                       child: Text(
-                        'Quick first-aid help for common emergencies',
+                        l10n.quickFirstAidHelp,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -393,10 +420,10 @@ class _SosPageState extends State<SosPage> {
 
                     final String id = guide['id']?.toString() ?? '';
 
-                    final String title = guide['title']?.toString() ?? '';
+                    final String title = _localizedText(guide['title']);
 
                     final String description =
-                        guide['shortDescription']?.toString() ?? '';
+                        _localizedText(guide['shortDescription']);
 
                     final String imagePath =
                         guide['thumbnail']?.toString() ?? '';
@@ -438,6 +465,7 @@ class _ErrorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       width: double.infinity,
@@ -470,7 +498,7 @@ class _ErrorCard extends StatelessWidget {
           const SizedBox(height: 14),
           ElevatedButton(
             onPressed: onRetry,
-            child: const Text('Try Again'),
+            child: Text(l10n.tryAgain),
           ),
         ],
       ),
@@ -488,6 +516,7 @@ class _EmptySearchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       width: double.infinity,
@@ -513,7 +542,7 @@ class _EmptySearchCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'No emergency guide found.',
+            l10n.noEmergencyGuideFound,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
@@ -523,7 +552,7 @@ class _EmptySearchCard extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            'Try searching for a different emergency.',
+            l10n.tryDifferentEmergency,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,

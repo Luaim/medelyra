@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -94,6 +95,8 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<void> _handleSignUp() async {
     if (isLoading || isGoogleLoading) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     final userName = userNameController.text.trim();
     final email = emailController.text.trim();
     final password = passwordController.text;
@@ -104,47 +107,47 @@ class _SignUpPageState extends State<SignUpPage> {
     // -------------------------------------------------------------------------
 
     if (userName.isEmpty) {
-      _showMessage('Please enter your user name.');
+      _showMessage(l10n.pleaseEnterUserName);
       return;
     }
 
     if (userName.length < 2) {
-      _showMessage('User name must be at least 2 characters.');
+      _showMessage(l10n.userNameMinLength);
       return;
     }
 
     if (email.isEmpty) {
-      _showMessage('Please enter your email.');
+      _showMessage(l10n.pleaseEnterEmail);
       return;
     }
 
     if (!_isValidEmail(email)) {
-      _showMessage('Please enter a valid email address.');
+      _showMessage(l10n.invalidEmailAddress);
       return;
     }
 
     if (password.isEmpty) {
-      _showMessage('Please enter a password.');
+      _showMessage(l10n.pleaseEnterPassword);
       return;
     }
 
     if (password.length < 6) {
-      _showMessage('Password must be at least 6 characters.');
+      _showMessage(l10n.passwordMinLength);
       return;
     }
 
     if (confirmPassword.isEmpty) {
-      _showMessage('Please confirm your password.');
+      _showMessage(l10n.pleaseConfirmPassword);
       return;
     }
 
     if (password != confirmPassword) {
-      _showMessage('Passwords do not match.');
+      _showMessage(l10n.passwordsDoNotMatch);
       return;
     }
 
     if (!agreeTerms) {
-      _showMessage('Please agree to the Terms & Conditions.');
+      _showMessage(l10n.agreeTermsRequired);
       return;
     }
 
@@ -209,32 +212,31 @@ class _SignUpPageState extends State<SignUpPage> {
 
       switch (e.code) {
         case 'email-already-in-use':
-          message = 'An account already exists with this email.';
+          message = l10n.emailAlreadyInUse;
           break;
 
         case 'invalid-email':
-          message = 'Please enter a valid email address.';
+          message = l10n.invalidEmailAddress;
           break;
 
         case 'weak-password':
-          message = 'Your password is too weak.';
+          message = l10n.weakPassword;
           break;
 
         case 'operation-not-allowed':
-          message =
-              'Email/password sign up is currently unavailable. Please check Firebase Authentication.';
+          message = l10n.emailSignUpUnavailable;
           break;
 
         case 'network-request-failed':
-          message = 'Please check your internet connection and try again.';
+          message = l10n.checkInternet;
           break;
 
         case 'too-many-requests':
-          message = 'Too many attempts. Please try again later.';
+          message = l10n.tooManyAttempts;
           break;
 
         default:
-          message = e.message ?? 'Unable to create your account.';
+          message = e.message ?? l10n.unableToCreateAccount;
       }
 
       _showMessage(message);
@@ -245,7 +247,7 @@ class _SignUpPageState extends State<SignUpPage> {
       if (!mounted) return;
 
       _showMessage(
-        'Sign up failed. Please try again.',
+        l10n.signUpFailed,
       );
     } finally {
       if (mounted) {
@@ -262,6 +264,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void _showTermsAndConditions() {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     final Color dialogBackground =
         isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF8F6F8);
@@ -327,7 +330,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Terms & Conditions',
+                          l10n.termsAndConditions,
                           style: TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w700,
@@ -371,57 +374,48 @@ class _SignUpPageState extends State<SignUpPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _TermsSection(
-                          title: '1. Acceptance of Terms',
-                          text:
-                              'By creating a Medelyra account, you agree to these Terms & Conditions. If you do not agree with these terms, please do not create an account or use the application.',
+                          title: l10n.termsAcceptanceTitle,
+                          text: l10n.termsAcceptanceText,
                           isDark: isDark,
                         ),
                         _TermsSection(
-                          title: '2. Use of Medelyra',
-                          text:
-                              'Medelyra is designed to help users manage and organize their medication-related information and reminders. You agree to use the application only for lawful purposes and in a responsible manner.',
+                          title: l10n.termsUseTitle,
+                          text: l10n.termsUseText,
                           isDark: isDark,
                         ),
                         _TermsSection(
-                          title: '3. Medical Information',
-                          text:
-                              'Medelyra is not a replacement for a doctor, pharmacist, or other qualified healthcare professional. Information and reminders provided through the application should not be considered medical advice. Always follow instructions provided by your healthcare professional.',
+                          title: l10n.termsMedicalTitle,
+                          text: l10n.termsMedicalText,
                           isDark: isDark,
                         ),
                         _TermsSection(
-                          title: '4. Your Account',
-                          text:
-                              'You are responsible for providing accurate information when creating your account and for keeping your account information secure. You are responsible for activity performed through your account.',
+                          title: l10n.termsAccountTitle,
+                          text: l10n.termsAccountText,
                           isDark: isDark,
                         ),
                         _TermsSection(
-                          title: '5. User Information',
-                          text:
-                              'Medelyra may store information that you provide when using the application, such as your name, email address, and information necessary to provide the application services. Your information should be handled according to the application’s privacy practices.',
+                          title: l10n.termsInformationTitle,
+                          text: l10n.termsInformationText,
                           isDark: isDark,
                         ),
                         _TermsSection(
-                          title: '6. Medication Reminders',
-                          text:
-                              'Medication reminders are provided as a convenience. You remain responsible for taking medications according to the instructions given by your healthcare professional. Medelyra should not be relied upon as the sole method for remembering or managing medication.',
+                          title: l10n.termsMedicationTitle,
+                          text: l10n.termsMedicationText,
                           isDark: isDark,
                         ),
                         _TermsSection(
-                          title: '7. Application Availability',
-                          text:
-                              'We aim to keep Medelyra available and functioning correctly, but we cannot guarantee that the application will always be available, error-free, or uninterrupted.',
+                          title: l10n.termsAvailabilityTitle,
+                          text: l10n.termsAvailabilityText,
                           isDark: isDark,
                         ),
                         _TermsSection(
-                          title: '8. Changes to These Terms',
-                          text:
-                              'These Terms & Conditions may be updated from time to time. Continued use of Medelyra after changes are made means that you accept the updated terms.',
+                          title: l10n.termsChangesTitle,
+                          text: l10n.termsChangesText,
                           isDark: isDark,
                         ),
                         _TermsSection(
-                          title: '9. Contact',
-                          text:
-                              'If you have questions about these Terms & Conditions, please contact the Medelyra support team.',
+                          title: l10n.termsContactTitle,
+                          text: l10n.termsContactText,
                           isDark: isDark,
                         ),
                       ],
@@ -456,9 +450,9 @@ class _SignUpPageState extends State<SignUpPage> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                       ),
-                      child: const Text(
-                        'Close',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.close,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -481,8 +475,10 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<void> _handleGoogleSignUp() async {
     if (isLoading || isGoogleLoading) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     if (!agreeTerms) {
-      _showMessage('Please agree to the Terms & Conditions.');
+      _showMessage(l10n.agreeTermsRequired);
       return;
     }
 
@@ -559,33 +555,31 @@ class _SignUpPageState extends State<SignUpPage> {
 
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          message =
-              'An account already exists with this email using a different sign-in method.';
+          message = l10n.accountExistsDifferentMethod;
           break;
 
         case 'credential-already-in-use':
-          message = 'This Google account is already being used.';
+          message = l10n.googleAccountAlreadyUsed;
           break;
 
         case 'operation-not-allowed':
-          message = 'Google Sign-In is not enabled in Firebase.';
+          message = l10n.googleSignInNotEnabled;
           break;
 
         case 'invalid-credential':
-          message =
-              'The Google sign-in information is invalid. Please try again.';
+          message = l10n.invalidGoogleInformation;
           break;
 
         case 'user-disabled':
-          message = 'This account has been disabled.';
+          message = l10n.accountDisabled;
           break;
 
         case 'network-request-failed':
-          message = 'Please check your internet connection and try again.';
+          message = l10n.checkInternet;
           break;
 
         default:
-          message = e.message ?? 'Unable to sign up with Google.';
+          message = e.message ?? l10n.unableToSignUpGoogle;
       }
 
       _showMessage(message);
@@ -596,7 +590,7 @@ class _SignUpPageState extends State<SignUpPage> {
       if (!mounted) return;
 
       _showMessage(
-        'Google Sign-Up failed. Please try again.',
+        l10n.googleSignUpFailed,
       );
     } finally {
       if (mounted) {
@@ -648,6 +642,8 @@ class _SignUpPageState extends State<SignUpPage> {
     final bool isSmall = h < 700;
     final bool busy = isLoading || isGoogleLoading;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: _pageBackground,
       body: SafeArea(
@@ -668,7 +664,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   // =================================================================
 
                   Align(
-                    alignment: Alignment.centerLeft,
+                    alignment: AlignmentDirectional.centerStart,
                     child: Padding(
                       padding: const EdgeInsets.only(
                         top: 2,
@@ -716,7 +712,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   // =================================================================
 
                   Text(
-                    'Sign Up',
+                    l10n.signUp,
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -733,13 +729,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   // USER NAME
                   // =================================================================
 
-                  _buildLabel('User Name'),
+                  _buildLabel(l10n.userName),
 
                   const SizedBox(height: 6),
 
                   _buildTextField(
                     controller: userNameController,
-                    hintText: 'Enter your User Name',
+                    hintText: l10n.enterYourUserName,
                     keyboardType: TextInputType.name,
                     prefixIcon: Icons.person_outline,
                   ),
@@ -750,13 +746,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   // EMAIL
                   // =================================================================
 
-                  _buildLabel('Email'),
+                  _buildLabel(l10n.email),
 
                   const SizedBox(height: 6),
 
                   _buildTextField(
                     controller: emailController,
-                    hintText: 'Enter your Email',
+                    hintText: l10n.enterYourEmail,
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: Icons.email_outlined,
                   ),
@@ -767,13 +763,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   // PASSWORD
                   // =================================================================
 
-                  _buildLabel('Password'),
+                  _buildLabel(l10n.password),
 
                   const SizedBox(height: 6),
 
                   _buildTextField(
                     controller: passwordController,
-                    hintText: 'Enter your Password',
+                    hintText: l10n.enterYourPassword,
                     obscureText: obscurePassword,
                     prefixIcon: Icons.lock_outline,
                     suffixIcon: IconButton(
@@ -800,13 +796,13 @@ class _SignUpPageState extends State<SignUpPage> {
                   // CONFIRM PASSWORD
                   // =================================================================
 
-                  _buildLabel('Confirm Password'),
+                  _buildLabel(l10n.confirmPassword),
 
                   const SizedBox(height: 6),
 
                   _buildTextField(
                     controller: confirmPasswordController,
-                    hintText: 'Confirm your Password',
+                    hintText: l10n.confirmYourPassword,
                     obscureText: obscureConfirmPassword,
                     prefixIcon: Icons.lock_outline,
                     suffixIcon: IconButton(
@@ -885,7 +881,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       // -------------------------------------------------------------
 
                       Text(
-                        'Agree With ',
+                        l10n.agreeWith,
                         style: TextStyle(
                           fontSize: 14,
                           height: 1.2,
@@ -900,9 +896,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
                       GestureDetector(
                         onTap: busy ? null : _showTermsAndConditions,
-                        child: const Text(
-                          'Terms & Conditions',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.termsAndConditions,
+                          style: const TextStyle(
                             fontSize: 14,
                             height: 1.2,
                             color: Color(0xFF1239B5),
@@ -950,9 +946,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
-                              'Sign Up',
-                              style: TextStyle(
+                          : Text(
+                              l10n.signUp,
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -981,7 +977,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           horizontal: 10,
                         ),
                         child: Text(
-                          'OR Continue with',
+                          l10n.orContinueWith,
                           style: TextStyle(
                             color: _dividerTextColor,
                             fontSize: 13,
@@ -1018,7 +1014,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Already have an account? ',
+                        l10n.alreadyHaveAccount,
                         style: TextStyle(
                           fontSize: 14,
                           color: _bodyTextColor,
@@ -1030,9 +1026,9 @@ class _SignUpPageState extends State<SignUpPage> {
                             : () {
                                 Navigator.pop(context);
                               },
-                        child: const Text(
-                          'Sign In',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.signIn,
+                          style: const TextStyle(
                             color: Color(0xFFB51E24),
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -1058,7 +1054,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _buildLabel(String text) {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: AlignmentDirectional.centerStart,
       child: Text(
         text,
         style: TextStyle(
@@ -1185,7 +1181,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        'Continue with Google',
+                        AppLocalizations.of(context)!.continueWithGoogle,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,

@@ -1,0 +1,319 @@
+{
+  "@@locale": "ar",
+
+  "appName": "Medelyra",
+
+  "language": "اللغة",
+  "chooseAppLanguage": "اختر لغة التطبيق",
+
+  "settings": "الإعدادات",
+  "account": "الحساب",
+  "editProfile": "تعديل الملف الشخصي",
+  "updatePersonalInformation": "تحديث معلوماتك الشخصية",
+  "changePassword": "تغيير كلمة المرور",
+  "keepAccountSecure": "حافظ على أمان حسابك",
+
+  "preferences": "التفضيلات",
+  "darkMode": "الوضع الداكن",
+  "switchAppAppearance": "تغيير مظهر التطبيق",
+
+  "more": "المزيد",
+  "privacyPolicy": "سياسة الخصوصية",
+  "readHowDataHandled": "اقرأ كيفية التعامل مع بياناتك",
+  "helpSupport": "المساعدة والدعم",
+  "getHelpUsingApp": "احصل على المساعدة في استخدام التطبيق",
+  "aboutMedelyra": "حول Medelyra",
+  "appVersionInformation": "إصدار التطبيق والمعلومات",
+
+  "accountActions": "إجراءات الحساب",
+  "deleteAccount": "حذف الحساب",
+  "deleteAccountDescription": "حذف حسابك وبيانات ملفك الشخصي نهائيًا",
+
+  "logout": "تسجيل الخروج",
+  "loggingOut": "جارٍ تسجيل الخروج...",
+
+  "english": "الإنجليزية",
+  "arabic": "العربية",
+
+  "logOut": "تسجيل الخروج",
+  "areYouSureLogout": "هل أنت متأكد أنك تريد تسجيل الخروج من حساب Medelyra؟",
+  "cancel": "إلغاء",
+  "unableToLogOut": "تعذر تسجيل الخروج. يرجى المحاولة مرة أخرى.",
+
+  "accountDeleted": "تم حذف حساب Medelyra الخاص بك نهائيًا.",
+  "confirmYourPassword": "تأكيد كلمة المرور",
+  "enterCurrentPassword": "لأمانك، أدخل كلمة المرور الحالية لحذف حسابك نهائيًا.",
+  "currentPassword": "كلمة المرور الحالية",
+  "continueText": "متابعة",
+
+  "deleteAccountWarning": "حذف حساب Medelyra الخاص بك نهائي ولا يمكن التراجع عنه.",
+  "deleteAccountWarningDetails": "سيتم حذف حسابك والمعلومات المخزنة في ملفك الشخصي ولن يمكن استعادتها.",
+  "areYouAbsolutelySure": "هل أنت متأكد تمامًا؟",
+  "finalDeleteConfirmation": "هذا هو التأكيد النهائي.",
+  "deleteAccountFinalDetails": "سيتم حذف حساب Medelyra الخاص بك نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
+  "keepMyAccount": "الاحتفاظ بحسابي",
+  "deletePermanently": "حذف نهائيًا",
+
+  "noAuthenticatedUser": "لم يتم العثور على مستخدم مسجل الدخول.",
+  "googleReauthenticationCancelled": "تم إلغاء إعادة المصادقة باستخدام Google.",
+  "passwordVerificationCancelled": "تم إلغاء التحقق من كلمة المرور.",
+  "noEmailAssociated": "لا يوجد عنوان بريد إلكتروني مرتبط بهذا الحساب.",
+  "securityRecentLogin": "لأمانك، يرجى تسجيل الدخول مرة أخرى قبل حذف حسابك.",
+  "checkInternet": "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.",
+  "sessionExpired": "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى والمحاولة.",
+  "accountNoLongerExists": "هذا الحساب لم يعد موجودًا.",
+  "unableToDeleteAccount": "تعذر حذف حسابك. يرجى المحاولة مرة أخرى.",
+
+  "medelyraAboutDescription": "Medelyra هو تطبيق لإدارة الأدوية والتذكير بها، مصمم لمساعدة المستخدمين على تنظيم أدويتهم وتذكيراتهم ومواعيدهم والمعلومات المتعلقة بصحتهم.",
+  "version": "الإصدار {version}",
+  "@version": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "openSourceLicenses": "تراخيص المصادر المفتوحة",
+  "viewLicenses": "عرض تراخيص البرامج المستخدمة في Medelyra",
+  "close": "إغلاق"
+
+  ,
+"forgotPassword": "نسيت كلمة المرور",
+"forgotPasswordDescription": "أدخل عنوان بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.",
+"email": "البريد الإلكتروني",
+"enterYourEmail": "أدخل بريدك الإلكتروني",
+"sendResetLink": "إرسال رابط إعادة التعيين",
+"rememberYourPassword": "هل تتذكر كلمة المرور؟ ",
+"signIn": "تسجيل الدخول",
+"pleaseEnterEmail": "يرجى إدخال بريدك الإلكتروني.",
+"invalidEmailAddress": "يرجى إدخال عنوان بريد إلكتروني صالح.",
+"passwordResetEmailSent": "تم إرسال بريد إعادة تعيين كلمة المرور. يرجى التحقق من صندوق الوارد.",
+"noAccountFound": "لم يتم العثور على حساب مرتبط بهذا البريد الإلكتروني.",
+"passwordResetUnavailable": "إعادة تعيين كلمة المرور غير متاحة حاليًا. يرجى التواصل مع الدعم.",
+"tooManyRequests": "طلبات كثيرة جدًا. يرجى المحاولة مرة أخرى لاحقًا.",
+"unableToSendResetEmail": "تعذر إرسال بريد إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى.",
+"somethingWentWrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+
+,
+"password": "كلمة المرور",
+"enterYourPassword": "أدخل كلمة المرور",
+"forgotPasswordQuestion": "هل نسيت كلمة المرور؟",
+"orContinueWith": "أو المتابعة باستخدام",
+"continueWithGoogle": "المتابعة باستخدام Google",
+"dontHaveAccount": "ليس لديك حساب؟ ",
+"signUp": "إنشاء حساب",
+"pleaseEnterPassword": "يرجى إدخال كلمة المرور.",
+"incorrectEmailOrPassword": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+"incorrectPassword": "كلمة المرور غير صحيحة.",
+"accountDisabled": "تم تعطيل هذا الحساب.",
+"tooManyAttempts": "محاولات كثيرة جدًا. يرجى المحاولة مرة أخرى لاحقًا.",
+"unableToSignIn": "تعذر تسجيل الدخول.",
+"accountExistsDifferentMethod": "يوجد حساب مرتبط بهذا البريد الإلكتروني باستخدام طريقة تسجيل دخول مختلفة.",
+"invalidGoogleCredential": "بيانات تسجيل الدخول باستخدام Google غير صالحة. يرجى المحاولة مرة أخرى.",
+"googleSignInNotEnabled": "تسجيل الدخول باستخدام Google غير مفعّل في Firebase.",
+"unableToSignInGoogle": "تعذر تسجيل الدخول باستخدام Google.",
+"googleSignInFailed": "فشل تسجيل الدخول باستخدام Google. يرجى المحاولة مرة أخرى."
+
+,
+"userName": "اسم المستخدم",
+"enterYourUserName": "أدخل اسم المستخدم",
+"confirmPassword": "تأكيد كلمة المرور",
+"confirmYourPassword": "أكد كلمة المرور",
+"agreeWith": "أوافق على ",
+"termsAndConditions": "الشروط والأحكام",
+"orContinueWith": "أو المتابعة باستخدام",
+"continueWithGoogle": "المتابعة باستخدام Google",
+"alreadyHaveAccount": "لديك حساب بالفعل؟ ",
+"pleaseEnterUserName": "يرجى إدخال اسم المستخدم.",
+"userNameMinLength": "يجب أن يتكون اسم المستخدم من حرفين على الأقل.",
+"passwordMinLength": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.",
+"pleaseConfirmPassword": "يرجى تأكيد كلمة المرور.",
+"passwordsDoNotMatch": "كلمتا المرور غير متطابقتين.",
+"agreeTermsRequired": "يرجى الموافقة على الشروط والأحكام.",
+"emailAlreadyInUse": "يوجد حساب مرتبط بهذا البريد الإلكتروني بالفعل.",
+"weakPassword": "كلمة المرور ضعيفة جدًا.",
+"emailSignUpUnavailable": "إنشاء الحساب باستخدام البريد الإلكتروني وكلمة المرور غير متاح حاليًا. يرجى التحقق من إعدادات مصادقة Firebase.",
+"unableToCreateAccount": "تعذر إنشاء حسابك.",
+"signUpFailed": "فشل إنشاء الحساب. يرجى المحاولة مرة أخرى.",
+"googleAccountAlreadyUsed": "حساب Google هذا مستخدم بالفعل.",
+"googleSignInNotEnabled": "تسجيل الدخول باستخدام Google غير مفعّل في Firebase.",
+"invalidGoogleInformation": "معلومات تسجيل الدخول باستخدام Google غير صالحة. يرجى المحاولة مرة أخرى.",
+"unableToSignUpGoogle": "تعذر إنشاء الحساب باستخدام Google.",
+"googleSignUpFailed": "فشل إنشاء الحساب باستخدام Google. يرجى المحاولة مرة أخرى.",
+"termsAcceptanceTitle": "1. الموافقة على الشروط",
+"termsAcceptanceText": "بإنشاء حساب Medelyra، فإنك توافق على هذه الشروط والأحكام. إذا كنت لا توافق على هذه الشروط، يرجى عدم إنشاء حساب أو استخدام التطبيق.",
+"termsUseTitle": "2. استخدام Medelyra",
+"termsUseText": "تم تصميم Medelyra لمساعدة المستخدمين على إدارة وتنظيم المعلومات المتعلقة بأدويتهم وتذكيراتهم. توافق على استخدام التطبيق لأغراض قانونية وبطريقة مسؤولة فقط.",
+"termsMedicalTitle": "3. المعلومات الطبية",
+"termsMedicalText": "لا يُعد Medelyra بديلاً عن الطبيب أو الصيدلي أو أي متخصص مؤهل في الرعاية الصحية. لا ينبغي اعتبار المعلومات والتذكيرات المقدمة من خلال التطبيق نصيحة طبية. اتبع دائمًا تعليمات متخصص الرعاية الصحية الخاص بك.",
+"termsAccountTitle": "4. حسابك",
+"termsAccountText": "أنت مسؤول عن تقديم معلومات دقيقة عند إنشاء حسابك وعن الحفاظ على أمان معلومات حسابك. كما أنك مسؤول عن النشاط الذي يتم من خلال حسابك.",
+"termsInformationTitle": "5. معلومات المستخدم",
+"termsInformationText": "قد يخزن Medelyra المعلومات التي تقدمها عند استخدام التطبيق، مثل اسمك وعنوان بريدك الإلكتروني والمعلومات اللازمة لتقديم خدمات التطبيق. يتم التعامل مع معلوماتك وفقًا لممارسات الخصوصية الخاصة بالتطبيق.",
+"termsMedicationTitle": "6. تذكيرات الأدوية",
+"termsMedicationText": "يتم توفير تذكيرات الأدوية كخدمة مساعدة. تظل مسؤولاً عن تناول الأدوية وفقًا للتعليمات التي يقدمها متخصص الرعاية الصحية الخاص بك. لا ينبغي الاعتماد على Medelyra باعتباره الوسيلة الوحيدة لتذكر الأدوية أو إدارتها.",
+"termsAvailabilityTitle": "7. توفر التطبيق",
+"termsAvailabilityText": "نسعى إلى إبقاء Medelyra متاحًا ويعمل بشكل صحيح، ولكن لا يمكننا ضمان أن التطبيق سيكون متاحًا دائمًا أو خاليًا من الأخطاء أو الانقطاعات.",
+"termsChangesTitle": "8. التغييرات على هذه الشروط",
+"termsChangesText": "قد يتم تحديث هذه الشروط والأحكام من وقت لآخر. استمرارك في استخدام Medelyra بعد إجراء التغييرات يعني موافقتك على الشروط المحدثة.",
+"termsContactTitle": "9. التواصل",
+"termsContactText": "إذا كانت لديك أسئلة حول هذه الشروط والأحكام، يرجى التواصل مع فريق دعم Medelyra."
+
+,
+"emergencyGuide": "دليل الطوارئ",
+"searchEmergencyHelp": "ابحث عن مساعدة للطوارئ...",
+"quickFirstAidHelp": "مساعدة سريعة للإسعافات الأولية للحالات الطارئة الشائعة",
+"couldNotLoadEmergencyGuides": "تعذر تحميل أدلة الطوارئ.",
+"tryAgain": "حاول مرة أخرى",
+"noEmergencyGuideFound": "لم يتم العثور على دليل للطوارئ.",
+"tryDifferentEmergency": "حاول البحث عن حالة طارئة مختلفة."
+
+,
+"ageCalculator": "حاسبة العمر",
+"findExactAge": "اعرف عمرك بدقة",
+"dateOfBirth": "تاريخ الميلاد",
+"selectDateOfBirth": "اختر تاريخ ميلادك",
+"calculateAge": "احسب العمر",
+"yourAge": "عمرك",
+"yearsOld": "سنة",
+"ageResultDetails": "{months} شهر • {days} يوم",
+"ageDisclaimer": "يتم حساب العمر بناءً على تاريخ ميلادك باستخدام تاريخ اليوم.",
+"pleaseSelectDateOfBirth": "يرجى اختيار تاريخ ميلادك.",
+"dateOfBirthFuture": "لا يمكن أن يكون تاريخ الميلاد في المستقبل.",
+"noAgeInstructions": "لا تتوفر تعليمات لحساب العمر."
+
+,
+"bloodPressure": "ضغط الدم",
+"understandBloodPressure": "افهم ضغط الدم لديك",
+"systolic": "الانقباضي",
+"diastolic": "الانبساطي",
+"enterSystolicPressure": "أدخل الضغط الانقباضي",
+"enterDiastolicPressure": "أدخل الضغط الانبساطي",
+"checkBloodPressure": "فحص ضغط الدم",
+"validSystolicPressure": "يرجى إدخال ضغط انقباضي صحيح.",
+"validDiastolicPressure": "يرجى إدخال ضغط انبساطي صحيح.",
+"realisticSystolicPressure": "يرجى إدخال ضغط انقباضي واقعي بين 50 و300 ملم زئبق.",
+"realisticDiastolicPressure": "يرجى إدخال ضغط انبساطي واقعي بين 30 و200 ملم زئبق.",
+"diastolicLowerThanSystolic": "يجب أن يكون الضغط الانبساطي أقل من الضغط الانقباضي.",
+"veryHigh": "مرتفع جدًا",
+"veryHighBloodPressureMessage": "هذه القراءة مرتفعة جدًا. إذا كنت تعاني من أعراض مثل ألم الصدر أو صعوبة التنفس أو الضعف أو تغيرات في الرؤية أو صداع شديد، فاطلب المساعدة الطبية الطارئة.",
+"highBloodPressure": "ارتفاع ضغط الدم",
+"highBloodPressureMessage": "هذه القراءة أعلى من النطاق المعتاد. يُنصح بمناقشة قراءاتك مع مختص في الرعاية الصحية.",
+"elevated": "مرتفع",
+"elevatedBloodPressureMessage": "هذه القراءة أعلى من النطاق المعتاد. يُنصح بمراقبة ضغط الدم ومناقشة القراءات المتكررة مع مختص في الرعاية الصحية.",
+"elevatedSystolicMessage": "ضغطك الانقباضي أعلى من النطاق المعتاد. يُنصح بمراقبة ضغط الدم مع مرور الوقت.",
+"normalRange": "ضمن النطاق الطبيعي",
+"normalBloodPressureMessage": "هذه القراءة ضمن النطاق المعتاد لضغط الدم.",
+"yourBloodPressure": "ضغط الدم لديك",
+"bloodPressureDisclaimer": "يمكن أن يتغير ضغط الدم على مدار اليوم. هذه الأداة للمعلومات العامة فقط ولا تُستخدم لتشخيص الحالات الطبية."
+
+,
+"bmiCalculator": "حاسبة مؤشر كتلة الجسم",
+"checkBodyMassIndex": "تحقق من مؤشر كتلة جسمك",
+"height": "الطول",
+"enterYourHeight": "أدخل طولك",
+"weight": "الوزن",
+"enterYourWeight": "أدخل وزنك",
+"calculateBmi": "حساب مؤشر كتلة الجسم",
+"validHeight": "يرجى إدخال طول صحيح.",
+"validWeight": "يرجى إدخال وزن صحيح.",
+"realisticHeight": "يرجى إدخال طول واقعي.",
+"realisticWeight": "يرجى إدخال وزن واقعي.",
+"underweight": "نقص الوزن",
+"healthyWeight": "الوزن الصحي",
+"overweight": "زيادة الوزن",
+"obesity": "السمنة",
+"yourBmi": "مؤشر كتلة جسمك",
+"adultBmiReference": "تُستخدم فئات مؤشر كتلة الجسم للبالغين كمرجع عام للفحص.",
+"bmiDisclaimer": "مؤشر كتلة الجسم هو مقياس للفحص ولا يشخّص الحالات الصحية، وقد لا يكون مناسبًا للجميع."
+
+,
+"healthTools": "أدوات صحية",
+"healthToolsDescription": "أدوات بسيطة تساعدك على فهم صحتك وإدارتها.",
+"searchHealthTools": "ابحث في الأدوات الصحية",
+"tools": "الأدوات",
+"noToolsFound": "لم يتم العثور على أدوات",
+"tryAnotherHealthTool": "حاول البحث عن أداة صحية أخرى",
+
+"bmiToolTitle": "حاسبة مؤشر كتلة الجسم",
+"bmiToolDescription": "تحقق من مؤشر كتلة جسمك",
+
+"ageToolTitle": "حاسبة العمر",
+"ageToolDescription": "احسب عمرك بدقة",
+
+"bloodPressureToolTitle": "ضغط الدم",
+"bloodPressureToolDescription": "افهم قراءة ضغط الدم لديك",
+
+"heartRateToolTitle": "معدل ضربات القلب",
+"heartRateToolDescription": "تحقق من معدل ضربات قلبك",
+
+"medicalUnitConverterToolTitle": "محول الوحدات الطبية",
+"medicalUnitConverterToolDescription": "حوّل الوحدات الطبية الشائعة",
+
+"sleepCalculatorToolTitle": "حاسبة النوم",
+"sleepCalculatorToolDescription": "اعرف أوقات النوم والاستيقاظ المقترحة"
+
+,
+"heartRate": "معدل ضربات القلب",
+"checkYourHeartRate": "تحقق من معدل ضربات قلبك",
+"heartRateLabel": "معدل ضربات القلب",
+"enterYourHeartRate": "أدخل معدل ضربات قلبك",
+"checkHeartRate": "تحقق من معدل ضربات القلب",
+"yourHeartRate": "معدل ضربات قلبك",
+
+"validHeartRate": "يرجى إدخال معدل ضربات قلب صحيح.",
+"realisticHeartRate": "يرجى إدخال معدل ضربات قلب واقعي بين 30 و220 نبضة في الدقيقة.",
+
+"belowTypicalRestingRange": "أقل من المعدل المعتاد أثناء الراحة",
+"belowTypicalRestingRangeMessage": "قد يكون معدل ضربات القلب أثناء الراحة أقل من 60 نبضة في الدقيقة طبيعيًا لبعض الأشخاص، وخاصة الرياضيين المدربين. ضع في اعتبارك معدل ضربات قلبك المعتاد وكيف تشعر.",
+
+"typicalRestingRange": "المعدل المعتاد أثناء الراحة",
+"typicalRestingRangeMessage": "هذه القراءة تقع ضمن النطاق المعتاد المستخدم لمعدل ضربات القلب أثناء الراحة لدى البالغين.",
+
+"aboveTypicalRestingRange": "أعلى من المعدل المعتاد أثناء الراحة",
+"aboveTypicalRestingRangeMessage": "قد يكون لارتفاع معدل ضربات القلب أثناء الراحة عن 100 نبضة في الدقيقة أسباب عديدة. حاول الراحة وإعادة القياس، خاصة إذا كانت هذه القراءة غير معتادة بالنسبة لك.",
+
+"heartRateDisclaimer": "يمكن أن يتغير معدل ضربات القلب بسبب النشاط والتوتر والأدوية وعوامل أخرى. هذه الأداة للمعلومات العامة ولا تُستخدم لتشخيص الحالات الطبية."
+
+,
+"medicalUnitConverter": "محول الوحدات الطبية",
+"convertCommonMedicalUnits": "تحويل الوحدات الطبية الشائعة",
+"convert": "تحويل",
+"value": "القيمة",
+"from": "من",
+"to": "إلى",
+"enterAValue": "أدخل قيمة",
+"convertedValue": "القيمة المحولة",
+
+"validUnitValue": "يرجى إدخال قيمة صحيحة.",
+"unableToConvertValue": "تعذر تحويل هذه القيمة.",
+
+"weightConversion": "الوزن",
+"temperatureConversion": "درجة الحرارة",
+"lengthConversion": "الطول",
+"glucoseConversion": "الجلوكوز",
+
+"medicalUnitConverterDisclaimer": "توفر هذه الأداة تحويلات للوحدات لأغراض مرجعية عامة. ولا تقدم نصائح طبية أو إرشادات حول جرعات الأدوية."
+
+,
+"sleepCalculator": "حاسبة النوم",
+"findSuggestedBedtimes": "العثور على أوقات النوم المقترحة",
+"wakeUpTime": "وقت الاستيقاظ",
+"selectYourWakeUpTime": "اختر وقت الاستيقاظ",
+"calculateBedtimes": "حساب أوقات النوم",
+"selectWakeUpTime": "يرجى اختيار وقت الاستيقاظ.",
+"suggestedBedtimes": "أوقات النوم المقترحة",
+"sleepSuggestionMessage": "تستند هذه الأوقات إلى مدد تقريبية لدورات النوم. قد تختلف احتياجاتك الفعلية من النوم.",
+"sleepCalculatorDisclaimer": "تختلف احتياجات النوم من شخص لآخر. تستند هذه الاقتراحات إلى مدد تقريبية لدورات النوم وليست نصيحة طبية.",
+"oneHour": "ساعة واحدة",
+"hoursCount": "{count} ساعات",
+"@hoursCount": {
+  "placeholders": {
+    "count": {}
+  }
+},
+"decimalHours": "{hours} ساعات",
+"@decimalHours": {
+  "placeholders": {
+    "hours": {}
+  }
+}
+}

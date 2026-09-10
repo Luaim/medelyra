@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:medelyra/services/theme_service.dart';
+import 'package:medelyra/services/language_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -14,8 +16,8 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final ThemeService _themeService = ThemeService.instance;
+  final LanguageService _languageService = LanguageService.instance;
 
-  String selectedLanguage = 'English';
   String appVersion = '';
 
   bool isLoggingOut = false;
@@ -89,8 +91,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
       if (!mounted) return;
 
+      final l10n = AppLocalizations.of(context)!;
+
       _showMessage(
-        'Unable to log out. Please try again.',
+        l10n.unableToLogOut,
       );
     } finally {
       if (mounted) {
@@ -111,6 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
       barrierDismissible: true,
       builder: (dialogContext) {
         final dark = Theme.of(dialogContext).brightness == Brightness.dark;
+        final l10n = AppLocalizations.of(dialogContext)!;
 
         return AlertDialog(
           backgroundColor:
@@ -128,7 +133,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Log Out',
+                  l10n.logOut,
                   style: TextStyle(
                     fontSize: 21,
                     fontWeight: FontWeight.w700,
@@ -139,7 +144,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
           content: Text(
-            'Are you sure you want to log out of your Medelyra account?',
+            l10n.areYouSureLogout,
             style: TextStyle(
               fontSize: 15,
               height: 1.45,
@@ -158,7 +163,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Navigator.pop(dialogContext, false);
               },
               child: Text(
-                'Cancel',
+                l10n.cancel,
                 style: TextStyle(
                   color:
                       dark ? const Color(0xFFBDBDBD) : const Color(0xFF666666),
@@ -178,9 +183,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   borderRadius: BorderRadius.circular(18),
                 ),
               ),
-              child: const Text(
-                'Log Out',
-                style: TextStyle(
+              child: Text(
+                l10n.logOut,
+                style: const TextStyle(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -250,8 +255,10 @@ class _SettingsPageState extends State<SettingsPage> {
       Future.delayed(const Duration(milliseconds: 300), () {
         if (!mounted) return;
 
+        final l10n = AppLocalizations.of(context)!;
+
         _showMessage(
-          'Your Medelyra account has been permanently deleted.',
+          l10n.accountDeleted,
         );
       });
     } on FirebaseAuthException catch (e, stackTrace) {
@@ -262,30 +269,29 @@ class _SettingsPageState extends State<SettingsPage> {
 
       if (!mounted) return;
 
+      final l10n = AppLocalizations.of(context)!;
+
       String message;
 
       switch (e.code) {
         case 'requires-recent-login':
-          message =
-              'For your security, please sign in again before deleting your account.';
+          message = l10n.securityRecentLogin;
           break;
 
         case 'network-request-failed':
-          message = 'Please check your internet connection and try again.';
+          message = l10n.checkInternet;
           break;
 
         case 'user-token-expired':
-          message =
-              'Your session has expired. Please sign in again and try again.';
+          message = l10n.sessionExpired;
           break;
 
         case 'user-not-found':
-          message = 'This account no longer exists.';
+          message = l10n.accountNoLongerExists;
           break;
 
         default:
-          message =
-              e.message ?? 'Unable to delete your account. Please try again.';
+          message = e.message ?? l10n.unableToDeleteAccount;
       }
 
       _showMessage(message);
@@ -295,8 +301,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
       if (!mounted) return;
 
+      final l10n = AppLocalizations.of(context)!;
+
       _showMessage(
-        'Unable to delete your account. Please try again.',
+        l10n.unableToDeleteAccount,
       );
     } finally {
       if (mounted) {
@@ -401,6 +409,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             final dark = Theme.of(context).brightness == Brightness.dark;
+            final l10n = AppLocalizations.of(context)!;
 
             return AlertDialog(
               backgroundColor:
@@ -417,7 +426,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Confirm Your Password',
+                      l10n.confirmYourPassword,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
@@ -432,7 +441,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'For your security, enter your current password to permanently delete your account.',
+                    l10n.enterCurrentPassword,
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.45,
@@ -450,7 +459,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       color: dark ? Colors.white : const Color(0xFF292929),
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Current password',
+                      hintText: l10n.currentPassword,
                       hintStyle: TextStyle(
                         color: dark
                             ? const Color(0xFF888888)
@@ -516,7 +525,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Navigator.pop(dialogContext);
                   },
                   child: Text(
-                    'Cancel',
+                    l10n.cancel,
                     style: TextStyle(
                       color: dark
                           ? const Color(0xFFBDBDBD)
@@ -540,9 +549,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       borderRadius: BorderRadius.circular(18),
                     ),
                   ),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.continueText,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -569,6 +578,7 @@ class _SettingsPageState extends State<SettingsPage> {
       barrierDismissible: true,
       builder: (dialogContext) {
         final dark = Theme.of(dialogContext).brightness == Brightness.dark;
+        final l10n = AppLocalizations.of(dialogContext)!;
 
         return AlertDialog(
           backgroundColor:
@@ -586,7 +596,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Delete Account',
+                  l10n.deleteAccount,
                   style: TextStyle(
                     fontSize: 21,
                     fontWeight: FontWeight.w700,
@@ -597,8 +607,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
           content: Text(
-            'Deleting your Medelyra account is permanent.\n\n'
-            'Your account and the information stored with your profile will be deleted and cannot be recovered.',
+            '${l10n.deleteAccountWarning}\n\n'
+            '${l10n.deleteAccountWarningDetails}',
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
@@ -617,7 +627,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Navigator.pop(dialogContext, false);
               },
               child: Text(
-                'Cancel',
+                l10n.cancel,
                 style: TextStyle(
                   color:
                       dark ? const Color(0xFFBDBDBD) : const Color(0xFF666666),
@@ -637,9 +647,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   borderRadius: BorderRadius.circular(18),
                 ),
               ),
-              child: const Text(
-                'Continue',
-                style: TextStyle(
+              child: Text(
+                l10n.continueText,
+                style: const TextStyle(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -662,6 +672,7 @@ class _SettingsPageState extends State<SettingsPage> {
       barrierDismissible: false,
       builder: (dialogContext) {
         final dark = Theme.of(dialogContext).brightness == Brightness.dark;
+        final l10n = AppLocalizations.of(dialogContext)!;
 
         return AlertDialog(
           backgroundColor:
@@ -670,7 +681,7 @@ class _SettingsPageState extends State<SettingsPage> {
             borderRadius: BorderRadius.circular(22),
           ),
           title: Text(
-            'Are you absolutely sure?',
+            l10n.areYouAbsolutelySure,
             style: TextStyle(
               fontSize: 21,
               fontWeight: FontWeight.w700,
@@ -678,8 +689,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
           content: Text(
-            'This is your final confirmation.\n\n'
-            'Your Medelyra account will be permanently deleted. This action cannot be undone.',
+            '${l10n.finalDeleteConfirmation}\n\n'
+            '${l10n.deleteAccountFinalDetails}',
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
@@ -697,9 +708,9 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text(
-                'Keep My Account',
-                style: TextStyle(
+              child: Text(
+                l10n.keepMyAccount,
+                style: const TextStyle(
                   color: Color(0xFF3D84A8),
                   fontWeight: FontWeight.w600,
                 ),
@@ -717,9 +728,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   borderRadius: BorderRadius.circular(18),
                 ),
               ),
-              child: const Text(
-                'Delete Permanently',
-                style: TextStyle(
+              child: Text(
+                l10n.deletePermanently,
+                style: const TextStyle(
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -762,6 +773,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final smallScreen = screenHeight < 700;
 
     final bool dark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     final bool busy = isLoggingOut || isDeletingAccount;
 
@@ -784,7 +796,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         title: Text(
-          'Settings',
+          l10n.settings,
           style: TextStyle(
             color: dark ? Colors.white : const Color(0xFF222222),
             fontSize: 24,
@@ -811,14 +823,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
 
                 // ACCOUNT
-                _sectionTitle('Account'),
+                _sectionTitle(l10n.account),
 
                 const SizedBox(height: 10),
 
                 _SettingsTile(
                   icon: Icons.person_outline_rounded,
-                  title: 'Edit Profile',
-                  subtitle: 'Update your personal information',
+                  title: l10n.editProfile,
+                  subtitle: l10n.updatePersonalInformation,
                   onTap: busy
                       ? () {}
                       : () {
@@ -833,8 +845,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 _SettingsTile(
                   icon: Icons.lock_outline_rounded,
-                  title: 'Change Password',
-                  subtitle: 'Keep your account secure',
+                  title: l10n.changePassword,
+                  subtitle: l10n.keepAccountSecure,
                   onTap: busy
                       ? () {}
                       : () {
@@ -850,14 +862,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
 
                 // PREFERENCES
-                _sectionTitle('Preferences'),
+                _sectionTitle(l10n.preferences),
 
                 const SizedBox(height: 10),
 
                 _SwitchTile(
                   icon: Icons.dark_mode_outlined,
-                  title: 'Dark Mode',
-                  subtitle: 'Switch app appearance',
+                  title: l10n.darkMode,
+                  subtitle: l10n.switchAppAppearance,
                   value: _themeService.isDarkMode,
                   onChanged: busy
                       ? (_) {}
@@ -870,22 +882,22 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 _DropdownTile(
                   icon: Icons.language_rounded,
-                  title: 'Language',
-                  subtitle: 'Choose app language',
-                  value: selectedLanguage,
-                  items: const [
-                    'English',
-                    'Arabic',
-                    'Malay',
+                  title: l10n.language,
+                  subtitle: l10n.chooseAppLanguage,
+                  value: _languageService.isArabic ? l10n.arabic : l10n.english,
+                  items: [
+                    l10n.english,
+                    l10n.arabic,
                   ],
                   onChanged: busy
                       ? (_) {}
-                      : (value) {
-                          if (value != null) {
-                            setState(() {
-                              selectedLanguage = value;
-                            });
-                          }
+                      : (value) async {
+                          if (value == null) return;
+
+                          final languageCode =
+                              value == l10n.arabic ? 'ar' : 'en';
+
+                          await _languageService.setLanguage(languageCode);
                         },
                 ),
 
@@ -894,14 +906,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
 
                 // MORE
-                _sectionTitle('More'),
+                _sectionTitle(l10n.more),
 
                 const SizedBox(height: 10),
 
                 _SettingsTile(
                   icon: Icons.privacy_tip_outlined,
-                  title: 'Privacy Policy',
-                  subtitle: 'Read how your data is handled',
+                  title: l10n.privacyPolicy,
+                  subtitle: l10n.readHowDataHandled,
                   onTap: busy
                       ? () {}
                       : () {
@@ -916,8 +928,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 _SettingsTile(
                   icon: Icons.help_outline_rounded,
-                  title: 'Help & Support',
-                  subtitle: 'Get help using the app',
+                  title: l10n.helpSupport,
+                  subtitle: l10n.getHelpUsingApp,
                   onTap: busy
                       ? () {}
                       : () {
@@ -932,8 +944,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 _SettingsTile(
                   icon: Icons.info_outline_rounded,
-                  title: 'About Medelyra',
-                  subtitle: 'App version and information',
+                  title: l10n.aboutMedelyra,
+                  subtitle: l10n.appVersionInformation,
                   onTap: busy
                       ? () {}
                       : () {
@@ -946,7 +958,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
 
                 // ACCOUNT ACTIONS
-                _sectionTitle('Account Actions'),
+                _sectionTitle(l10n.accountActions),
 
                 const SizedBox(height: 10),
 
@@ -1000,7 +1012,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Delete Account',
+                                    l10n.deleteAccount,
                                     style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w700,
@@ -1011,7 +1023,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'Permanently delete your account and profile data',
+                                    l10n.deleteAccountDescription,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: dark
@@ -1060,7 +1072,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             Icons.logout_rounded,
                           ),
                     label: Text(
-                      isLoggingOut ? 'Logging Out...' : 'Logout',
+                      isLoggingOut ? l10n.loggingOut : l10n.logout,
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: dark
@@ -1102,6 +1114,7 @@ class _SettingsPageState extends State<SettingsPage> {
       barrierDismissible: true,
       builder: (dialogContext) {
         final dark = Theme.of(dialogContext).brightness == Brightness.dark;
+        final l10n = AppLocalizations.of(dialogContext)!;
 
         return Dialog(
           backgroundColor: Colors.transparent,
@@ -1152,7 +1165,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 // APP NAME
                 Text(
-                  'Medelyra',
+                  l10n.appName,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -1165,7 +1178,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 // VERSION
                 Text(
-                  appVersion.isEmpty ? 'Version 1.0.0' : 'Version $appVersion',
+                  l10n.version(
+                    appVersion.isEmpty ? '1.0.0' : appVersion,
+                  ),
                   style: TextStyle(
                     fontSize: 13,
                     color: dark
@@ -1192,9 +1207,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   child: Text(
-                    'Medelyra is a medication management and reminder app '
-                    'designed to help users organize their medications, '
-                    'reminders, schedules, and health-related information.',
+                    l10n.medelyraAboutDescription,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -1216,7 +1229,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     showLicensePage(
                       context: context,
-                      applicationName: 'Medelyra',
+                      applicationName: l10n.appName,
                       applicationVersion:
                           appVersion.isEmpty ? '1.0.0' : appVersion,
                     );
@@ -1246,7 +1259,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Open Source Licenses',
+                                l10n.openSourceLicenses,
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -1257,7 +1270,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'View licenses for software used by Medelyra',
+                                l10n.viewLicenses,
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: dark
@@ -1298,9 +1311,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    child: const Text(
-                      'Close',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.close,
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),

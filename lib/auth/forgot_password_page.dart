@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -68,6 +69,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Future<void> _sendResetEmail() async {
     if (isLoading) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     final String email = emailController.text.trim();
 
     // ------------------------------------------------------------
@@ -75,12 +78,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     // ------------------------------------------------------------
 
     if (email.isEmpty) {
-      _showMessage('Please enter your email.');
+      _showMessage(l10n.pleaseEnterEmail);
       return;
     }
 
     if (!_isValidEmail(email)) {
-      _showMessage('Please enter a valid email address.');
+      _showMessage(l10n.invalidEmailAddress);
       return;
     }
 
@@ -106,7 +109,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       if (!mounted) return;
 
       _showSuccessMessage(
-        'Password reset email sent. Please check your inbox.',
+        l10n.passwordResetEmailSent,
       );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
@@ -120,28 +123,27 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
       switch (e.code) {
         case 'invalid-email':
-          message = 'Please enter a valid email address.';
+          message = l10n.invalidEmailAddress;
           break;
 
         case 'user-not-found':
-          message = 'No account was found with this email.';
+          message = l10n.noAccountFound;
           break;
 
         case 'operation-not-allowed':
-          message = 'Password reset is currently unavailable. '
-              'Please contact support.';
+          message = l10n.passwordResetUnavailable;
           break;
 
         case 'network-request-failed':
-          message = 'Please check your internet connection and try again.';
+          message = l10n.checkInternet;
           break;
 
         case 'too-many-requests':
-          message = 'Too many requests. Please try again later.';
+          message = l10n.tooManyRequests;
           break;
 
         default:
-          message = 'Unable to send reset email. Please try again.';
+          message = l10n.unableToSendResetEmail;
           break;
       }
 
@@ -154,7 +156,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       if (!mounted) return;
 
       _showMessage(
-        'Something went wrong. Please try again.',
+        l10n.somethingWentWrong,
       );
     } finally {
       if (mounted) {
@@ -223,6 +225,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     final double h = size.height;
     final double w = size.width;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: _pageBackground,
       body: SafeArea(
@@ -267,7 +271,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         // ==================================================
 
                         Text(
-                          'Forgot Password',
+                          l10n.forgotPassword,
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
@@ -287,8 +291,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             horizontal: 10,
                           ),
                           child: Text(
-                            'Enter your email address and we will send you '
-                            'a link to reset your password.',
+                            l10n.forgotPasswordDescription,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
@@ -304,7 +307,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         // EMAIL LABEL
                         // ==================================================
 
-                        _buildLabel('Email'),
+                        _buildLabel(l10n.email),
 
                         const SizedBox(height: 6),
 
@@ -314,7 +317,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                         _buildTextField(
                           controller: emailController,
-                          hintText: 'Enter your Email',
+                          hintText: l10n.enterYourEmail,
                           prefixIcon: Icons.email_outlined,
                         ),
 
@@ -379,9 +382,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                         color: Colors.white,
                                       ),
                                     )
-                                  : const Text(
-                                      'Send Reset Link',
-                                      style: TextStyle(
+                                  : Text(
+                                      l10n.sendResetLink,
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600,
@@ -401,7 +404,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Remember your password? ',
+                              l10n.rememberYourPassword,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: _signInTextColor,
@@ -413,9 +416,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                   : () {
                                       Navigator.pop(context);
                                     },
-                              child: const Text(
-                                'Sign In',
-                                style: TextStyle(
+                              child: Text(
+                                l10n.signIn,
+                                style: const TextStyle(
                                   color: Color(0xFF9B1C1C),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
@@ -470,7 +473,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   Widget _buildLabel(String text) {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: AlignmentDirectional.centerStart,
       child: Text(
         text,
         style: TextStyle(

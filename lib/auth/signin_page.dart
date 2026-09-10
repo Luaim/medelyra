@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -33,21 +34,23 @@ class _SignInPageState extends State<SignInPage>
   Future<void> _handleSignIn() async {
     if (isLoading || isGoogleLoading) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     final email = emailController.text.trim();
     final password = passwordController.text;
 
     if (email.isEmpty) {
-      _showMessage('Please enter your email.');
+      _showMessage(l10n.pleaseEnterEmail);
       return;
     }
 
     if (!_isValidEmail(email)) {
-      _showMessage('Please enter a valid email address.');
+      _showMessage(l10n.invalidEmailAddress);
       return;
     }
 
     if (password.isEmpty) {
-      _showMessage('Please enter your password.');
+      _showMessage(l10n.pleaseEnterPassword);
       return;
     }
 
@@ -74,35 +77,35 @@ class _SignInPageState extends State<SignInPage>
 
       switch (e.code) {
         case 'invalid-credential':
-          message = 'Incorrect email or password.';
+          message = l10n.incorrectEmailOrPassword;
           break;
 
         case 'user-not-found':
-          message = 'No account was found with this email.';
+          message = l10n.noAccountFound;
           break;
 
         case 'wrong-password':
-          message = 'Incorrect password.';
+          message = l10n.incorrectPassword;
           break;
 
         case 'invalid-email':
-          message = 'Please enter a valid email address.';
+          message = l10n.invalidEmailAddress;
           break;
 
         case 'user-disabled':
-          message = 'This account has been disabled.';
+          message = l10n.accountDisabled;
           break;
 
         case 'too-many-requests':
-          message = 'Too many attempts. Please try again later.';
+          message = l10n.tooManyAttempts;
           break;
 
         case 'network-request-failed':
-          message = 'Please check your internet connection and try again.';
+          message = l10n.checkInternet;
           break;
 
         default:
-          message = e.message ?? 'Unable to sign in.';
+          message = e.message ?? l10n.unableToSignIn;
       }
 
       _showMessage(message);
@@ -114,7 +117,7 @@ class _SignInPageState extends State<SignInPage>
       );
 
       _showMessage(
-        'Something went wrong. Please try again.',
+        l10n.somethingWentWrong,
       );
     } finally {
       if (mounted) {
@@ -131,6 +134,8 @@ class _SignInPageState extends State<SignInPage>
 
   Future<void> _handleGoogleSignIn() async {
     if (isLoading || isGoogleLoading) return;
+
+    final l10n = AppLocalizations.of(context)!;
 
     setState(() {
       isGoogleLoading = true;
@@ -171,29 +176,27 @@ class _SignInPageState extends State<SignInPage>
 
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          message =
-              'An account already exists with this email using a different sign-in method.';
+          message = l10n.accountExistsDifferentMethod;
           break;
 
         case 'invalid-credential':
-          message =
-              'The Google sign-in credential is invalid. Please try again.';
+          message = l10n.invalidGoogleCredential;
           break;
 
         case 'operation-not-allowed':
-          message = 'Google Sign-In is not enabled in Firebase.';
+          message = l10n.googleSignInNotEnabled;
           break;
 
         case 'user-disabled':
-          message = 'This account has been disabled.';
+          message = l10n.accountDisabled;
           break;
 
         case 'network-request-failed':
-          message = 'Please check your internet connection and try again.';
+          message = l10n.checkInternet;
           break;
 
         default:
-          message = e.message ?? 'Unable to sign in with Google.';
+          message = e.message ?? l10n.unableToSignInGoogle;
       }
 
       _showMessage(message);
@@ -205,7 +208,7 @@ class _SignInPageState extends State<SignInPage>
       );
 
       _showMessage(
-        'Google Sign-In failed. Please try again.',
+        l10n.googleSignInFailed,
       );
     } finally {
       if (mounted) {
@@ -259,6 +262,8 @@ class _SignInPageState extends State<SignInPage>
     final bool isSmall = h < 700;
     final bool busy = isLoading || isGoogleLoading;
 
+    final l10n = AppLocalizations.of(context)!;
+
     // =========================================================================
     // THEME COLORS
     // =========================================================================
@@ -308,7 +313,7 @@ class _SignInPageState extends State<SignInPage>
                     // =================================================================
 
                     Text(
-                      'Sign In',
+                      l10n.signIn,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
@@ -326,7 +331,7 @@ class _SignInPageState extends State<SignInPage>
                     // =================================================================
 
                     _buildLabel(
-                      'Email',
+                      l10n.email,
                       isDark: isDark,
                     ),
 
@@ -335,7 +340,7 @@ class _SignInPageState extends State<SignInPage>
                     _buildTextField(
                       context: context,
                       controller: emailController,
-                      hintText: 'Enter your Email',
+                      hintText: l10n.enterYourEmail,
                       prefixIcon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       isDark: isDark,
@@ -348,7 +353,7 @@ class _SignInPageState extends State<SignInPage>
                     // =================================================================
 
                     _buildLabel(
-                      'Password',
+                      l10n.password,
                       isDark: isDark,
                     ),
 
@@ -357,7 +362,7 @@ class _SignInPageState extends State<SignInPage>
                     _buildTextField(
                       context: context,
                       controller: passwordController,
-                      hintText: 'Enter your Password',
+                      hintText: l10n.enterYourPassword,
                       prefixIcon: Icons.lock_outline,
                       obscureText: obscurePassword,
                       keyboardType: TextInputType.text,
@@ -389,7 +394,7 @@ class _SignInPageState extends State<SignInPage>
                     // =================================================================
 
                     Align(
-                      alignment: Alignment.centerRight,
+                      alignment: AlignmentDirectional.centerEnd,
                       child: GestureDetector(
                         onTap: busy
                             ? null
@@ -399,13 +404,13 @@ class _SignInPageState extends State<SignInPage>
                                   '/forgot-password',
                                 );
                               },
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
                             vertical: 6,
                           ),
                           child: Text(
-                            'Forgot Password?',
-                            style: TextStyle(
+                            l10n.forgotPasswordQuestion,
+                            style: const TextStyle(
                               color: Color(0xFF9B1C1C),
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -478,9 +483,9 @@ class _SignInPageState extends State<SignInPage>
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text(
-                                  'Sign In',
-                                  style: TextStyle(
+                              : Text(
+                                  l10n.signIn,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
@@ -511,7 +516,7 @@ class _SignInPageState extends State<SignInPage>
                             horizontal: 10,
                           ),
                           child: Text(
-                            'OR Continue with',
+                            l10n.orContinueWith,
                             style: TextStyle(
                               color: secondaryText,
                               fontSize: 13,
@@ -538,6 +543,7 @@ class _SignInPageState extends State<SignInPage>
                     _googleButton(
                       context,
                       isDark: isDark,
+                      googleText: l10n.continueWithGoogle,
                     ),
 
                     const SizedBox(height: 18),
@@ -550,7 +556,7 @@ class _SignInPageState extends State<SignInPage>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Don’t have an account? ',
+                          l10n.dontHaveAccount,
                           style: TextStyle(
                             fontSize: 14,
                             color: isDark
@@ -567,9 +573,9 @@ class _SignInPageState extends State<SignInPage>
                                     '/signup',
                                   );
                                 },
-                          child: const Text(
-                            'Sign Up',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.signUp,
+                            style: const TextStyle(
                               color: Color(0xFF9B1C1C),
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -599,7 +605,7 @@ class _SignInPageState extends State<SignInPage>
     required bool isDark,
   }) {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: AlignmentDirectional.centerStart,
       child: Text(
         text,
         style: TextStyle(
@@ -684,6 +690,7 @@ class _SignInPageState extends State<SignInPage>
   Widget _googleButton(
     BuildContext context, {
     required bool isDark,
+    required String googleText,
   }) {
     final bool disabled = isLoading || isGoogleLoading;
 
@@ -738,7 +745,7 @@ class _SignInPageState extends State<SignInPage>
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          'Continue with Google',
+                          googleText,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,

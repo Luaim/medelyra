@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 const Color _backgroundColor = Color(0xFFFAF9FC);
 const Color _primaryColor = Color(0xFF7A63B8);
@@ -81,17 +82,19 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
   void _convert() {
     FocusScope.of(context).unfocus();
 
+    final l10n = AppLocalizations.of(context)!;
+
     final input = double.tryParse(
       _valueController.text.trim().replaceAll(',', '.'),
     );
 
     if (input == null) {
-      _showError('Please enter a valid value.');
+      _showError(l10n.validUnitValue);
       return;
     }
 
     if (!input.isFinite) {
-      _showError('Please enter a valid value.');
+      _showError(l10n.validUnitValue);
       return;
     }
 
@@ -103,7 +106,7 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
     );
 
     if (result == null || !result.isFinite) {
-      _showError('Unable to convert this value.');
+      _showError(l10n.unableToConvertValue);
       return;
     }
 
@@ -223,7 +226,10 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final hasResult = _result != null && _resultText != null;
+
     final availableUnits = _units[_conversionType]!;
 
     return SafeArea(
@@ -276,7 +282,7 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Medical Unit Converter',
+                          l10n.medicalUnitConverter,
                           style: TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w600,
@@ -312,10 +318,12 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // ----------------------------------------------------------------
                       // DESCRIPTION
+                      // ----------------------------------------------------------------
 
                       Text(
-                        'Convert common medical units',
+                        l10n.convertCommonMedicalUnits,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
@@ -325,7 +333,9 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
 
                       const SizedBox(height: 18),
 
+                      // ----------------------------------------------------------------
                       // ICON
+                      // ----------------------------------------------------------------
 
                       const Icon(
                         Icons.swap_horiz_rounded,
@@ -340,7 +350,7 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                       // ----------------------------------------------------------------
 
                       Text(
-                        'Convert',
+                        l10n.convert,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -363,7 +373,7 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                       // ----------------------------------------------------------------
 
                       Text(
-                        'Value',
+                        l10n.value,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -388,7 +398,7 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                         children: [
                           Expanded(
                             child: _UnitDropdown(
-                              label: 'From',
+                              label: l10n.from,
                               value: _fromUnit,
                               items: availableUnits,
                               onChanged: (value) {
@@ -404,7 +414,7 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _UnitDropdown(
-                              label: 'To',
+                              label: l10n.to,
                               value: _toUnit,
                               items: availableUnits,
                               onChanged: (value) {
@@ -438,9 +448,9 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Text(
-                            'Convert',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.convert,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -485,9 +495,7 @@ class _MedicalUnitConverterPageState extends State<MedicalUnitConverterPage> {
                             const SizedBox(width: 9),
                             Expanded(
                               child: Text(
-                                'This tool provides unit conversions for '
-                                'general reference. It does not provide '
-                                'medical or medication dosing advice.',
+                                l10n.medicalUnitConverterDisclaimer,
                                 style: TextStyle(
                                   fontSize: 12.5,
                                   height: 1.4,
@@ -525,9 +533,28 @@ class _DropdownField extends StatelessWidget {
     required this.onChanged,
   });
 
+  String _localizedConversionType(
+    String item,
+    AppLocalizations l10n,
+  ) {
+    switch (item) {
+      case 'Weight':
+        return l10n.weightConversion;
+      case 'Temperature':
+        return l10n.temperatureConversion;
+      case 'Length':
+        return l10n.lengthConversion;
+      case 'Glucose':
+        return l10n.glucoseConversion;
+      default:
+        return item;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     final fieldBackground =
         isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
@@ -567,7 +594,9 @@ class _DropdownField extends StatelessWidget {
           items: items.map((item) {
             return DropdownMenuItem<String>(
               value: item,
-              child: Text(item),
+              child: Text(
+                _localizedConversionType(item, l10n),
+              ),
             );
           }).toList(),
           onChanged: onChanged,
@@ -593,6 +622,7 @@ class _ValueInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       height: 52,
@@ -614,7 +644,7 @@ class _ValueInputField extends StatelessWidget {
           color: isDark ? Colors.white : _textColor,
         ),
         decoration: InputDecoration(
-          hintText: 'Enter a value',
+          hintText: l10n.enterAValue,
           hintStyle: TextStyle(
             fontSize: 15,
             color: isDark ? const Color(0xFF8E8E8E) : const Color(0xFF9CA3AF),
@@ -728,6 +758,7 @@ class _ConverterResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -744,7 +775,7 @@ class _ConverterResultCard extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Converted value',
+            l10n.convertedValue,
             style: TextStyle(
               fontSize: 14,
               color: isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor,

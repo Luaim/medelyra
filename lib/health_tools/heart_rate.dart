@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 const Color _backgroundColor = Color(0xFFFAF9FC);
 const Color _primaryColor = Color(0xFFD95C68);
@@ -53,6 +54,8 @@ class _HeartRatePageState extends State<HeartRatePage> {
   void _checkHeartRate() {
     FocusScope.of(context).unfocus();
 
+    final l10n = AppLocalizations.of(context)!;
+
     setState(() {
       _errorMessage = null;
       _category = null;
@@ -66,19 +69,20 @@ class _HeartRatePageState extends State<HeartRatePage> {
 
     // Empty / invalid input
     if (heartRate == null || heartRate <= 0) {
-      _showError('Please enter a valid heart rate.');
+      _showError(l10n.validHeartRate);
       return;
     }
 
     // Unrealistic input
     if (heartRate < 30 || heartRate > 220) {
-      _showError(
-        'Please enter a realistic heart rate between 30 and 220 bpm.',
-      );
+      _showError(l10n.realisticHeartRate);
       return;
     }
 
-    final result = _getHeartRateCategory(heartRate);
+    final result = _getHeartRateCategory(
+      heartRate,
+      l10n,
+    );
 
     setState(() {
       _resultHeartRate = heartRate;
@@ -92,29 +96,27 @@ class _HeartRatePageState extends State<HeartRatePage> {
   // HEART RATE CATEGORY
   // --------------------------------------------------------------------------
 
-  (String, String) _getHeartRateCategory(int heartRate) {
+  (String, String) _getHeartRateCategory(
+    int heartRate,
+    AppLocalizations l10n,
+  ) {
     if (heartRate < 60) {
       return (
-        'Below typical resting range',
-        'A resting heart rate below 60 bpm can be normal for some '
-            'people, especially trained athletes. Consider your usual '
-            'resting heart rate and how you feel.',
+        l10n.belowTypicalRestingRange,
+        l10n.belowTypicalRestingRangeMessage,
       );
     }
 
     if (heartRate <= 100) {
       return (
-        'Typical resting range',
-        'This reading is within the commonly used resting heart rate '
-            'range for adults.',
+        l10n.typicalRestingRange,
+        l10n.typicalRestingRangeMessage,
       );
     }
 
     return (
-      'Above typical resting range',
-      'A resting heart rate above 100 bpm can have many causes. '
-          'Consider resting and checking again, especially if this '
-          'is unusual for you.',
+      l10n.aboveTypicalRestingRange,
+      l10n.aboveTypicalRestingRangeMessage,
     );
   }
 
@@ -157,6 +159,8 @@ class _HeartRatePageState extends State<HeartRatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final hasResult =
         _category != null && _message != null && _resultHeartRate != null;
 
@@ -212,7 +216,7 @@ class _HeartRatePageState extends State<HeartRatePage> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Heart Rate',
+                          l10n.heartRate,
                           style: TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w600,
@@ -253,7 +257,7 @@ class _HeartRatePageState extends State<HeartRatePage> {
                       // ----------------------------------------------------------
 
                       Text(
-                        'Check your heart rate',
+                        l10n.checkYourHeartRate,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
@@ -280,7 +284,7 @@ class _HeartRatePageState extends State<HeartRatePage> {
                       // ----------------------------------------------------------
 
                       Text(
-                        'Heart rate',
+                        l10n.heartRateLabel,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -313,9 +317,9 @@ class _HeartRatePageState extends State<HeartRatePage> {
                               borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          child: const Text(
-                            'Check Heart Rate',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.checkHeartRate,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -373,10 +377,7 @@ class _HeartRatePageState extends State<HeartRatePage> {
                             const SizedBox(width: 9),
                             Expanded(
                               child: Text(
-                                'Heart rate can change with activity, stress, '
-                                'medications, and other factors. This tool is '
-                                'for general information and does not diagnose '
-                                'medical conditions.',
+                                l10n.heartRateDisclaimer,
                                 style: TextStyle(
                                   fontSize: 12.5,
                                   height: 1.4,
@@ -415,6 +416,7 @@ class _HeartRateInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     final fieldBackground =
         isDark ? const Color(0xFF252525) : const Color(0xFFFAFAFC);
@@ -448,7 +450,7 @@ class _HeartRateInputField extends StatelessWidget {
                 color: textColor,
               ),
               decoration: InputDecoration(
-                hintText: 'Enter your heart rate',
+                hintText: l10n.enterYourHeartRate,
                 hintStyle: TextStyle(
                   fontSize: 15,
                   color: hintColor,
@@ -564,6 +566,8 @@ class _HeartRateResultCard extends StatelessWidget {
     final secondaryTextColor =
         isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 18,
@@ -579,7 +583,7 @@ class _HeartRateResultCard extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Your heart rate',
+            l10n.yourHeartRate,
             style: TextStyle(
               fontSize: 14,
               color: secondaryTextColor,

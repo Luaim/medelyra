@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../widgets/nav_bar.dart';
 import 'age.dart';
@@ -47,44 +48,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
   // HEALTH TOOLS
   // --------------------------------------------------------------------------
 
-  final List<_HealthTool> _tools = const [
-    _HealthTool(
-      title: 'BMI Calculator',
-      description: 'Check your body mass index',
-      icon: Icons.monitor_weight_outlined,
-      iconColor: Color(0xFF3D84A8),
-    ),
-    _HealthTool(
-      title: 'Age Calculator',
-      description: 'Find your exact age',
-      icon: Icons.cake_outlined,
-      iconColor: Color(0xFFD18B3C),
-    ),
-    _HealthTool(
-      title: 'Blood Pressure',
-      description: 'Understand your blood pressure',
-      icon: Icons.favorite_outline,
-      iconColor: Color(0xFFD95C68),
-    ),
-    _HealthTool(
-      title: 'Heart Rate',
-      description: 'Check your heart rate',
-      icon: Icons.monitor_heart_outlined,
-      iconColor: Color(0xFFC95C68),
-    ),
-    _HealthTool(
-      title: 'Medical Unit Converter',
-      description: 'Convert common medical units',
-      icon: Icons.swap_horiz_rounded,
-      iconColor: Color(0xFF7167B7),
-    ),
-    _HealthTool(
-      title: 'Sleep Calculator',
-      description: 'Find suggested sleep and wake times',
-      icon: Icons.bedtime_outlined,
-      iconColor: Color(0xFF6B67B7),
-    ),
-  ];
+  List<_HealthTool> _tools = [];
 
   late List<_HealthTool> _filteredTools;
 
@@ -96,7 +60,6 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
   void initState() {
     super.initState();
 
-    _filteredTools = _tools;
     _searchController.addListener(_filterTools);
   }
 
@@ -109,6 +72,57 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
     _searchController.removeListener(_filterTools);
     _searchController.dispose();
     super.dispose();
+  }
+
+  // --------------------------------------------------------------------------
+  // LOCALIZED TOOLS
+  // --------------------------------------------------------------------------
+
+  List<_HealthTool> _buildTools(AppLocalizations l10n) {
+    return [
+      _HealthTool(
+        id: 'bmi',
+        title: l10n.bmiToolTitle,
+        description: l10n.bmiToolDescription,
+        icon: Icons.monitor_weight_outlined,
+        iconColor: const Color(0xFF3D84A8),
+      ),
+      _HealthTool(
+        id: 'age',
+        title: l10n.ageToolTitle,
+        description: l10n.ageToolDescription,
+        icon: Icons.cake_outlined,
+        iconColor: const Color(0xFFD18B3C),
+      ),
+      _HealthTool(
+        id: 'blood_pressure',
+        title: l10n.bloodPressureToolTitle,
+        description: l10n.bloodPressureToolDescription,
+        icon: Icons.favorite_outline,
+        iconColor: const Color(0xFFD95C68),
+      ),
+      _HealthTool(
+        id: 'heart_rate',
+        title: l10n.heartRateToolTitle,
+        description: l10n.heartRateToolDescription,
+        icon: Icons.monitor_heart_outlined,
+        iconColor: const Color(0xFFC95C68),
+      ),
+      _HealthTool(
+        id: 'medical_unit_converter',
+        title: l10n.medicalUnitConverterToolTitle,
+        description: l10n.medicalUnitConverterToolDescription,
+        icon: Icons.swap_horiz_rounded,
+        iconColor: const Color(0xFF7167B7),
+      ),
+      _HealthTool(
+        id: 'sleep_calculator',
+        title: l10n.sleepCalculatorToolTitle,
+        description: l10n.sleepCalculatorToolDescription,
+        icon: Icons.bedtime_outlined,
+        iconColor: const Color(0xFF6B67B7),
+      ),
+    ];
   }
 
   // --------------------------------------------------------------------------
@@ -135,7 +149,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
   // --------------------------------------------------------------------------
 
   void _openTool(_HealthTool tool) {
-    if (tool.title == 'BMI Calculator') {
+    if (tool.id == 'bmi') {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -148,7 +162,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
       return;
     }
 
-    if (tool.title == 'Age Calculator') {
+    if (tool.id == 'age') {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -161,7 +175,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
       return;
     }
 
-    if (tool.title == 'Blood Pressure') {
+    if (tool.id == 'blood_pressure') {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -174,7 +188,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
       return;
     }
 
-    if (tool.title == 'Heart Rate') {
+    if (tool.id == 'heart_rate') {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -187,7 +201,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
       return;
     }
 
-    if (tool.title == 'Medical Unit Converter') {
+    if (tool.id == 'medical_unit_converter') {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -200,7 +214,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
       return;
     }
 
-    if (tool.title == 'Sleep Calculator') {
+    if (tool.id == 'sleep_calculator') {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -248,6 +262,22 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Rebuild the localized tool list whenever the page builds.
+    _tools = _buildTools(l10n);
+
+    if (_searchController.text.trim().isEmpty) {
+      _filteredTools = _tools;
+    } else {
+      final query = _searchController.text.trim().toLowerCase();
+
+      _filteredTools = _tools.where((tool) {
+        return tool.title.toLowerCase().contains(query) ||
+            tool.description.toLowerCase().contains(query);
+      }).toList();
+    }
+
     return Scaffold(
       backgroundColor: _pageBackground,
 
@@ -279,7 +309,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                     // ----------------------------------------------------------
 
                     Text(
-                      'Health Tools',
+                      l10n.healthTools,
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w600,
@@ -295,8 +325,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                     // ----------------------------------------------------------
 
                     Text(
-                      'Simple tools to help you understand '
-                      'and manage your health.',
+                      l10n.healthToolsDescription,
                       style: TextStyle(
                         fontSize: 15,
                         height: 1.45,
@@ -337,7 +366,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                         ),
                         cursorColor: _primaryColor,
                         decoration: InputDecoration(
-                          hintText: 'Search health tools',
+                          hintText: l10n.searchHealthTools,
                           hintStyle: TextStyle(
                             fontSize: 15,
                             color: _isDark
@@ -381,7 +410,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                     // ----------------------------------------------------------
 
                     Text(
-                      'Tools',
+                      l10n.tools,
                       style: TextStyle(
                         fontSize: 19,
                         fontWeight: FontWeight.w600,
@@ -453,7 +482,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                       ),
                       const SizedBox(height: 14),
                       Text(
-                        'No tools found',
+                        l10n.noToolsFound,
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
@@ -462,7 +491,7 @@ class _HealthToolsPageState extends State<HealthToolsPage> {
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        'Try searching for another health tool.',
+                        l10n.tryAnotherHealthTool,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
@@ -631,12 +660,14 @@ class _HealthToolCard extends StatelessWidget {
 // ==============================================================================
 
 class _HealthTool {
+  final String id;
   final String title;
   final String description;
   final IconData icon;
   final Color iconColor;
 
   const _HealthTool({
+    required this.id,
     required this.title,
     required this.description,
     required this.icon,

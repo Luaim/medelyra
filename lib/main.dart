@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:medelyra/health_tools/health_tools_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:medelyra/auth/forgot_password_page.dart';
 import 'package:medelyra/emergency/emergency_guide_details_page.dart';
@@ -16,6 +18,7 @@ import 'package:medelyra/settings/privacy_policy_page.dart';
 
 import 'services/notification_service.dart';
 import 'services/theme_service.dart';
+import 'services/language_service.dart';
 
 import 'auth/signin_page.dart';
 import 'auth/signup_page.dart';
@@ -52,6 +55,9 @@ Future<void> main() async {
   // This prevents the app from showing the light theme
   // for a moment before switching to dark mode.
   await ThemeService.instance.loadTheme();
+
+  // Load the saved language BEFORE runApp().
+  await LanguageService.instance.loadLanguage();
 
   // Check whether onboarding has already been completed.
   final prefs = await SharedPreferences.getInstance();
@@ -100,6 +106,7 @@ class MedelyraApp extends StatefulWidget {
 
 class _MedelyraAppState extends State<MedelyraApp> {
   final ThemeService _themeService = ThemeService.instance;
+  final LanguageService _languageService = LanguageService.instance;
 
   @override
   void initState() {
@@ -107,6 +114,8 @@ class _MedelyraAppState extends State<MedelyraApp> {
 
     // Listen for theme changes made while the app is running.
     _themeService.addListener(_onThemeChanged);
+
+    _languageService.addListener(_onLanguageChanged);
   }
 
   void _onThemeChanged() {
@@ -115,9 +124,16 @@ class _MedelyraAppState extends State<MedelyraApp> {
     }
   }
 
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   void dispose() {
     _themeService.removeListener(_onThemeChanged);
+    _languageService.removeListener(_onLanguageChanged);
     super.dispose();
   }
 
@@ -126,6 +142,21 @@ class _MedelyraAppState extends State<MedelyraApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Medelyra',
+
+      // App localization.
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ar'),
+      ],
+
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
+      locale: _languageService.locale,
 
       // Existing light theme — intentionally unchanged.
       theme: ThemeData(

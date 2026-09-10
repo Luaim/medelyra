@@ -38,6 +38,32 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
       _isDark ? const Color(0xFFBDBDBD) : const Color(0xFF77737A);
 
   // ---------------------------------------------------------------------------
+  // LANGUAGE
+  // ---------------------------------------------------------------------------
+
+  bool get _isArabic => Localizations.localeOf(context).languageCode == 'ar';
+
+  // Reads either:
+  //
+  // {
+  //   "en": "Choking",
+  //   "ar": "الاختناق"
+  // }
+  //
+  // or a normal String for backwards compatibility.
+  String _localizedText(dynamic value) {
+    if (value is Map) {
+      if (_isArabic) {
+        return value['ar']?.toString() ?? value['en']?.toString() ?? '';
+      }
+
+      return value['en']?.toString() ?? value['ar']?.toString() ?? '';
+    }
+
+    return value?.toString() ?? '';
+  }
+
+  // ---------------------------------------------------------------------------
   // LOAD GUIDE
   // ---------------------------------------------------------------------------
 
@@ -86,7 +112,9 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
       if (foundGuide == null) {
         setState(() {
           isLoading = false;
-          errorMessage = 'This emergency guide could not be found.';
+          errorMessage = _isArabic
+              ? 'تعذر العثور على دليل الطوارئ هذا.'
+              : 'This emergency guide could not be found.';
         });
         return;
       }
@@ -100,7 +128,9 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
 
       setState(() {
         isLoading = false;
-        errorMessage = 'Could not load this emergency guide.';
+        errorMessage = _isArabic
+            ? 'تعذر تحميل دليل الطوارئ هذا.'
+            : 'Could not load this emergency guide.';
       });
     }
   }
@@ -125,7 +155,7 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Emergency guide',
+          _isArabic ? 'دليل الطوارئ' : 'Emergency guide',
           style: TextStyle(
             color: _primaryTextColor,
             fontSize: 22,
@@ -158,15 +188,32 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
     }
 
     if (guide == null) {
-      return const _ErrorState(
-        message: 'This emergency guide could not be found.',
+      return _ErrorState(
+        message: _isArabic
+            ? 'تعذر العثور على دليل الطوارئ هذا.'
+            : 'This emergency guide could not be found.',
       );
     }
 
-    final String title = guide!['title']?.toString() ?? 'Emergency guide';
+    // -------------------------------------------------------------------------
+    // GUIDE TITLE
+    // -------------------------------------------------------------------------
 
-    final String shortDescription =
-        guide!['shortDescription']?.toString() ?? '';
+    final String title = _localizedText(
+      guide!['title'],
+    );
+
+    // -------------------------------------------------------------------------
+    // SHORT DESCRIPTION
+    // -------------------------------------------------------------------------
+
+    final String shortDescription = _localizedText(
+      guide!['shortDescription'],
+    );
+
+    // -------------------------------------------------------------------------
+    // STEPS
+    // -------------------------------------------------------------------------
 
     final List<dynamic> steps =
         guide!['steps'] is List ? guide!['steps'] as List<dynamic> : [];
@@ -181,6 +228,10 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // -------------------------------------------------------------------
+          // TITLE
+          // -------------------------------------------------------------------
+
           Text(
             title,
             style: TextStyle(
@@ -189,6 +240,11 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
               color: _primaryTextColor,
             ),
           ),
+
+          // -------------------------------------------------------------------
+          // SHORT DESCRIPTION
+          // -------------------------------------------------------------------
+
           if (shortDescription.isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
@@ -200,9 +256,15 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
               ),
             ),
           ],
+
           const SizedBox(height: 22),
+
+          // -------------------------------------------------------------------
+          // STEPS
+          // -------------------------------------------------------------------
+
           if (steps.isEmpty)
-            const _NoStepsState()
+            _NoStepsState()
           else
             ...List.generate(
               steps.length,
@@ -213,10 +275,20 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
                   return const SizedBox.shrink();
                 }
 
-                final String stepTitle = step['title']?.toString() ?? '';
+                // -------------------------------------------------------------
+                // IMPORTANT:
+                //
+                // title is now a language object in the JSON.
+                // _localizedText() selects "en" or "ar".
+                // -------------------------------------------------------------
 
-                final String description =
-                    step['description']?.toString() ?? '';
+                final String stepTitle = _localizedText(
+                  step['title'],
+                );
+
+                final String description = _localizedText(
+                  step['description'],
+                );
 
                 final String image = step['image']?.toString() ?? '';
 
@@ -265,6 +337,9 @@ class _GuideStepCard extends StatelessWidget {
     final stepCircleBackground =
         isDark ? const Color(0xFF26343A) : const Color(0xFFE9F2F6);
 
+    final stepNumberColor =
+        isDark ? const Color(0xFF6FA9C5) : const Color(0xFF3D84A8);
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 16),
@@ -298,10 +373,10 @@ class _GuideStepCard extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   '$stepNumber',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF3D84A8),
+                    color: stepNumberColor,
                   ),
                 ),
               ),
@@ -378,6 +453,10 @@ class _NoStepsState extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final message = Localizations.localeOf(context).languageCode == 'ar'
+        ? 'لا توجد تعليمات متاحة لهذا الدليل.'
+        : 'No instructions are available for this guide.';
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(22),
@@ -391,7 +470,7 @@ class _NoStepsState extends StatelessWidget {
             : null,
       ),
       child: Text(
-        'No instructions are available for this guide.',
+        message,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 15,
@@ -418,6 +497,10 @@ class _ErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final tryAgain = Localizations.localeOf(context).languageCode == 'ar'
+        ? 'حاول مرة أخرى'
+        : 'Try Again';
 
     return Center(
       child: Padding(
@@ -458,7 +541,7 @@ class _ErrorState extends StatelessWidget {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: onRetry,
-                  child: const Text('Try Again'),
+                  child: Text(tryAgain),
                 ),
               ],
             ],
