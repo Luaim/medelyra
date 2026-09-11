@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../widgets/nav_bar.dart';
 
 class ReminderPage extends StatelessWidget {
@@ -26,6 +28,8 @@ class ReminderPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final screenWidth = MediaQuery.of(context).size.width;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -85,7 +89,7 @@ class ReminderPage extends StatelessWidget {
                   // ==================================================
 
                   Text(
-                    'Reminders',
+                    l10n.reminders,
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w700,
@@ -96,7 +100,7 @@ class ReminderPage extends StatelessWidget {
                   const SizedBox(height: 6),
 
                   Text(
-                    'Manage your medicine and appointments',
+                    l10n.manageMedicineAndAppointments,
                     style: TextStyle(
                       fontSize: 14,
                       color: subtitleColor,
@@ -110,8 +114,8 @@ class ReminderPage extends StatelessWidget {
                   // ==================================================
 
                   _ReminderOptionCard(
-                    title: 'Pill Reminder',
-                    subtitle: 'Track your daily medications',
+                    title: l10n.pillReminder,
+                    subtitle: l10n.trackDailyMedications,
                     imagePath: 'assets/pillReminder.png',
                     fallbackIcon: Icons.medication_rounded,
                     onPressed: () {
@@ -134,8 +138,8 @@ class ReminderPage extends StatelessWidget {
                   // ==================================================
 
                   _ReminderOptionCard(
-                    title: 'Appointment Reminder',
-                    subtitle: 'Never miss your doctor visits',
+                    title: l10n.appointmentReminder,
+                    subtitle: l10n.neverMissDoctorVisits,
                     imagePath: 'assets/appointmentReminder.png',
                     fallbackIcon: Icons.calendar_month_rounded,
                     onPressed: () {
@@ -186,7 +190,7 @@ class ReminderPage extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'View My Reminders',
+                              l10n.viewMyReminders,
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -228,7 +232,7 @@ class ReminderPage extends StatelessWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Tip: Set reminders to stay consistent with your medication and appointments.',
+                            l10n.reminderTip,
                             style: TextStyle(
                               fontSize: 13,
                               color: helperTextColor,

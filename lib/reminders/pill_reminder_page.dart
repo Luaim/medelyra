@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 import '../widgets/nav_bar.dart';
 import '../services/notification_service.dart';
@@ -61,6 +63,81 @@ class _PillReminderPageState extends State<PillReminderPage> {
     '1 Month',
     'Ongoing',
   ];
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
+
+  // ------------------------------------------------------------
+  // LOCALIZED LABELS
+  // ------------------------------------------------------------
+
+  String _medicineTypeLabel(String value) {
+    switch (value) {
+      case 'Pill':
+        return _l10n.pill;
+      case 'Injection':
+        return _l10n.injection;
+      case 'Cream':
+        return _l10n.cream;
+      case 'Drop':
+        return _l10n.drop;
+      case 'Inhaler':
+        return _l10n.inhaler;
+      case 'Bandage':
+        return _l10n.bandage;
+      case 'Syrup':
+        return _l10n.syrup;
+      case 'Other':
+        return _l10n.other;
+      default:
+        return value;
+    }
+  }
+
+  String _frequencyLabel(String value) {
+    switch (value) {
+      case 'Once Daily':
+        return _l10n.onceDaily;
+      case 'Twice Daily':
+        return _l10n.twiceDaily;
+      case '3 Times Daily':
+        return _l10n.threeTimesDaily;
+      case '4 Times Daily':
+        return _l10n.fourTimesDaily;
+      case 'Every 8 Hours':
+        return _l10n.every8Hours;
+      case 'Every 12 Hours':
+        return _l10n.every12Hours;
+      case 'As Needed':
+        return _l10n.asNeeded;
+      case 'Custom Schedule':
+        return _l10n.customSchedule;
+      default:
+        return value;
+    }
+  }
+
+  String _durationLabel(String value) {
+    switch (value) {
+      case '1 Day':
+        return _l10n.oneDay;
+      case '3 Days':
+        return _l10n.threeDays;
+      case '7 Days':
+        return _l10n.sevenDays;
+      case '14 Days':
+        return _l10n.fourteenDays;
+      case '1 Month':
+        return _l10n.oneMonth;
+      case 'Ongoing':
+        return _l10n.ongoing;
+      default:
+        return value;
+    }
+  }
+
+  // ------------------------------------------------------------
+  // DISPOSE
+  // ------------------------------------------------------------
 
   @override
   void dispose() {
@@ -170,6 +247,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
     final picked = await showTimePicker(
       context: context,
       initialTime: selectedTimes[index],
+      helpText: _l10n.selectTime,
     );
 
     if (picked != null) {
@@ -183,6 +261,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      helpText: _l10n.selectTime,
     );
 
     if (picked != null) {
@@ -212,6 +291,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
       lastDate: DateTime.now().add(
         const Duration(days: 3650),
       ),
+      helpText: _l10n.selectDate,
     );
 
     if (picked != null) {
@@ -315,24 +395,24 @@ class _PillReminderPageState extends State<PillReminderPage> {
     final instructions = instructionsController.text.trim();
 
     if (medicineName.isEmpty) {
-      _showMessage('Please enter the medicine name.');
+      _showMessage(_l10n.pleaseEnterMedicineName);
       return;
     }
 
     if (dose.isEmpty) {
-      _showMessage('Please enter the dose or amount.');
+      _showMessage(_l10n.pleaseEnterDose);
       return;
     }
 
     if (selectedFrequency == 'Custom Schedule' && selectedTimes.isEmpty) {
-      _showMessage('Please add at least one reminder time.');
+      _showMessage(_l10n.pleaseAddReminderTime);
       return;
     }
 
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      _showMessage('Please sign in before adding a reminder.');
+      _showMessage(_l10n.pleaseSignInBeforeAppointment);
       return;
     }
 
@@ -451,7 +531,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
       if (!mounted) return;
 
       _showMessage(
-        'Medicine reminder added successfully.',
+        _l10n.medicineReminderAddedSuccessfully,
         success: true,
       );
 
@@ -466,7 +546,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
       if (!mounted) return;
 
       _showMessage(
-        'Could not save reminder. Please try again.',
+        _l10n.couldNotSaveReminder,
       );
 
       debugPrint('Save reminder error: $e');
@@ -548,7 +628,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
 
               Center(
                 child: Text(
-                  'New Reminder',
+                  _l10n.newReminder,
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
@@ -564,7 +644,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // --------------------------------------------------
 
               Text(
-                'Medicine Type',
+                _l10n.medicineType,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -578,12 +658,13 @@ class _PillReminderPageState extends State<PillReminderPage> {
                 spacing: 18,
                 runSpacing: 12,
                 children: medicineTypes.map((item) {
-                  final isSelected = selectedType == item['label'];
+                  final internalValue = item['label'] as String;
+                  final isSelected = selectedType == internalValue;
 
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedType = item['label'];
+                        selectedType = internalValue;
                       });
                     },
                     child: Container(
@@ -607,13 +688,14 @@ class _PillReminderPageState extends State<PillReminderPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            item['label'],
+                            _medicineTypeLabel(internalValue),
                             style: TextStyle(
                               fontSize: 11,
                               color: isSelected
                                   ? Colors.white
                                   : secondaryTextColor,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
@@ -629,7 +711,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // --------------------------------------------------
 
               Text(
-                'Medicine Name',
+                _l10n.medicineName,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -645,8 +727,8 @@ class _PillReminderPageState extends State<PillReminderPage> {
                 child: TextField(
                   controller: medicineNameController,
                   textCapitalization: TextCapitalization.words,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter medicine name',
+                  decoration: InputDecoration(
+                    hintText: _l10n.enterMedicineName,
                     border: InputBorder.none,
                   ),
                 ),
@@ -659,7 +741,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // --------------------------------------------------
 
               Text(
-                'Dose / Amount',
+                _l10n.doseAmount,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -675,8 +757,8 @@ class _PillReminderPageState extends State<PillReminderPage> {
                 child: TextField(
                   controller: doseController,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    hintText: 'Example: 1 tablet, 5 ml',
+                  decoration: InputDecoration(
+                    hintText: _l10n.doseExample,
                     border: InputBorder.none,
                   ),
                 ),
@@ -689,7 +771,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // --------------------------------------------------
 
               Text(
-                'Frequency',
+                _l10n.frequency,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -715,7 +797,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
 
               if (selectedFrequency != 'As Needed') ...[
                 Text(
-                  'Reminder Time',
+                  _l10n.reminderTime,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -725,14 +807,12 @@ class _PillReminderPageState extends State<PillReminderPage> {
                 const SizedBox(height: 8),
                 if (selectedFrequency == 'Every 8 Hours')
                   _infoBox(
-                    'Choose the starting time. '
-                    'The next reminders will be 8 hours apart.',
+                    _l10n.every8HoursInfo,
                     backgroundColor: helperBackgroundColor,
                   ),
                 if (selectedFrequency == 'Every 12 Hours')
                   _infoBox(
-                    'Choose the starting time. '
-                    'The second reminder will be 12 hours later.',
+                    _l10n.every12HoursInfo,
                     backgroundColor: helperBackgroundColor,
                   ),
                 ..._buildTimeFields(
@@ -748,9 +828,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
                 ],
               ] else ...[
                 _infoBox(
-                  'This medicine does not have a fixed time. '
-                  'Use the instructions provided by your doctor '
-                  'or pharmacist.',
+                  _l10n.asNeededInfo,
                   backgroundColor: helperBackgroundColor,
                 ),
               ],
@@ -762,7 +840,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // --------------------------------------------------
 
               Text(
-                'Start Date',
+                _l10n.startDate,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -781,9 +859,9 @@ class _PillReminderPageState extends State<PillReminderPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${selectedStartDate.day}/'
-                        '${selectedStartDate.month}/'
-                        '${selectedStartDate.year}',
+                        DateFormat.yMd(
+                          _l10n.localeName,
+                        ).format(selectedStartDate),
                         style: TextStyle(
                           color: primaryTextColor,
                         ),
@@ -805,7 +883,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // --------------------------------------------------
 
               Text(
-                'Duration',
+                _l10n.duration,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -834,7 +912,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
               // --------------------------------------------------
 
               Text(
-                'Instructions (Optional)',
+                _l10n.instructionsOptional,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -845,7 +923,9 @@ class _PillReminderPageState extends State<PillReminderPage> {
               const SizedBox(height: 8),
 
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                ),
                 decoration: BoxDecoration(
                   color: inputColor,
                   borderRadius: BorderRadius.circular(12),
@@ -857,8 +937,8 @@ class _PillReminderPageState extends State<PillReminderPage> {
                   controller: instructionsController,
                   maxLines: 3,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    hintText: 'Example: Take after food',
+                  decoration: InputDecoration(
+                    hintText: _l10n.instructionsExample,
                     border: InputBorder.none,
                   ),
                 ),
@@ -892,9 +972,9 @@ class _PillReminderPageState extends State<PillReminderPage> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Add Reminder',
-                          style: TextStyle(
+                      : Text(
+                          _l10n.addReminder,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -929,7 +1009,7 @@ class _PillReminderPageState extends State<PillReminderPage> {
       widgets.add(
         _timeField(
           index: 0,
-          label: 'Starting Time',
+          label: _l10n.startingTime,
           inputColor: inputColor,
           borderColor: borderColor,
           primaryTextColor: primaryTextColor,
@@ -960,9 +1040,9 @@ class _PillReminderPageState extends State<PillReminderPage> {
       String label;
 
       if (selectedTimes.length == 1) {
-        label = 'Time';
+        label = _l10n.time;
       } else {
-        label = 'Dose ${i + 1}';
+        label = _l10n.doseNumber(i + 1);
       }
 
       widgets.add(
@@ -1065,9 +1145,9 @@ class _PillReminderPageState extends State<PillReminderPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Your reminder times',
-            style: TextStyle(
+          Text(
+            _l10n.yourReminderTimes,
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               color: Color(0xFF3D84A8),
             ),
@@ -1115,9 +1195,9 @@ class _PillReminderPageState extends State<PillReminderPage> {
           Icons.add,
           color: Color(0xFF3D84A8),
         ),
-        label: const Text(
-          'Add Another Time',
-          style: TextStyle(
+        label: Text(
+          _l10n.addAnotherTime,
+          style: const TextStyle(
             color: Color(0xFF3D84A8),
           ),
         ),
@@ -1212,17 +1292,25 @@ class _PillReminderPageState extends State<PillReminderPage> {
       borderColor: borderColor,
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          value: value,
+          value: items.contains(value) ? value : items.first,
           isExpanded: true,
           dropdownColor: color,
-          items: items
-              .map(
-                (e) => DropdownMenuItem(
-                  value: e,
-                  child: Text(e),
-                ),
-              )
-              .toList(),
+          items: items.map(
+            (e) {
+              String label;
+
+              if (frequencyOptions.contains(e)) {
+                label = _frequencyLabel(e);
+              } else {
+                label = _durationLabel(e);
+              }
+
+              return DropdownMenuItem<String>(
+                value: e,
+                child: Text(label),
+              );
+            },
+          ).toList(),
           onChanged: (value) {
             if (value != null) {
               onChanged(value);

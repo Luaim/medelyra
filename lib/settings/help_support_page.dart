@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HelpSupportPage extends StatefulWidget {
   const HelpSupportPage({super.key});
@@ -18,56 +19,60 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
   static const Color secondaryText = Color(0xFF666666);
   static const Color lightBlue = Color(0xFFEAF4F8);
 
-  final List<Map<String, dynamic>> faqs = [
-    {
-      'q': 'How do I create a Medelyra account?',
-      'a':
-          'You can create an account using your email and password or continue with Google. You must agree to the Terms & Conditions before creating an account.',
-      'icon': Icons.person_add_alt_1_outlined,
-    },
-    {
-      'q': 'How do I add a medicine reminder?',
-      'a':
-          'Open the medication or reminder section of Medelyra, choose the option to add a reminder, enter the required medication and schedule information, then save it.',
-      'icon': Icons.medication_outlined,
-    },
-    {
-      'q': 'Will I receive medication reminders?',
-      'a':
-          'Medelyra can provide reminders based on the medication schedules you create. Make sure notifications are enabled for Medelyra in your device settings.',
-      'icon': Icons.notifications_none_outlined,
-    },
-    {
-      'q': 'How do I edit my profile?',
-      'a':
-          'Open your profile and use the available profile options to update your personal information. You can also manage your emergency contact information there.',
-      'icon': Icons.manage_accounts_outlined,
-    },
-    {
-      'q': 'How do I add an emergency contact?',
-      'a':
-          'Open your profile and add your emergency contact information. The emergency contact information you provide is stored as part of your Medelyra profile.',
-      'icon': Icons.contact_emergency_outlined,
-    },
-    {
-      'q': 'How do I edit or delete a reminder?',
-      'a':
-          'Open your reminder list and select the reminder you want to manage. From there, use the available options to update or remove the reminder.',
-      'icon': Icons.edit_calendar_outlined,
-    },
-    {
-      'q': 'I forgot my password. What should I do?',
-      'a':
-          'On the Sign In page, select "Forgot Password?" and follow the instructions to reset your password.',
-      'icon': Icons.lock_reset_outlined,
-    },
-    {
-      'q': 'How do I update my medication information?',
-      'a':
-          'Open the medication information you want to change and edit the available details. Save your changes when you are finished.',
-      'icon': Icons.edit_note_outlined,
-    },
-  ];
+  // ===========================================================================
+  // LOCALIZATION
+  // ===========================================================================
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
+
+  // ===========================================================================
+  // FAQ DATA
+  // ===========================================================================
+
+  List<Map<String, dynamic>> _getFaqs() {
+    return [
+      {
+        'q': _l10n.faqCreateAccountQuestion,
+        'a': _l10n.faqCreateAccountAnswer,
+        'icon': Icons.person_add_alt_1_outlined,
+      },
+      {
+        'q': _l10n.faqAddMedicineQuestion,
+        'a': _l10n.faqAddMedicineAnswer,
+        'icon': Icons.medication_outlined,
+      },
+      {
+        'q': _l10n.faqMedicationRemindersQuestion,
+        'a': _l10n.faqMedicationRemindersAnswer,
+        'icon': Icons.notifications_none_outlined,
+      },
+      {
+        'q': _l10n.faqEditProfileQuestion,
+        'a': _l10n.faqEditProfileAnswer,
+        'icon': Icons.manage_accounts_outlined,
+      },
+      {
+        'q': _l10n.faqEmergencyContactQuestion,
+        'a': _l10n.faqEmergencyContactAnswer,
+        'icon': Icons.contact_emergency_outlined,
+      },
+      {
+        'q': _l10n.faqEditDeleteReminderQuestion,
+        'a': _l10n.faqEditDeleteReminderAnswer,
+        'icon': Icons.edit_calendar_outlined,
+      },
+      {
+        'q': _l10n.faqForgotPasswordQuestion,
+        'a': _l10n.faqForgotPasswordAnswer,
+        'icon': Icons.lock_reset_outlined,
+      },
+      {
+        'q': _l10n.faqUpdateMedicationQuestion,
+        'a': _l10n.faqUpdateMedicationAnswer,
+        'icon': Icons.edit_note_outlined,
+      },
+    ];
+  }
 
   // ===========================================================================
   // THEME COLORS
@@ -107,6 +112,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final faqs = _getFaqs();
 
     return Scaffold(
       backgroundColor: _pageBackground,
@@ -121,7 +127,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Help & Support',
+          _l10n.helpSupport,
           style: TextStyle(
             fontSize: 21,
             fontWeight: FontWeight.w700,
@@ -181,7 +187,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Common Questions',
+                              _l10n.commonQuestions,
                               style: TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w700,
@@ -190,7 +196,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Quick answers to help you use Medelyra.',
+                              _l10n.quickAnswersHelp,
                               style: TextStyle(
                                 fontSize: 13,
                                 color: _secondaryTextColor,
@@ -211,7 +217,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          '${faqs.length} topics',
+                          _l10n.topicsCount(faqs.length),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -258,7 +264,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                     child: Column(
                       children: [
                         Text(
-                          'Medelyra',
+                          _l10n.appName,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -269,7 +275,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          'Medication reminders made simple.',
+                          _l10n.medicationRemindersMadeSimple,
                           style: TextStyle(
                             fontSize: 11,
                             color: _isDark
@@ -296,12 +302,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
   Widget _buildHeroCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(
-        20,
-        20,
-        20,
-        20,
-      ),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -356,7 +357,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'How can we help?',
+                  _l10n.howCanWeHelp,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -365,7 +366,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Find answers to common questions or get in touch with our support team.',
+                  _l10n.helpHeroDescription,
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
@@ -562,10 +563,10 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Need more help?',
-                  style: TextStyle(
+                  _l10n.needMoreHelp,
+                  style: const TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -577,9 +578,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
 
           const SizedBox(height: 13),
 
-          const Text(
-            'If you cannot find what you are looking for, you can contact the Medelyra support team.',
-            style: TextStyle(
+          Text(
+            _l10n.moreHelpDescription,
+            style: const TextStyle(
               fontSize: 13.5,
               height: 1.45,
               color: Colors.white70,
@@ -624,7 +625,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Copy email',
+                  tooltip: _l10n.copyEmail,
                   visualDensity: VisualDensity.compact,
                   onPressed: _copySupportEmail,
                   icon: const Icon(
@@ -656,17 +657,17 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.mail_outline_rounded,
                     size: 19,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    'Contact Support',
-                    style: TextStyle(
+                    _l10n.contactSupport,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                     ),
@@ -694,12 +695,12 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Support email copied to clipboard.',
+            _l10n.supportEmailCopied,
           ),
           behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
   }
@@ -759,7 +760,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                 // -----------------------------------------------------------
 
                 Text(
-                  'Contact Medelyra Support',
+                  _l10n.contactMedelyraSupport,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 19,
@@ -771,7 +772,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                 const SizedBox(height: 8),
 
                 Text(
-                  'For account, reminder, notification, or technical questions, contact us at:',
+                  _l10n.contactSupportDescription,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13.5,
@@ -829,12 +830,12 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                       ScaffoldMessenger.of(context)
                         ..hideCurrentSnackBar()
                         ..showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text(
-                              'Support email copied to clipboard.',
+                              _l10n.supportEmailCopied,
                             ),
                             behavior: SnackBarBehavior.floating,
-                            duration: Duration(seconds: 2),
+                            duration: const Duration(seconds: 2),
                           ),
                         );
                     },
@@ -846,9 +847,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                         borderRadius: BorderRadius.circular(13),
                       ),
                     ),
-                    child: const Text(
-                      'Copy Email Address',
-                      style: TextStyle(
+                    child: Text(
+                      _l10n.copyEmailAddress,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -867,7 +868,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                     Navigator.pop(dialogContext);
                   },
                   child: Text(
-                    'Close',
+                    _l10n.close,
                     style: TextStyle(
                       color: _mutedTextColor,
                       fontSize: 14,

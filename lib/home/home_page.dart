@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../services/local_database_service.dart';
 import '../services/local_appointment_service.dart';
@@ -14,6 +16,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // ============================================================
+  // LOCALIZATION
+  // ============================================================
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
+
   // ============================================================
   // STATUS COLORS
   // ============================================================
@@ -216,7 +224,7 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Could not load reminders: $e',
+            _l10n.couldNotLoadReminders(e.toString()),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -246,37 +254,18 @@ class _HomePageState extends State<HomePage> {
         '${date.day.toString().padLeft(2, '0')}';
   }
 
-  String _monthName(int month) {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-
-    return months[month - 1];
+  String _monthName(DateTime date) {
+    return DateFormat(
+      'MMMM',
+      _l10n.localeName,
+    ).format(date);
   }
 
   String _dayName(DateTime date) {
-    const days = [
-      'Mon',
-      'Tue',
-      'Wed',
-      'Thu',
-      'Fri',
-      'Sat',
-      'Sun',
-    ];
-
-    return days[date.weekday - 1];
+    return DateFormat(
+      'EEE',
+      _l10n.localeName,
+    ).format(date);
   }
 
   // ============================================================
@@ -695,7 +684,7 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Could not update reminder: $e',
+            _l10n.couldNotUpdateReminder(e.toString()),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -755,7 +744,7 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Could not mark medicine as taken: $e',
+            _l10n.couldNotMarkMedicineTaken(e.toString()),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -776,11 +765,16 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Skip this dose?'),
+          title: Text(
+            _l10n.skipThisDose,
+          ),
           content: Text(
-            'This will mark the $time dose as skipped for '
-            '${selectedDate.day}/${selectedDate.month}/'
-            '${selectedDate.year}.',
+            _l10n.skipDoseConfirmation(
+              time,
+              DateFormat.yMd(
+                _l10n.localeName,
+              ).format(selectedDate),
+            ),
           ),
           actions: [
             TextButton(
@@ -790,7 +784,9 @@ class _HomePageState extends State<HomePage> {
                   false,
                 );
               },
-              child: const Text('Cancel'),
+              child: Text(
+                _l10n.cancel,
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -799,9 +795,9 @@ class _HomePageState extends State<HomePage> {
                   true,
                 );
               },
-              child: const Text(
-                'Skip Dose',
-                style: TextStyle(
+              child: Text(
+                _l10n.skipDose,
+                style: const TextStyle(
                   color: Colors.red,
                 ),
               ),
@@ -858,7 +854,7 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Could not skip reminder: $e',
+            _l10n.couldNotSkipReminder(e.toString()),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -922,7 +918,7 @@ class _HomePageState extends State<HomePage> {
     final selected = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
-      helpText: 'Choose a new reminder time',
+      helpText: _l10n.chooseNewReminderTime,
     );
 
     if (selected == null) {
@@ -941,9 +937,9 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Please choose a time later than the current time.',
+            _l10n.chooseLaterTime,
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -1018,7 +1014,7 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Could not postpone reminder: $e',
+            _l10n.couldNotPostponeReminder(e.toString()),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -1045,7 +1041,7 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Could not update appointment: $e',
+            _l10n.couldNotUpdateAppointment(e.toString()),
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -1083,7 +1079,7 @@ class _HomePageState extends State<HomePage> {
               // ==================================================
 
               Text(
-                '${_monthName(selectedDate.month)} '
+                '${_monthName(selectedDate)} '
                 '${selectedDate.year}',
                 style: TextStyle(
                   fontSize: 22,
@@ -1133,9 +1129,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         decoration: BoxDecoration(
                           color: selected
-                              ? const Color(
-                                  0xFF5891FA,
-                                )
+                              ? const Color(0xFF5891FA)
                               : _dateCardColor,
                           borderRadius: BorderRadius.circular(
                             16,
@@ -1169,7 +1163,7 @@ class _HomePageState extends State<HomePage> {
                                 height: 2,
                               ),
                               Text(
-                                'Today',
+                                _l10n.today,
                                 style: TextStyle(
                                   fontSize: 9,
                                   color: selected ? Colors.white : primaryBlue,
@@ -1200,7 +1194,7 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   children: [
                     _tab(
-                      'Medicines',
+                      _l10n.medicines,
                       showMedicines,
                       () {
                         setState(() {
@@ -1209,7 +1203,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     _tab(
-                      'Appointment',
+                      _l10n.appointment,
                       !showMedicines,
                       () {
                         setState(() {
@@ -1230,8 +1224,8 @@ class _HomePageState extends State<HomePage> {
               if (currentUserId == null)
                 _emptyState(
                   icon: Icons.login,
-                  title: 'Please log in',
-                  message: 'Log in to see your reminders.',
+                  title: _l10n.pleaseLogIn,
+                  message: _l10n.logInToSeeReminders,
                 )
               else if (_isLoading)
                 const Center(
@@ -1274,8 +1268,8 @@ class _HomePageState extends State<HomePage> {
     if (filtered.isEmpty) {
       return _emptyState(
         icon: Icons.medication_outlined,
-        title: 'No medicines on this date',
-        message: 'You have no active medicine reminders for this day.',
+        title: _l10n.noMedicinesOnThisDate,
+        message: _l10n.noActiveMedicineReminders,
       );
     }
 
@@ -1299,7 +1293,7 @@ class _HomePageState extends State<HomePage> {
     String documentId,
     Map<String, dynamic> item,
   ) {
-    final medicineName = item['medicineName']?.toString() ?? 'Medicine';
+    final medicineName = item['medicineName']?.toString() ?? _l10n.medicine;
 
     final dose = item['dose']?.toString() ?? '';
 
@@ -1517,9 +1511,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      child: const Text(
-                        'Mark as Taken',
-                        style: TextStyle(
+                      child: Text(
+                        _l10n.markAsTaken,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -1545,7 +1539,7 @@ class _HomePageState extends State<HomePage> {
                       vertical: 8,
                     ),
                     child: Text(
-                      'Postpone',
+                      _l10n.postpone,
                       style: TextStyle(
                         color: primaryBlue,
                         fontWeight: FontWeight.w600,
@@ -1565,14 +1559,14 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   borderRadius: BorderRadius.circular(8),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 7,
                       vertical: 8,
                     ),
                     child: Text(
-                      'Skip',
-                      style: TextStyle(
+                      _l10n.skip,
+                      style: const TextStyle(
                         color: Color(0xFFEF5350),
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
@@ -1593,8 +1587,9 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Expanded(
                   child: Text(
-                    'Reminder moved to '
-                    '${postponedText ?? 'new time'}',
+                    _l10n.reminderMovedTo(
+                      postponedText ?? _l10n.newTime,
+                    ),
                     style: TextStyle(
                       fontSize: 12,
                       color: orange,
@@ -1610,11 +1605,11 @@ class _HomePageState extends State<HomePage> {
                       time: time,
                     );
                   },
-                  child: const Padding(
-                    padding: EdgeInsets.all(5),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
                     child: Text(
-                      'Take Now',
-                      style: TextStyle(
+                      _l10n.takeNow,
+                      style: const TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1639,21 +1634,23 @@ class _HomePageState extends State<HomePage> {
   ) {
     if (status == 'taken') {
       return _badge(
-        'Taken',
+        _l10n.taken,
         green,
       );
     }
 
     if (status == 'skipped') {
       return _badge(
-        'Skipped',
+        _l10n.skipped,
         red,
       );
     }
 
     if (status == 'postponed') {
       return _badge(
-        postponedTime != null ? 'Postponed • $postponedTime' : 'Postponed',
+        postponedTime != null
+            ? '${_l10n.postponed} • $postponedTime'
+            : _l10n.postponed,
         orange,
       );
     }
@@ -1698,18 +1695,18 @@ class _HomePageState extends State<HomePage> {
         color: green,
         borderRadius: BorderRadius.circular(18),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.check_circle,
             color: Colors.white,
             size: 18,
           ),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Text(
-            'Taken',
-            style: TextStyle(
+            _l10n.taken,
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w700,
             ),
@@ -1732,18 +1729,18 @@ class _HomePageState extends State<HomePage> {
         color: red.withOpacity(0.12),
         borderRadius: BorderRadius.circular(18),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.remove_circle_outline,
             color: Color(0xFFEF5350),
             size: 18,
           ),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           Text(
-            'Skipped',
-            style: TextStyle(
+            _l10n.skipped,
+            style: const TextStyle(
               color: Color(0xFFEF5350),
               fontWeight: FontWeight.w700,
             ),
@@ -1775,8 +1772,8 @@ class _HomePageState extends State<HomePage> {
     if (filtered.isEmpty) {
       return _emptyState(
         icon: Icons.calendar_today_outlined,
-        title: 'No appointments on this date',
-        message: 'You have no appointments scheduled for this day.',
+        title: _l10n.noAppointmentsOnThisDate,
+        message: _l10n.noAppointmentsScheduled,
       );
     }
 
@@ -1800,7 +1797,7 @@ class _HomePageState extends State<HomePage> {
     String documentId,
     Map<String, dynamic> item,
   ) {
-    final title = item['appointmentType']?.toString() ?? 'Appointment';
+    final title = item['appointmentType']?.toString() ?? _l10n.appointmentTitle;
 
     final hospital = item['hospital']?.toString() ?? '';
 
@@ -1816,7 +1813,7 @@ class _HomePageState extends State<HomePage> {
       dateTime = DateTime.tryParse(value);
     }
 
-    String timeText = 'Time not set';
+    String timeText = _l10n.timeNotSet;
 
     if (dateTime != null) {
       timeText = TimeOfDay.fromDateTime(
@@ -1911,20 +1908,20 @@ class _HomePageState extends State<HomePage> {
                         18,
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.check_circle,
                           color: Colors.white,
                           size: 18,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 6,
                         ),
                         Text(
-                          'Completed',
-                          style: TextStyle(
+                          _l10n.completed,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
                           ),
@@ -1952,9 +1949,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      child: const Text(
-                        'Mark as Completed',
-                        style: TextStyle(
+                      child: Text(
+                        _l10n.markAsCompleted,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                         ),
                       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
@@ -22,7 +23,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   bool appointmentReminder = true;
 
-  String reminderTime = "1 hour before";
+  // Stored as stable internal values so localization does not
+  // break the DropdownButton.
+  //
+  // 30m = 30 minutes
+  // 1h  = 1 hour
+  // 2h  = 2 hours
+  // 1d  = 1 day
+  String reminderTime = "1h";
 
   final Color primaryBlue = const Color(0xFF67C0D7);
 
@@ -68,6 +76,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
     if (!mounted) return;
 
+    final savedReminderTime = prefs.getString('reminderTime') ?? "1h";
+
     setState(() {
       masterToggle = prefs.getBool('masterToggle') ?? true;
 
@@ -79,8 +89,46 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
       appointmentReminder = prefs.getBool('appointmentReminder') ?? true;
 
-      reminderTime = prefs.getString('reminderTime') ?? "1 hour before";
+      // Convert old saved values to the new stable values.
+      reminderTime = _normalizeReminderTime(savedReminderTime);
     });
+
+    // If an old value was converted, save the new stable value.
+    if (savedReminderTime != reminderTime) {
+      await _saveString('reminderTime', reminderTime);
+    }
+  }
+
+  // ============================================================
+  // NORMALIZE OLD REMINDER VALUES
+  // ============================================================
+
+  String _normalizeReminderTime(String value) {
+    switch (value) {
+      // Old English values
+      case "30 minutes before":
+        return "30m";
+
+      case "1 hour before":
+        return "1h";
+
+      case "2 hours before":
+        return "2h";
+
+      case "1 day before":
+        return "1d";
+
+      // New stable values
+      case "30m":
+      case "1h":
+      case "2h":
+      case "1d":
+        return value;
+
+      // Safe fallback
+      default:
+        return "1h";
+    }
   }
 
   // ============================================================
@@ -109,11 +157,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: _pageBackground,
       appBar: AppBar(
         title: Text(
-          "Notifications",
+          l10n.notifications,
           style: TextStyle(
             color: _primaryTextColor,
           ),
@@ -129,7 +179,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           // GENERAL
           // ======================================================
 
-          _buildSectionTitle("General"),
+          _buildSectionTitle(l10n.general),
 
           _buildCard(
             child: SwitchListTile(
@@ -145,13 +195,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 );
               },
               title: Text(
-                "Enable Notifications",
+                l10n.enableNotifications,
                 style: TextStyle(
                   color: _primaryTextColor,
                 ),
               ),
               subtitle: Text(
-                "Turn on/off all app notifications",
+                l10n.turnOnOffAllAppNotifications,
                 style: TextStyle(
                   color: _secondaryTextColor,
                 ),
@@ -170,13 +220,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           // MEDICINE REMINDERS
           // ======================================================
 
-          _buildSectionTitle("Medicine Reminders"),
+          _buildSectionTitle(l10n.medicineRemindersSection),
 
           _buildCard(
             child: Column(
               children: [
                 _buildSwitchTile(
-                  title: "Medicine Reminders",
+                  title: l10n.medicineReminders,
                   value: medicineReminder,
                   onChanged: masterToggle
                       ? (value) async {
@@ -192,7 +242,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       : null,
                 ),
                 _buildSwitchTile(
-                  title: "Medicine Sound",
+                  title: l10n.medicineSound,
                   value: medicineSound,
                   onChanged: masterToggle
                       ? (value) async {
@@ -208,7 +258,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       : null,
                 ),
                 _buildSwitchTile(
-                  title: "Medicine Vibration",
+                  title: l10n.medicineVibration,
                   value: medicineVibration,
                   onChanged: masterToggle
                       ? (value) async {
@@ -233,13 +283,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           // APPOINTMENTS
           // ======================================================
 
-          _buildSectionTitle("Appointments"),
+          _buildSectionTitle(l10n.appointments),
 
           _buildCard(
             child: Column(
               children: [
                 _buildSwitchTile(
-                  title: "Appointment Alerts",
+                  title: l10n.appointmentAlerts,
                   value: appointmentReminder,
                   onChanged: masterToggle
                       ? (value) async {
@@ -255,13 +305,19 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       : null,
                 ),
                 _buildDropdownTile(
-                  title: "Reminder Time",
+                  title: l10n.reminderTime,
                   value: reminderTime,
                   items: const [
-                    "30 minutes before",
-                    "1 hour before",
-                    "2 hours before",
-                    "1 day before",
+                    "30m",
+                    "1h",
+                    "2h",
+                    "1d",
+                  ],
+                  itemLabels: [
+                    l10n.thirtyMinutesBefore,
+                    l10n.oneHourBefore,
+                    l10n.twoHoursBefore,
+                    l10n.oneDayBefore,
                   ],
                   onChanged: masterToggle
                       ? (value) async {
@@ -369,6 +425,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
     required String title,
     required String value,
     required List<String> items,
+    required List<String> itemLabels,
     required ValueChanged<String?>? onChanged,
   }) {
     final enabled = onChanged != null;
@@ -381,7 +438,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         ),
       ),
       trailing: DropdownButton<String>(
-        value: value,
+        value: items.contains(value) ? value : items.first,
         underline: const SizedBox(),
         dropdownColor: _dropdownBackground,
         style: TextStyle(
@@ -389,19 +446,18 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         ),
         iconEnabledColor: enabled ? _secondaryTextColor : _disabledTextColor,
         iconDisabledColor: _disabledTextColor,
-        items: items
-            .map(
-              (item) => DropdownMenuItem<String>(
-                value: item,
-                child: Text(
-                  item,
-                  style: TextStyle(
-                    color: _dropdownTextColor,
-                  ),
-                ),
+        items: List.generate(
+          items.length,
+          (index) => DropdownMenuItem<String>(
+            value: items[index],
+            child: Text(
+              itemLabels[index],
+              style: TextStyle(
+                color: _dropdownTextColor,
               ),
-            )
-            .toList(),
+            ),
+          ),
+        ),
         onChanged: onChanged,
       ),
     );

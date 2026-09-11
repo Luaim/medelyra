@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../widgets/nav_bar.dart';
 import '../services/notification_service.dart';
@@ -15,10 +16,13 @@ class AppointmentReminderPage extends StatefulWidget {
 
 class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
   final TextEditingController reasonController = TextEditingController();
+
   final TextEditingController hospitalController = TextEditingController();
 
   final Color primaryBlue = const Color(0xFF3D84A8);
 
+  // Internal value. Do not localize these because they are saved
+  // to the local database.
   String selectedType = 'General';
 
   DateTime selectedDate = DateTime.now();
@@ -49,49 +53,95 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
   Color get _primaryTextColor => _isDark ? Colors.white : Colors.black87;
 
+  // ============================================================
+  // APPOINTMENT TYPES
+  // ============================================================
+
   final List<Map<String, dynamic>> appointmentTypes = [
     {
-      'label': 'General',
+      'value': 'General',
       'icon': Icons.local_hospital,
     },
     {
-      'label': 'Eye',
+      'value': 'Eye',
       'icon': Icons.remove_red_eye,
     },
     {
-      'label': 'Dental',
+      'value': 'Dental',
       'icon': Icons.medical_services,
     },
     {
-      'label': 'Heart',
+      'value': 'Heart',
       'icon': Icons.favorite,
     },
   ];
 
   // ============================================================
+  // APPOINTMENT TYPE LABEL
+  // ============================================================
+
+  String _appointmentTypeLabel(
+    String value,
+    AppLocalizations l10n,
+  ) {
+    switch (value) {
+      case 'Eye':
+        return l10n.eyeAppointment;
+
+      case 'Dental':
+        return l10n.dentalAppointment;
+
+      case 'Heart':
+        return l10n.heartAppointment;
+
+      case 'General':
+      default:
+        return l10n.generalAppointment;
+    }
+  }
+
+  // ============================================================
   // BOTTOM NAVIGATION
   // ============================================================
 
-  void _onBottomTap(BuildContext context, int index) {
+  void _onBottomTap(
+    BuildContext context,
+    int index,
+  ) {
     switch (index) {
       case 0:
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(
+          context,
+          '/home',
+        );
         break;
 
       case 1:
-        Navigator.pushReplacementNamed(context, '/reminder');
+        Navigator.pushReplacementNamed(
+          context,
+          '/reminder',
+        );
         break;
 
       case 2:
-        Navigator.pushReplacementNamed(context, '/health-tools');
+        Navigator.pushReplacementNamed(
+          context,
+          '/health-tools',
+        );
         break;
 
       case 3:
-        Navigator.pushReplacementNamed(context, '/sos');
+        Navigator.pushReplacementNamed(
+          context,
+          '/sos',
+        );
         break;
 
       case 4:
-        Navigator.pushReplacementNamed(context, '/profile');
+        Navigator.pushReplacementNamed(
+          context,
+          '/profile',
+        );
         break;
     }
   }
@@ -159,11 +209,13 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
   Future<void> _saveAppointment() async {
     if (isSaving) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
       _showMessage(
-        'Please sign in before creating an appointment.',
+        l10n.pleaseSignInBeforeAppointment,
         isError: true,
       );
       return;
@@ -174,7 +226,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
     if (hospital.isEmpty) {
       _showMessage(
-        'Please enter the hospital or clinic name.',
+        l10n.pleaseEnterHospitalClinic,
         isError: true,
       );
       return;
@@ -184,7 +236,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
     if (appointmentDateTime.isBefore(DateTime.now())) {
       _showMessage(
-        'Please select a future date and time.',
+        l10n.pleaseSelectFutureDateTime,
         isError: true,
       );
       return;
@@ -210,8 +262,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
         if (!mounted) return;
 
         _showMessage(
-          'The appointment must be more than $reminderLabel from now '
-          'to receive the reminder.',
+          l10n.appointmentMustBeMoreThan(
+            reminderLabel,
+          ),
           isError: true,
         );
 
@@ -229,8 +282,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
         if (!mounted) return;
 
         _showMessage(
-          'Please allow notifications and exact alarms '
-          'for Medelyra in Android settings.',
+          l10n.allowNotificationsExactAlarms,
           isError: true,
         );
 
@@ -286,8 +338,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       if (!mounted) return;
 
       _showMessage(
-        'Appointment saved. Reminder set for '
-        '${_formatReminderDuration(reminderBefore)} before.',
+        l10n.appointmentSavedReminderSet(
+          _formatReminderDuration(reminderBefore),
+        ),
         isError: false,
       );
 
@@ -309,7 +362,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
       );
 
       _showMessage(
-        'Could not save appointment. Please try again.',
+        l10n.couldNotSaveAppointment,
         isError: true,
       );
     } finally {
@@ -325,34 +378,38 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
   // FORMAT REMINDER DURATION
   // ============================================================
 
-  String _formatReminderDuration(Duration duration) {
+  String _formatReminderDuration(
+    Duration duration,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (duration.inDays >= 1) {
       final days = duration.inDays;
 
       if (days == 1) {
-        return '1 day';
+        return l10n.oneDay;
       }
 
-      return '$days days';
+      return l10n.daysCount(days);
     }
 
     if (duration.inHours >= 1) {
       final hours = duration.inHours;
 
       if (hours == 1) {
-        return '1 hour';
+        return l10n.oneHour;
       }
 
-      return '$hours hours';
+      return l10n.hoursCount(hours);
     }
 
     final minutes = duration.inMinutes;
 
     if (minutes == 1) {
-      return '1 minute';
+      return l10n.oneMinute;
     }
 
-    return '$minutes minutes';
+    return l10n.minutesCount(minutes);
   }
 
   // ============================================================
@@ -394,13 +451,18 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: _pageBackground,
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 1,
-        onTap: (i) => _onBottomTap(context, i),
+        onTap: (i) => _onBottomTap(
+          context,
+          i,
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -418,7 +480,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
 
               Center(
                 child: Text(
-                  'New Appointment',
+                  l10n.newAppointment,
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
@@ -434,7 +496,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               // ==================================================
 
               Text(
-                'Appointment Type',
+                l10n.appointmentType,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -448,12 +510,14 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                 spacing: 10,
                 runSpacing: 10,
                 children: appointmentTypes.map((item) {
-                  final bool isSelected = selectedType == item['label'];
+                  final String value = item['value'];
+
+                  final bool isSelected = selectedType == value;
 
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedType = item['label'];
+                        selectedType = value;
                       });
                     },
                     child: Container(
@@ -477,7 +541,10 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            item['label'],
+                            _appointmentTypeLabel(
+                              value,
+                              l10n,
+                            ),
                             style: TextStyle(
                               fontSize: 12,
                               color: isSelected
@@ -499,7 +566,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               // ==================================================
 
               Text(
-                'Hospital / Clinic',
+                l10n.hospitalClinic,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -518,7 +585,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                   ),
                   cursorColor: primaryBlue,
                   decoration: InputDecoration(
-                    hintText: 'Enter hospital or clinic name...',
+                    hintText: l10n.enterHospitalClinicName,
                     hintStyle: TextStyle(
                       color: _secondaryTextColor,
                     ),
@@ -534,7 +601,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               // ==================================================
 
               Text(
-                'Select Date',
+                l10n.selectDate,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -574,7 +641,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               // ==================================================
 
               Text(
-                'Select Time',
+                l10n.selectTime,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -612,7 +679,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
               // ==================================================
 
               Text(
-                'Reason / Notes',
+                l10n.reasonNotes,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -642,7 +709,7 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                   ),
                   cursorColor: primaryBlue,
                   decoration: InputDecoration(
-                    hintText: 'Example: Follow-up appointment...',
+                    hintText: l10n.followUpAppointmentExample,
                     hintStyle: TextStyle(
                       color: _secondaryTextColor,
                     ),
@@ -679,9 +746,9 @@ class _AppointmentReminderPageState extends State<AppointmentReminderPage> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Confirm Appointment',
-                          style: TextStyle(
+                      : Text(
+                          l10n.confirmAppointment,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

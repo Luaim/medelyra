@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../widgets/nav_bar.dart';
 
@@ -86,10 +87,12 @@ class _ProfilePageState extends State<ProfilePage> {
           _isLoading = false;
         });
 
+        final l10n = AppLocalizations.of(context)!;
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Could not load your profile. Please try again.',
+              l10n.couldNotLoadYourProfile,
             ),
           ),
         );
@@ -142,18 +145,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String _getString(
     String field, {
-    String fallback = 'Not provided',
+    String? fallback,
   }) {
     final value = _profileData[field];
 
     if (value == null) {
-      return fallback;
+      return fallback ?? '';
     }
 
     final text = value.toString().trim();
 
     if (text.isEmpty) {
-      return fallback;
+      return fallback ?? '';
     }
 
     return text;
@@ -164,19 +167,19 @@ class _ProfilePageState extends State<ProfilePage> {
   // ============================================================
 
   String _getEmergencyContact() {
+    final l10n = AppLocalizations.of(context)!;
+
     final name = _getString(
       'emergencyContactName',
-      fallback: '',
     );
 
     final phone = _getString(
       'emergencyContactPhone',
-      fallback: '',
     );
 
     // Both are empty
     if (name.isEmpty && phone.isEmpty) {
-      return 'Not provided';
+      return l10n.notProvided;
     }
 
     // Only name exists
@@ -198,10 +201,12 @@ class _ProfilePageState extends State<ProfilePage> {
   // ============================================================
 
   String _getDateOfBirth() {
+    final l10n = AppLocalizations.of(context)!;
+
     final value = _profileData['dateOfBirth'];
 
     if (value == null) {
-      return 'Not provided';
+      return l10n.notProvided;
     }
 
     try {
@@ -224,7 +229,7 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
-    return 'Not provided';
+    return l10n.notProvided;
   }
 
   // ============================================================
@@ -259,10 +264,12 @@ class _ProfilePageState extends State<ProfilePage> {
   // ============================================================
 
   String _getAllergies() {
+    final l10n = AppLocalizations.of(context)!;
+
     final value = _profileData['allergies'];
 
     if (value == null || value is! List || value.isEmpty) {
-      return 'No known allergies';
+      return l10n.noKnownAllergies;
     }
 
     final allergies = value
@@ -275,7 +282,7 @@ class _ProfilePageState extends State<ProfilePage> {
         .toList();
 
     if (allergies.isEmpty) {
-      return 'No known allergies';
+      return l10n.noKnownAllergies;
     }
 
     return allergies.join(', ');
@@ -303,10 +310,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (!mounted) return;
 
+      final l10n = AppLocalizations.of(context)!;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Could not log out. Please try again.',
+            l10n.couldNotLogOut,
           ),
         ),
       );
@@ -319,6 +328,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     final size = MediaQuery.of(context).size;
 
     final screenWidth = size.width;
@@ -334,24 +345,27 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final name = _getString(
       'name',
-      fallback: currentUser?.displayName ?? 'Medelyra User',
+      fallback: currentUser?.displayName ?? l10n.medelyraUser,
     );
 
     final email = _getString(
       'email',
-      fallback: currentUser?.email ?? 'Not provided',
+      fallback: currentUser?.email ?? l10n.notProvided,
     );
 
     final phone = _getString(
       'phone',
+      fallback: l10n.notProvided,
     );
 
     final gender = _getString(
       'gender',
+      fallback: l10n.notProvided,
     );
 
     final bloodGroup = _getString(
       'bloodGroup',
+      fallback: l10n.notProvided,
     );
 
     final emergencyContact = _getEmergencyContact();
@@ -404,7 +418,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         // ==================================================
 
                         Text(
-                          'Profile',
+                          l10n.profile,
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
@@ -433,7 +447,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         // ==================================================
 
                         Text(
-                          'Personal Information',
+                          l10n.personalInformation,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -449,27 +463,27 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             ProfileInfoTile(
                               icon: Icons.person_outline,
-                              label: 'Full Name',
+                              label: l10n.fullName,
                               value: name,
                             ),
                             ProfileInfoTile(
                               icon: Icons.email_outlined,
-                              label: 'Email',
+                              label: l10n.emailAddress,
                               value: email,
                             ),
                             ProfileInfoTile(
                               icon: Icons.phone_outlined,
-                              label: 'Phone Number',
+                              label: l10n.phoneNumber,
                               value: phone,
                             ),
                             ProfileInfoTile(
                               icon: Icons.calendar_month_outlined,
-                              label: 'Date of Birth',
+                              label: l10n.dateOfBirth,
                               value: _getDateOfBirth(),
                             ),
                             ProfileInfoTile(
                               icon: Icons.wc_outlined,
-                              label: 'Gender',
+                              label: l10n.gender,
                               value: gender,
                             ),
                           ],
@@ -484,7 +498,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         // ==================================================
 
                         Text(
-                          'Medical Information',
+                          l10n.medicalInformation,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -500,17 +514,17 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             ProfileInfoTile(
                               icon: Icons.bloodtype_outlined,
-                              label: 'Blood Group',
+                              label: l10n.bloodGroup,
                               value: bloodGroup,
                             ),
                             ProfileInfoTile(
                               icon: Icons.contact_emergency_outlined,
-                              label: 'Emergency Contact',
+                              label: l10n.emergencyContact,
                               value: emergencyContact,
                             ),
                             ProfileInfoTile(
                               icon: Icons.medical_information_outlined,
-                              label: 'Allergies',
+                              label: l10n.allergies,
                               value: _getAllergies(),
                             ),
                           ],
@@ -525,7 +539,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         // ==================================================
 
                         Text(
-                          'Quick Actions',
+                          l10n.quickActions,
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -540,8 +554,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         // Settings
                         _ActionTile(
                           icon: Icons.settings_outlined,
-                          title: 'Settings',
-                          subtitle: 'Manage account preferences',
+                          title: l10n.settings,
+                          subtitle: l10n.manageAccountPreferences,
                           onTap: () {
                             Navigator.pushNamed(
                               context,
@@ -557,8 +571,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         // Notifications
                         _ActionTile(
                           icon: Icons.notifications_none_rounded,
-                          title: 'Notifications',
-                          subtitle: 'Control reminder and app alerts',
+                          title: l10n.notifications,
+                          subtitle: l10n.controlReminderAndAppAlerts,
                           onTap: () {
                             Navigator.pushNamed(
                               context,
@@ -583,8 +597,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             icon: const Icon(
                               Icons.logout_rounded,
                             ),
-                            label: const Text(
-                              'Logout',
+                            label: Text(
+                              l10n.logout,
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(
@@ -622,6 +636,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildHeaderCard(
     String name,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
@@ -703,7 +719,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   height: 6,
                 ),
                 Text(
-                  'Medelyra User',
+                  l10n.medelyraUser,
                   style: TextStyle(
                     fontSize: 15,
                     color: _isDark
@@ -715,22 +731,24 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(
                   height: 10,
                 ),
-                const Row(
+                Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.verified_user_outlined,
                       size: 18,
                       color: Color(0xFF2F7B95),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 6,
                     ),
-                    Text(
-                      'Health profile active',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF2F7B95),
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        l10n.healthProfileActive,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF2F7B95),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -819,9 +837,6 @@ class ProfileInfoTile extends StatelessWidget {
           ),
         ),
         child: Icon(
-          // IMPORTANT:
-          // Keep the original icon passed by each ProfileInfoTile.
-          // This prevents every row from becoming a person icon.
           icon,
           color: const Color(0xFF3D84A8),
         ),

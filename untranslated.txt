@@ -1,0 +1,28 @@
+{
+  "ar": [
+    "newAppointment",
+    "appointmentType",
+    "generalAppointment",
+    "eyeAppointment",
+    "dentalAppointment",
+    "heartAppointment",
+    "hospitalClinic",
+    "enterHospitalClinicName",
+    "selectDate",
+    "selectTime",
+    "reasonNotes",
+    "followUpAppointmentExample",
+    "confirmAppointment",
+    "pleaseSignInBeforeAppointment",
+    "pleaseEnterHospitalClinic",
+    "pleaseSelectFutureDateTime",
+    "appointmentMustBeMoreThan",
+    "allowNotificationsExactAlarms",
+    "appointmentSavedReminderSet",
+    "couldNotSaveAppointment",
+    "oneDay",
+    "daysCount",
+    "oneMinute",
+    "minutesCount"
+  ]
+}

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../widgets/nav_bar.dart';
 import '../services/notification_service.dart';
@@ -56,7 +57,16 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   List<Map<String, dynamic>> reminders = [];
 
   // ============================================================
+  // LOCALIZATION
+  // ============================================================
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
+
+  // ============================================================
   // MEDICINE OPTIONS
+  // IMPORTANT:
+  // These values remain in English because they are stored in the DB.
+  // Only their displayed labels are translated.
   // ============================================================
 
   final List<Map<String, dynamic>> medicineTypes = [
@@ -115,6 +125,75 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   ];
 
   // ============================================================
+  // DISPLAY LABEL HELPERS
+  // ============================================================
+
+  String _medicineTypeLabel(String value) {
+    switch (value) {
+      case 'Pill':
+        return _l10n.pill;
+      case 'Injection':
+        return _l10n.injection;
+      case 'Cream':
+        return _l10n.cream;
+      case 'Drop':
+        return _l10n.drop;
+      case 'Inhaler':
+        return _l10n.inhaler;
+      case 'Bandage':
+        return _l10n.bandage;
+      case 'Syrup':
+        return _l10n.syrup;
+      case 'Other':
+        return _l10n.other;
+      default:
+        return value;
+    }
+  }
+
+  String _frequencyLabel(String value) {
+    switch (value) {
+      case 'Once Daily':
+        return _l10n.onceDaily;
+      case 'Twice Daily':
+        return _l10n.twiceDaily;
+      case '3 Times Daily':
+        return _l10n.threeTimesDaily;
+      case '4 Times Daily':
+        return _l10n.fourTimesDaily;
+      case 'Every 8 Hours':
+        return _l10n.everyEightHours;
+      case 'Every 12 Hours':
+        return _l10n.everyTwelveHours;
+      case 'As Needed':
+        return _l10n.asNeeded;
+      case 'Custom Schedule':
+        return _l10n.customSchedule;
+      default:
+        return value;
+    }
+  }
+
+  String _durationLabel(String value) {
+    switch (value) {
+      case '1 Day':
+        return _l10n.oneDayDuration;
+      case '3 Days':
+        return _l10n.threeDaysDuration;
+      case '7 Days':
+        return _l10n.sevenDaysDuration;
+      case '14 Days':
+        return _l10n.fourteenDaysDuration;
+      case '1 Month':
+        return _l10n.oneMonthDuration;
+      case 'Ongoing':
+        return _l10n.ongoingDuration;
+      default:
+        return value;
+    }
+  }
+
+  // ============================================================
   // INIT
   // ============================================================
 
@@ -136,16 +215,13 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       setState(() {
         _loading = false;
-        _errorMessage = 'Please sign in again.';
+        _errorMessage = _l10n.pleaseSignInAgain;
       });
 
       return;
     }
 
     try {
-      // ==========================================================
-      // LOAD BOTH REMINDER TYPES LOCALLY
-      // ==========================================================
       final medicineRows =
           await LocalDatabaseService.instance.getMedicines(user.uid);
 
@@ -157,8 +233,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       // ==========================================================
       // MEDICINES
       // ==========================================================
+
       for (final data in medicineRows) {
         final rawTimes = data['times'];
+
         final List<String> times = rawTimes is String
             ? rawTimes
                 .split(',')
@@ -169,28 +247,29 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                 ? rawTimes.map((e) => e.toString()).toList()
                 : <String>[];
 
-        final timeText = times.isEmpty ? 'No time' : times.join(' • ');
+        final timeText = times.isEmpty ? _l10n.noTime : times.join(' • ');
 
         final String instructions =
             (data['instructions'] ?? '').toString().trim();
+
         final String frequency = (data['frequency'] ?? '').toString().trim();
 
         String subtitle = '';
 
         if (instructions.isNotEmpty && frequency.isNotEmpty) {
-          subtitle = '$instructions • $frequency';
+          subtitle = '$instructions • ${_frequencyLabel(frequency)}';
         } else if (frequency.isNotEmpty) {
-          subtitle = frequency;
+          subtitle = _frequencyLabel(frequency);
         } else if (instructions.isNotEmpty) {
           subtitle = instructions;
         } else {
-          subtitle = 'Medicine reminder';
+          subtitle = _l10n.medicineReminder;
         }
 
         loaded.add({
           'id': data['id'].toString(),
           'collection': 'medicines',
-          'title': data['medicineName'] ?? 'Medicine',
+          'title': data['medicineName'] ?? _l10n.medicine,
           'subtitle': subtitle,
           'time': timeText,
           'type': 'pill',
@@ -202,15 +281,17 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       // ==========================================================
       // APPOINTMENTS
       // ==========================================================
+
       for (final data in appointmentRows) {
         DateTime? appointmentDateTime;
+
         final rawDateTime = data['dateTime'];
 
         if (rawDateTime is String && rawDateTime.isNotEmpty) {
           appointmentDateTime = DateTime.tryParse(rawDateTime);
         }
 
-        String timeText = 'No date';
+        String timeText = _l10n.noDate;
 
         if (appointmentDateTime != null) {
           timeText =
@@ -219,6 +300,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         }
 
         final String hospital = (data['hospital'] ?? '').toString().trim();
+
         final String appointmentType =
             (data['appointmentType'] ?? 'Appointment').toString();
 
@@ -226,7 +308,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           'id': data['id'].toString(),
           'collection': 'appointments',
           'title': appointmentType,
-          'subtitle': hospital.isEmpty ? 'Appointment' : hospital,
+          'subtitle': hospital.isEmpty ? _l10n.appointment : hospital,
           'time': timeText,
           'type': 'appointment',
           'active': data['active'] == 1 || data['active'] == true,
@@ -252,7 +334,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       setState(() {
         _loading = false;
-        _errorMessage = 'Could not load reminders.';
+        _errorMessage = _l10n.couldNotLoadReminders(e);
       });
 
       debugPrint('Load reminders error: $e');
@@ -277,7 +359,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   int? _storedInt(dynamic value) {
     if (value is int) return value;
     if (value is num) return value.toInt();
-    return int.tryParse(value?.toString() ?? '');
+
+    return int.tryParse(
+      value?.toString() ?? '',
+    );
   }
 
   List<TimeOfDay> _storedTimesAsTimeOfDay(dynamic value) {
@@ -368,6 +453,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
   String _formatTimeForDatabase(TimeOfDay time) {
     final hour = time.hour.toString().padLeft(2, '0');
+
     final minute = time.minute.toString().padLeft(2, '0');
 
     return '$hour:$minute';
@@ -377,7 +463,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   // ADD HOURS
   // ============================================================
 
-  TimeOfDay _addHours(TimeOfDay time, int hours) {
+  TimeOfDay _addHours(
+    TimeOfDay time,
+    int hours,
+  ) {
     final totalMinutes = time.hour * 60 + time.minute + hours * 60;
 
     final normalizedMinutes = totalMinutes % (24 * 60);
@@ -483,6 +572,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     bool value,
   ) async {
     final String collection = item['collection'].toString();
+
     final String id = item['id'].toString();
 
     try {
@@ -506,18 +596,20 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           );
         } else {
           final times = _storedTimesAsTimeOfDay(data['times']);
+
           final startDate = _parseLocalDate(
                 data['startDate'],
                 fallback: DateTime.now(),
               ) ??
               DateTime.now();
+
           final durationDays = _storedInt(data['durationDays']);
 
           await NotificationService.instance.requestPermission();
 
           await _scheduleMedicineNotifications(
             medicineId: id,
-            medicineName: (data['medicineName'] ?? 'Medicine').toString(),
+            medicineName: (data['medicineName'] ?? _l10n.medicine).toString(),
             times: times,
             durationDays: durationDays,
             startDate: startDate,
@@ -533,12 +625,11 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         );
 
         final data = Map<String, dynamic>.from(item['data']);
+
         final notificationId = id.hashCode.abs();
 
         if (!value) {
-          await NotificationService.instance.cancel(
-            notificationId,
-          );
+          await NotificationService.instance.cancel(notificationId);
         } else {
           final appointmentTime = _parseLocalDate(data['dateTime']);
 
@@ -547,7 +638,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                 await NotificationService.instance.requestPermission();
 
             if (!permissionGranted) {
-              throw Exception('Notification permission was not granted.');
+              throw Exception(
+                'Notification permission was not granted.',
+              );
             }
 
             final reminderBefore = await NotificationService.instance
@@ -555,7 +648,8 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
             await NotificationService.instance.scheduleAppointmentNotification(
               id: notificationId,
-              appointmentType: '${data['appointmentType'] ?? 'Appointment'} '
+              appointmentType:
+                  '${data['appointmentType'] ?? _l10n.appointment} '
                   'at ${data['hospital'] ?? ''}',
               appointmentTime: appointmentTime,
               reminderBefore: reminderBefore,
@@ -573,12 +667,16 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not update reminder.'),
+        SnackBar(
+          content: Text(
+            _l10n.couldNotUpdateReminder(e),
+          ),
         ),
       );
 
-      debugPrint('Toggle reminder error: $e');
+      debugPrint(
+        'Toggle reminder error: $e',
+      );
     }
   }
 
@@ -586,7 +684,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   // DELETE
   // ============================================================
 
-  Future<void> _delete(Map<String, dynamic> item) async {
+  Future<void> _delete(
+    Map<String, dynamic> item,
+  ) async {
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -594,25 +694,35 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(22),
           ),
-          title: const Text(
-            'Delete Reminder',
-            style: TextStyle(
+          title: Text(
+            _l10n.deleteReminder,
+            style: const TextStyle(
               fontWeight: FontWeight.w700,
             ),
           ),
           content: Text(
-            'Are you sure you want to delete "${item['title']}"?',
+            _l10n.deleteReminderConfirmation(
+              item['title'].toString(),
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel'),
+              onPressed: () => Navigator.pop(
+                dialogContext,
+                false,
+              ),
+              child: Text(
+                _l10n.cancel,
+              ),
             ),
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text(
-                'Delete',
-                style: TextStyle(
+              onPressed: () => Navigator.pop(
+                dialogContext,
+                true,
+              ),
+              child: Text(
+                _l10n.delete,
+                style: const TextStyle(
                   color: Colors.red,
                 ),
               ),
@@ -626,12 +736,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
     try {
       final String collection = item['collection'].toString();
+
       final String id = item['id'].toString();
 
       if (collection == 'medicines') {
         await _cancelMedicineNotifications(
           medicineId: id,
-          data: Map<String, dynamic>.from(item['data']),
+          data: Map<String, dynamic>.from(
+            item['data'],
+          ),
         );
 
         await LocalDatabaseService.instance.deleteMedicine(id);
@@ -650,20 +763,26 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Reminder deleted.'),
+        SnackBar(
+          content: Text(
+            _l10n.reminderDeleted,
+          ),
         ),
       );
     } catch (e) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not delete reminder.'),
+        SnackBar(
+          content: Text(
+            _l10n.couldNotDeleteReminder,
+          ),
         ),
       );
 
-      debugPrint('Delete reminder error: $e');
+      debugPrint(
+        'Delete reminder error: $e',
+      );
     }
   }
 
@@ -688,7 +807,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   Future<void> _editMedicine(
     Map<String, dynamic> item,
   ) async {
-    final data = Map<String, dynamic>.from(item['data']);
+    final data = Map<String, dynamic>.from(
+      item['data'],
+    );
 
     final nameController = TextEditingController(
       text: (data['medicineName'] ?? '').toString(),
@@ -712,13 +833,17 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
     String frequency = (data['frequency'] ?? 'Once Daily').toString();
 
-    if (!frequencyOptions.contains(frequency)) {
+    if (!frequencyOptions.contains(
+      frequency,
+    )) {
       frequency = 'Once Daily';
     }
 
     String duration = (data['duration'] ?? '7 Days').toString();
 
-    if (!durationOptions.contains(duration)) {
+    if (!durationOptions.contains(
+      duration,
+    )) {
       duration = '7 Days';
     }
 
@@ -728,7 +853,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         ) ??
         DateTime.now();
 
-    List<TimeOfDay> times = _storedTimesAsTimeOfDay(data['times']);
+    List<TimeOfDay> times = _storedTimesAsTimeOfDay(
+      data['times'],
+    );
 
     if (times.isEmpty && frequency != 'As Needed') {
       times = [TimeOfDay.now()];
@@ -756,7 +883,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                 ),
                 decoration: BoxDecoration(
                   color: _dialogBackground,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(
+                    28,
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -773,19 +902,25 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                             width: 44,
                             height: 44,
                             decoration: BoxDecoration(
-                              color: primaryBlue.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(14),
+                              color: primaryBlue.withOpacity(
+                                0.12,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                14,
+                              ),
                             ),
                             child: Icon(
                               Icons.medication_outlined,
                               color: primaryBlue,
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          const Expanded(
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          Expanded(
                             child: Text(
-                              'Edit Medicine',
-                              style: TextStyle(
+                              _l10n.editMedicine,
+                              style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -796,7 +931,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               dialogContext,
                               false,
                             ),
-                            icon: const Icon(Icons.close),
+                            icon: const Icon(
+                              Icons.close,
+                            ),
                           ),
                         ],
                       ),
@@ -816,63 +953,97 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _dialogSectionTitle('Basic Information'),
-                            const SizedBox(height: 12),
+                            _dialogSectionTitle(
+                              _l10n.basicInformation,
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
                             _modernTextField(
                               controller: nameController,
-                              label: 'Medicine Name',
-                              hint: 'Enter medicine name',
+                              label: _l10n.medicineName,
+                              hint: _l10n.enterMedicineName,
                               icon: Icons.medication_outlined,
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _modernDropdown(
-                              label: 'Medicine Type',
+                              label: _l10n.medicineType,
                               icon: Icons.category_outlined,
                               value: medicineType,
                               items: medicineTypes
-                                  .map((e) => e['label'].toString())
+                                  .map(
+                                    (e) => e['label'].toString(),
+                                  )
+                                  .toList(),
+                              itemLabels: medicineTypes
+                                  .map(
+                                    (e) => _medicineTypeLabel(
+                                      e['label'].toString(),
+                                    ),
+                                  )
                                   .toList(),
                               onChanged: (value) {
-                                setDialogState(() {
-                                  medicineType = value;
-                                });
+                                setDialogState(
+                                  () {
+                                    medicineType = value;
+                                  },
+                                );
                               },
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _modernTextField(
                               controller: doseController,
-                              label: 'Dose / Amount',
-                              hint: 'Example: 1 tablet, 5 ml',
+                              label: _l10n.doseAmount,
+                              hint: _l10n.doseExample,
                               icon: Icons.scale_outlined,
                             ),
-                            const SizedBox(height: 22),
-                            _dialogSectionTitle('Schedule'),
-                            const SizedBox(height: 12),
+                            const SizedBox(
+                              height: 22,
+                            ),
+                            _dialogSectionTitle(
+                              _l10n.schedule,
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
                             _modernDropdown(
-                              label: 'Frequency',
+                              label: _l10n.frequency,
                               icon: Icons.repeat,
                               value: frequency,
                               items: frequencyOptions,
+                              itemLabels: frequencyOptions
+                                  .map(
+                                    _frequencyLabel,
+                                  )
+                                  .toList(),
                               onChanged: (value) {
-                                setDialogState(() {
-                                  frequency = value;
+                                setDialogState(
+                                  () {
+                                    frequency = value;
 
-                                  if (value == 'As Needed') {
-                                    times = [];
-                                  } else {
-                                    final startingTime = times.isNotEmpty
-                                        ? times.first
-                                        : TimeOfDay.now();
+                                    if (value == 'As Needed') {
+                                      times = [];
+                                    } else {
+                                      final startingTime = times.isNotEmpty
+                                          ? times.first
+                                          : TimeOfDay.now();
 
-                                    times = _timesForFrequency(
-                                      value,
-                                      startingTime,
-                                    );
-                                  }
-                                });
+                                      times = _timesForFrequency(
+                                        value,
+                                        startingTime,
+                                      );
+                                    }
+                                  },
+                                );
                               },
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             if (frequency != 'As Needed')
                               _buildMedicineTimesEditor(
                                 context: context,
@@ -882,20 +1053,24 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               )
                             else
                               _editInfoBox(
-                                'This medicine has no fixed reminder time.',
+                                _l10n.noFixedReminderTime,
                                 icon: Icons.info_outline,
                               ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _modernDateField(
-                              label: 'Start Date',
+                              label: _l10n.startDate,
                               date: startDate,
                               onTap: () async {
                                 final now = DateTime.now();
+
                                 final firstDate = DateTime(
                                   now.year,
                                   now.month,
                                   now.day,
                                 );
+
                                 final initialDate = startDate.isBefore(
                                   firstDate,
                                 )
@@ -906,35 +1081,54 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                   context: dialogContext,
                                   initialDate: initialDate,
                                   firstDate: firstDate,
-                                  lastDate: DateTime(2035),
+                                  lastDate: DateTime(
+                                    2035,
+                                  ),
                                 );
 
                                 if (picked != null) {
-                                  setDialogState(() {
-                                    startDate = picked;
-                                  });
+                                  setDialogState(
+                                    () {
+                                      startDate = picked;
+                                    },
+                                  );
                                 }
                               },
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _modernDropdown(
-                              label: 'Duration',
+                              label: _l10n.duration,
                               icon: Icons.timelapse_outlined,
                               value: duration,
                               items: durationOptions,
+                              itemLabels: durationOptions
+                                  .map(
+                                    _durationLabel,
+                                  )
+                                  .toList(),
                               onChanged: (value) {
-                                setDialogState(() {
-                                  duration = value;
-                                });
+                                setDialogState(
+                                  () {
+                                    duration = value;
+                                  },
+                                );
                               },
                             ),
-                            const SizedBox(height: 22),
-                            _dialogSectionTitle('Additional Information'),
-                            const SizedBox(height: 12),
+                            const SizedBox(
+                              height: 22,
+                            ),
+                            _dialogSectionTitle(
+                              _l10n.additionalInformation,
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
                             _modernTextField(
                               controller: instructionsController,
-                              label: 'Instructions (Optional)',
-                              hint: 'Example: Take after food',
+                              label: _l10n.instructionsOptional,
+                              hint: _l10n.instructionsExample,
                               icon: Icons.notes_outlined,
                               maxLines: 3,
                             ),
@@ -952,14 +1146,23 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       decoration: BoxDecoration(
                         color: _dialogBackground,
                         borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(28),
-                          bottomRight: Radius.circular(28),
+                          bottomLeft: Radius.circular(
+                            28,
+                          ),
+                          bottomRight: Radius.circular(
+                            28,
+                          ),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withOpacity(
+                              0.04,
+                            ),
                             blurRadius: 10,
-                            offset: const Offset(0, -3),
+                            offset: const Offset(
+                              0,
+                              -3,
+                            ),
                           ),
                         ],
                       ),
@@ -972,25 +1175,34 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                 false,
                               ),
                               style: OutlinedButton.styleFrom(
-                                minimumSize: const Size(0, 50),
+                                minimumSize: const Size(
+                                  0,
+                                  50,
+                                ),
                                 side: BorderSide(
                                   color: _borderColor,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
                                 ),
                               ),
-                              child: const Text('Cancel'),
+                              child: Text(
+                                _l10n.cancel,
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(
+                            width: 12,
+                          ),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
                                 if (nameController.text.trim().isEmpty) {
                                   _dialogError(
                                     dialogContext,
-                                    'Please enter the medicine name.',
+                                    _l10n.pleaseEnterMedicineName,
                                   );
                                   return;
                                 }
@@ -998,7 +1210,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                 if (doseController.text.trim().isEmpty) {
                                   _dialogError(
                                     dialogContext,
-                                    'Please enter the dose or amount.',
+                                    _l10n.pleaseEnterDose,
                                   );
                                   return;
                                 }
@@ -1007,25 +1219,33 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                     times.isEmpty) {
                                   _dialogError(
                                     dialogContext,
-                                    'Please add at least one reminder time.',
+                                    _l10n.pleaseAddReminderTime,
                                   );
                                   return;
                                 }
 
-                                Navigator.pop(dialogContext, true);
+                                Navigator.pop(
+                                  dialogContext,
+                                  true,
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: primaryBlue,
                                 foregroundColor: Colors.white,
-                                minimumSize: const Size(0, 50),
+                                minimumSize: const Size(
+                                  0,
+                                  50,
+                                ),
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
                                 ),
                               ),
-                              child: const Text(
-                                'Save Changes',
-                                style: TextStyle(
+                              child: Text(
+                                _l10n.saveChanges,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -1052,6 +1272,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
     try {
       final finalTimes = frequency == 'As Needed' ? <TimeOfDay>[] : times;
+
       final durationDays = _durationInDays(duration);
 
       DateTime? endDate;
@@ -1061,7 +1282,11 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           startDate.year,
           startDate.month,
           startDate.day,
-        ).add(Duration(days: durationDays - 1));
+        ).add(
+          Duration(
+            days: durationDays - 1,
+          ),
+        );
       }
 
       await _cancelMedicineNotifications(
@@ -1116,8 +1341,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Medicine updated successfully.'),
+        SnackBar(
+          content: Text(
+            _l10n.medicineUpdatedSuccessfully,
+          ),
         ),
       );
     } catch (e) {
@@ -1128,12 +1355,16 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not update medicine.'),
+        SnackBar(
+          content: Text(
+            _l10n.couldNotUpdateMedicine,
+          ),
         ),
       );
 
-      debugPrint('Edit medicine error: $e');
+      debugPrint(
+        'Edit medicine error: $e',
+      );
     }
   }
 
@@ -1158,14 +1389,16 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Reminder Time',
-            style: TextStyle(
+          Text(
+            _l10n.reminderTime,
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 7),
+          const SizedBox(
+            height: 7,
+          ),
           _timeSelector(
             context: context,
             time: startingTime,
@@ -1185,7 +1418,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
               }
             },
           ),
-          const SizedBox(height: 10),
+          const SizedBox(
+            height: 10,
+          ),
           _schedulePreviewSmall(
             previewTimes,
           ),
@@ -1196,19 +1431,23 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Reminder Times',
-          style: TextStyle(
+        Text(
+          _l10n.reminderTimes,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 7),
+        const SizedBox(
+          height: 7,
+        ),
         ...List.generate(
           times.length,
           (index) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 9),
+              padding: const EdgeInsets.only(
+                bottom: 9,
+              ),
               child: _timeSelector(
                 context: context,
                 time: times[index],
@@ -1261,7 +1500,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                 size: 19,
               ),
               label: Text(
-                'Add Another Time',
+                _l10n.addAnotherTime,
                 style: TextStyle(
                   color: primaryBlue,
                   fontWeight: FontWeight.w600,
@@ -1272,7 +1511,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                   color: primaryBlue,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(
+                    12,
+                  ),
                 ),
               ),
             ),
@@ -1314,7 +1555,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
               color: primaryBlue,
               size: 20,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(
+              width: 10,
+            ),
             Expanded(
               child: Text(
                 _formatTimeOfDay(time),
@@ -1357,7 +1600,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       width: double.infinity,
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
-        color: primaryBlue.withOpacity(0.08),
+        color: primaryBlue.withOpacity(
+          0.08,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -1368,7 +1613,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
             color: primaryBlue,
             size: 18,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(
+            width: 8,
+          ),
           Expanded(
             child: Wrap(
               spacing: 7,
@@ -1387,7 +1634,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       ),
                     ),
                     child: Text(
-                      _formatTimeOfDay(time),
+                      _formatTimeOfDay(
+                        time,
+                      ),
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -1418,7 +1667,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           ) ??
           DateTime.now();
 
-      int daysToCancel = _storedInt(data['durationDays']) ?? 30;
+      int daysToCancel = _storedInt(
+            data['durationDays'],
+          ) ??
+          30;
 
       if (daysToCancel > 365) {
         daysToCancel = 365;
@@ -1428,14 +1680,18 @@ class _ManagereminderspageState extends State<Managereminderspage> {
         daysToCancel = 30;
       }
 
-      final oldTimes = _storedTimesAsTimeOfDay(data['times']);
+      final oldTimes = _storedTimesAsTimeOfDay(
+        data['times'],
+      );
 
       for (int day = 0; day < daysToCancel; day++) {
         final date = DateTime(
           startDate.year,
           startDate.month,
           startDate.day,
-        ).add(Duration(days: day));
+        ).add(
+          Duration(days: day),
+        );
 
         for (int timeIndex = 0; timeIndex < oldTimes.length; timeIndex++) {
           final notificationId =
@@ -1443,11 +1699,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       .hashCode &
                   0x7fffffff;
 
-          await NotificationService.instance.cancel(notificationId);
+          await NotificationService.instance.cancel(
+            notificationId,
+          );
         }
       }
     } catch (e) {
-      debugPrint('Cancel medicine notifications error: $e');
+      debugPrint(
+        'Cancel medicine notifications error: $e',
+      );
     }
   }
 
@@ -1515,7 +1775,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
   Future<void> _editAppointment(
     Map<String, dynamic> item,
   ) async {
-    final data = Map<String, dynamic>.from(item['data']);
+    final data = Map<String, dynamic>.from(
+      item['data'],
+    );
 
     final hospitalController = TextEditingController(
       text: (data['hospital'] ?? '').toString(),
@@ -1538,9 +1800,17 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
     DateTime appointmentDate = _parseLocalDate(
           data['dateTime'],
-          fallback: DateTime.now().add(const Duration(hours: 1)),
+          fallback: DateTime.now().add(
+            const Duration(
+              hours: 1,
+            ),
+          ),
         ) ??
-        DateTime.now().add(const Duration(hours: 1));
+        DateTime.now().add(
+          const Duration(
+            hours: 1,
+          ),
+        );
 
     final bool? result = await showDialog<bool>(
       context: context,
@@ -1564,7 +1834,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                 ),
                 decoration: BoxDecoration(
                   color: _dialogBackground,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(
+                    28,
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -1581,19 +1853,25 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                             width: 44,
                             height: 44,
                             decoration: BoxDecoration(
-                              color: primaryBlue.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(14),
+                              color: primaryBlue.withOpacity(
+                                0.12,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                14,
+                              ),
                             ),
                             child: Icon(
                               Icons.calendar_month_outlined,
                               color: primaryBlue,
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          const Expanded(
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          Expanded(
                             child: Text(
-                              'Edit Appointment',
-                              style: TextStyle(
+                              _l10n.editAppointment,
+                              style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -1604,7 +1882,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                               dialogContext,
                               false,
                             ),
-                            icon: const Icon(Icons.close),
+                            icon: const Icon(
+                              Icons.close,
+                            ),
                           ),
                         ],
                       ),
@@ -1624,10 +1904,14 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _dialogSectionTitle('Appointment Details'),
-                            const SizedBox(height: 12),
+                            _dialogSectionTitle(
+                              _l10n.appointmentDetails,
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
                             _modernDropdown(
-                              label: 'Appointment Type',
+                              label: _l10n.appointmentType,
                               icon: Icons.local_hospital_outlined,
                               value: appointmentType,
                               items: const [
@@ -1636,32 +1920,50 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                 'Dental',
                                 'Heart',
                               ],
+                              itemLabels: [
+                                _l10n.generalAppointment,
+                                _l10n.eyeAppointment,
+                                _l10n.dentalAppointment,
+                                _l10n.heartAppointment,
+                              ],
                               onChanged: (value) {
-                                setDialogState(() {
-                                  appointmentType = value;
-                                });
+                                setDialogState(
+                                  () {
+                                    appointmentType = value;
+                                  },
+                                );
                               },
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _modernTextField(
                               controller: hospitalController,
-                              label: 'Hospital / Clinic',
-                              hint: 'Enter hospital or clinic name',
+                              label: _l10n.hospitalClinic,
+                              hint: _l10n.enterHospitalClinicName,
                               icon: Icons.local_hospital_outlined,
                             ),
-                            const SizedBox(height: 22),
-                            _dialogSectionTitle('Date & Time'),
-                            const SizedBox(height: 12),
+                            const SizedBox(
+                              height: 22,
+                            ),
+                            _dialogSectionTitle(
+                              _l10n.dateAndTime,
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
                             _modernDateField(
-                              label: 'Appointment Date',
+                              label: _l10n.appointmentDate,
                               date: appointmentDate,
                               onTap: () async {
                                 final now = DateTime.now();
+
                                 final firstDate = DateTime(
                                   now.year,
                                   now.month,
                                   now.day,
                                 );
+
                                 final initialDate = appointmentDate.isBefore(
                                   firstDate,
                                 )
@@ -1672,26 +1974,34 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                   context: dialogContext,
                                   initialDate: initialDate,
                                   firstDate: firstDate,
-                                  lastDate: DateTime(2035),
+                                  lastDate: DateTime(
+                                    2035,
+                                  ),
                                 );
 
                                 if (picked != null) {
-                                  setDialogState(() {
-                                    appointmentDate = DateTime(
-                                      picked.year,
-                                      picked.month,
-                                      picked.day,
-                                      appointmentDate.hour,
-                                      appointmentDate.minute,
-                                    );
-                                  });
+                                  setDialogState(
+                                    () {
+                                      appointmentDate = DateTime(
+                                        picked.year,
+                                        picked.month,
+                                        picked.day,
+                                        appointmentDate.hour,
+                                        appointmentDate.minute,
+                                      );
+                                    },
+                                  );
                                 }
                               },
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _timeSelector(
                               context: context,
-                              time: TimeOfDay.fromDateTime(appointmentDate),
+                              time: TimeOfDay.fromDateTime(
+                                appointmentDate,
+                              ),
                               onTap: () async {
                                 final picked = await showTimePicker(
                                   context: dialogContext,
@@ -1701,25 +2011,33 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                 );
 
                                 if (picked != null) {
-                                  setDialogState(() {
-                                    appointmentDate = DateTime(
-                                      appointmentDate.year,
-                                      appointmentDate.month,
-                                      appointmentDate.day,
-                                      picked.hour,
-                                      picked.minute,
-                                    );
-                                  });
+                                  setDialogState(
+                                    () {
+                                      appointmentDate = DateTime(
+                                        appointmentDate.year,
+                                        appointmentDate.month,
+                                        appointmentDate.day,
+                                        picked.hour,
+                                        picked.minute,
+                                      );
+                                    },
+                                  );
                                 }
                               },
                             ),
-                            const SizedBox(height: 22),
-                            _dialogSectionTitle('Notes'),
-                            const SizedBox(height: 12),
+                            const SizedBox(
+                              height: 22,
+                            ),
+                            _dialogSectionTitle(
+                              _l10n.notes,
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
                             _modernTextField(
                               controller: reasonController,
-                              label: 'Reason / Notes',
-                              hint: 'Example: Follow-up appointment',
+                              label: _l10n.reasonNotes,
+                              hint: _l10n.followUpAppointmentExample,
                               icon: Icons.notes_outlined,
                               maxLines: 4,
                             ),
@@ -1737,8 +2055,12 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       decoration: BoxDecoration(
                         color: _dialogBackground,
                         borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(28),
-                          bottomRight: Radius.circular(28),
+                          bottomLeft: Radius.circular(
+                            28,
+                          ),
+                          bottomRight: Radius.circular(
+                            28,
+                          ),
                         ),
                       ),
                       child: Row(
@@ -1750,25 +2072,34 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                 false,
                               ),
                               style: OutlinedButton.styleFrom(
-                                minimumSize: const Size(0, 50),
+                                minimumSize: const Size(
+                                  0,
+                                  50,
+                                ),
                                 side: BorderSide(
                                   color: _borderColor,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
                                 ),
                               ),
-                              child: const Text('Cancel'),
+                              child: Text(
+                                _l10n.cancel,
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(
+                            width: 12,
+                          ),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
                                 if (hospitalController.text.trim().isEmpty) {
                                   _dialogError(
                                     dialogContext,
-                                    'Please enter the hospital or clinic name.',
+                                    _l10n.pleaseEnterHospitalClinicName,
                                   );
                                   return;
                                 }
@@ -1778,25 +2109,33 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                                 )) {
                                   _dialogError(
                                     dialogContext,
-                                    'Please select a future date and time.',
+                                    _l10n.pleaseSelectFutureDateAndTime,
                                   );
                                   return;
                                 }
 
-                                Navigator.pop(dialogContext, true);
+                                Navigator.pop(
+                                  dialogContext,
+                                  true,
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: primaryBlue,
                                 foregroundColor: Colors.white,
-                                minimumSize: const Size(0, 50),
+                                minimumSize: const Size(
+                                  0,
+                                  50,
+                                ),
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(
+                                    14,
+                                  ),
                                 ),
                               ),
-                              child: const Text(
-                                'Save Changes',
-                                style: TextStyle(
+                              child: Text(
+                                _l10n.saveChanges,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -1823,9 +2162,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     try {
       final notificationId = item['id'].hashCode.abs();
 
-      await NotificationService.instance.cancel(
-        notificationId,
-      );
+      await NotificationService.instance.cancel(notificationId);
 
       final now = DateTime.now().toIso8601String();
 
@@ -1866,8 +2203,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Appointment updated successfully.'),
+        SnackBar(
+          content: Text(
+            _l10n.appointmentUpdatedSuccessfully,
+          ),
         ),
       );
     } catch (e) {
@@ -1877,12 +2216,37 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not update appointment.'),
+        SnackBar(
+          content: Text(
+            _l10n.couldNotUpdateAppointment(e),
+          ),
         ),
       );
 
-      debugPrint('Edit appointment error: $e');
+      debugPrint(
+        'Edit appointment error: $e',
+      );
+    }
+  }
+
+  // ============================================================
+  // APPOINTMENT TYPE DISPLAY
+  // ============================================================
+
+  String _appointmentTypeLabel(
+    String value,
+  ) {
+    switch (value) {
+      case 'General':
+        return _l10n.generalAppointment;
+      case 'Eye':
+        return _l10n.eyeAppointment;
+      case 'Dental':
+        return _l10n.dentalAppointment;
+      case 'Heart':
+        return _l10n.heartAppointment;
+      default:
+        return value;
     }
   }
 
@@ -1970,6 +2334,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
     required IconData icon,
     required String value,
     required List<String> items,
+    required List<String> itemLabels,
     required ValueChanged<String> onChanged,
   }) {
     return DropdownButtonFormField<String>(
@@ -2008,17 +2373,18 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           ),
         ),
       ),
-      items: items.map(
-        (item) {
+      items: List.generate(
+        items.length,
+        (index) {
           return DropdownMenuItem<String>(
-            value: item,
+            value: items[index],
             child: Text(
-              item,
+              itemLabels[index],
               overflow: TextOverflow.ellipsis,
             ),
           );
         },
-      ).toList(),
+      ),
       onChanged: (value) {
         if (value != null) {
           onChanged(value);
@@ -2092,7 +2458,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: primaryBlue.withOpacity(0.08),
+        color: primaryBlue.withOpacity(
+          0.08,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -2103,7 +2471,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
             color: primaryBlue,
             size: 19,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(
+            width: 8,
+          ),
           Expanded(
             child: Text(
               text,
@@ -2200,7 +2570,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       backgroundColor: _pageBackground,
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: 1,
-        onTap: (i) => _onBottomTap(context, i),
+        onTap: (i) => _onBottomTap(
+          context,
+          i,
+        ),
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -2214,21 +2587,25 @@ class _ManagereminderspageState extends State<Managereminderspage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'My Reminders',
-                  style: TextStyle(
+                Text(
+                  _l10n.myReminders,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(
+                  height: 6,
+                ),
                 Text(
-                  'Manage your reminders',
+                  _l10n.manageYourReminders,
                   style: TextStyle(
                     color: _secondaryTextColor,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(
+                  height: 20,
+                ),
                 if (_loading)
                   const Center(
                     child: Padding(
@@ -2243,7 +2620,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                 else if (reminders.isEmpty)
                   _emptyState()
                 else
-                  ...reminders.map(_card),
+                  ...reminders.map(
+                    _card,
+                  ),
               ],
             ),
           ),
@@ -2271,19 +2650,25 @@ class _ManagereminderspageState extends State<Managereminderspage> {
             size: 42,
             color: Colors.red.shade400,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(
+            height: 10,
+          ),
           Text(
-            _errorMessage ?? 'Something went wrong.',
+            _errorMessage ?? _l10n.somethingWentWrong,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(
+            height: 12,
+          ),
           ElevatedButton(
             onPressed: _loadReminders,
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryBlue,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Try Again'),
+            child: Text(
+              _l10n.tryAgain,
+            ),
           ),
         ],
       ),
@@ -2312,19 +2697,23 @@ class _ManagereminderspageState extends State<Managereminderspage> {
             size: 50,
             color: primaryBlue,
           ),
-          const SizedBox(height: 12),
-          const Text(
-            'No reminders yet',
-            style: TextStyle(
+          const SizedBox(
+            height: 12,
+          ),
+          Text(
+            _l10n.noRemindersYet,
+            style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 6),
-          const Text(
-            'Your medicine and appointment reminders will appear here.',
+          const SizedBox(
+            height: 6,
+          ),
+          Text(
+            _l10n.remindersWillAppearHere,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.grey,
             ),
           ),
@@ -2364,10 +2753,6 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ======================================================
-          // ICON
-          // ======================================================
-
           Container(
             width: 60,
             height: 60,
@@ -2384,13 +2769,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
               color: primaryBlue,
             ),
           ),
-
-          const SizedBox(width: 12),
-
-          // ======================================================
-          // CONTENT
-          // ======================================================
-
+          const SizedBox(
+            width: 12,
+          ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -2407,7 +2788,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                     ),
                   ),
                   child: Text(
-                    item['time'],
+                    item['time'].toString(),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -2415,30 +2796,40 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(
+                  height: 6,
+                ),
                 Text(
-                  item['title'],
+                  isMedicine
+                      ? item['title'].toString()
+                      : _appointmentTypeLabel(
+                          item['title'].toString(),
+                        ),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(
+                  height: 2,
+                ),
                 Text(
-                  item['subtitle'],
+                  item['subtitle'].toString(),
                   style: TextStyle(
                     fontSize: 13,
                     color: _secondaryTextColor,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(
+                  height: 10,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
                         _action(
-                          'Edit',
+                          _l10n.edit,
                           () => _editReminder(
                             item,
                           ),
@@ -2447,7 +2838,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                           width: 16,
                         ),
                         _action(
-                          'Delete',
+                          _l10n.delete,
                           () => _delete(
                             item,
                           ),
@@ -2467,7 +2858,9 @@ class _ManagereminderspageState extends State<Managereminderspage> {
                       activeTrackColor: primaryBlue,
                       inactiveThumbColor: Colors.white,
                       inactiveTrackColor: _isDark
-                          ? const Color(0xFF4A4A4A)
+                          ? const Color(
+                              0xFF4A4A4A,
+                            )
                           : Colors.grey.shade300,
                     ),
                   ],

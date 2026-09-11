@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -10,31 +11,10 @@ class CustomBottomNavBar extends StatelessWidget {
     required this.onTap,
   });
 
-  static const List<_NavItem> _items = [
-    _NavItem(
-      icon: Icons.home_rounded,
-      label: 'Home',
-    ),
-    _NavItem(
-      icon: Icons.alarm_outlined,
-      label: 'Reminders',
-    ),
-    _NavItem(
-      icon: Icons.health_and_safety_outlined,
-      label: 'Health',
-    ),
-    _NavItem(
-      icon: Icons.medical_services_outlined,
-      label: 'SOS',
-    ),
-    _NavItem(
-      icon: Icons.person_outline_rounded,
-      label: 'Profile',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     const accent = Color(0xFF2D6AE3);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -49,6 +29,29 @@ class CustomBottomNavBar extends StatelessWidget {
 
     final selectedBackground =
         isDark ? const Color(0xFF24334D) : const Color(0xFFE8F0FF);
+
+    final items = [
+      _NavItem(
+        icon: Icons.home_rounded,
+        label: l10n.home,
+      ),
+      _NavItem(
+        icon: Icons.alarm_outlined,
+        label: l10n.reminders,
+      ),
+      _NavItem(
+        icon: Icons.health_and_safety_outlined,
+        label: l10n.healthTools,
+      ),
+      _NavItem(
+        icon: Icons.medical_services_outlined,
+        label: l10n.emergencyGuide,
+      ),
+      _NavItem(
+        icon: Icons.person_outline_rounded,
+        label: l10n.profile,
+      ),
+    ];
 
     return SafeArea(
       top: false,
@@ -77,9 +80,9 @@ class CustomBottomNavBar extends StatelessWidget {
           ),
           child: Row(
             children: List.generate(
-              _items.length,
+              items.length,
               (index) {
-                final item = _items[index];
+                final item = items[index];
                 final isSelected = selectedIndex == index;
 
                 return Expanded(

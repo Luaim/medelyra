@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditPasswordPage extends StatefulWidget {
   const EditPasswordPage({super.key});
@@ -9,45 +10,25 @@ class EditPasswordPage extends StatefulWidget {
 }
 
 class _EditPasswordPageState extends State<EditPasswordPage> {
-  // ============================================================
-  // CONTROLLERS
-  // ============================================================
-
   final TextEditingController currentController = TextEditingController();
-
   final TextEditingController newController = TextEditingController();
-
   final TextEditingController confirmController = TextEditingController();
-
-  // ============================================================
-  // VISIBILITY
-  // ============================================================
 
   bool showCurrent = false;
   bool showNew = false;
   bool showConfirm = false;
 
-  // ============================================================
-  // STATE
-  // ============================================================
-
   bool isLoading = false;
   String? error;
 
-  // ============================================================
-  // FIREBASE
-  // ============================================================
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
 
   // ============================================================
   // AUTHENTICATION CHECK
   // ============================================================
 
-  /// Returns true when this Firebase account has a password
-  /// authentication provider.
-  ///
-  /// Google-only accounts will return false.
   bool get hasPasswordProvider {
     final user = _auth.currentUser;
 
@@ -60,7 +41,6 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
     );
   }
 
-  /// Returns true when the account is using Google.
   bool get isGoogleAccount {
     final user = _auth.currentUser;
 
@@ -155,7 +135,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
 
     if (user == null) {
       setState(() {
-        error = 'Your session has expired. Please sign in again.';
+        error = _l10n.sessionExpired;
       });
       return;
     }
@@ -167,8 +147,8 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
     if (!hasPasswordProvider) {
       setState(() {
         error = isGoogleAccount
-            ? 'This account uses Google Sign-In. Your password is managed by Google.'
-            : 'This account does not have a password that can be changed here.';
+            ? _l10n.googlePasswordManaged
+            : _l10n.noPasswordToChange;
       });
       return;
     }
@@ -178,7 +158,6 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
     // ------------------------------------------------------------
 
     // Do NOT trim passwords.
-    // Spaces can technically be part of a password.
     final currentPassword = currentController.text;
     final newPassword = newController.text;
     final confirmPassword = confirmController.text;
@@ -189,49 +168,49 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
 
     if (currentPassword.isEmpty) {
       setState(() {
-        error = 'Please enter your current password.';
+        error = _l10n.pleaseEnterCurrentPassword;
       });
       return;
     }
 
     if (newPassword.isEmpty) {
       setState(() {
-        error = 'Please enter your new password.';
+        error = _l10n.pleaseEnterNewPassword;
       });
       return;
     }
 
     if (confirmPassword.isEmpty) {
       setState(() {
-        error = 'Please confirm your new password.';
+        error = _l10n.pleaseConfirmNewPassword;
       });
       return;
     }
 
     if (newPassword.length < 6) {
       setState(() {
-        error = 'New password must be at least 6 characters.';
+        error = _l10n.newPasswordMinLength;
       });
       return;
     }
 
     if (newPassword != confirmPassword) {
       setState(() {
-        error = 'Passwords do not match.';
+        error = _l10n.passwordsDoNotMatch;
       });
       return;
     }
 
     if (currentPassword == newPassword) {
       setState(() {
-        error = 'New password must be different from your current password.';
+        error = _l10n.newPasswordMustBeDifferent;
       });
       return;
     }
 
     if (user.email == null || user.email!.isEmpty) {
       setState(() {
-        error = 'Unable to update the password for this account.';
+        error = _l10n.unableToUpdatePassword;
       });
       return;
     }
@@ -265,10 +244,6 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
 
       if (!mounted) return;
 
-      // ----------------------------------------------------------
-      // CLEAR FIELDS
-      // ----------------------------------------------------------
-
       currentController.clear();
       newController.clear();
       confirmController.clear();
@@ -285,12 +260,12 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Password updated successfully.',
+              _l10n.passwordUpdatedSuccessfully,
             ),
             behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 3),
+            duration: const Duration(seconds: 3),
           ),
         );
 
@@ -313,35 +288,35 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
       switch (e.code) {
         case 'wrong-password':
         case 'invalid-credential':
-          message = 'Current password is incorrect.';
+          message = _l10n.currentPasswordIncorrect;
           break;
 
         case 'weak-password':
-          message = 'New password is too weak.';
+          message = _l10n.newPasswordTooWeak;
           break;
 
         case 'requires-recent-login':
-          message = 'Please sign in again before changing your password.';
+          message = _l10n.securityRecentLogin;
           break;
 
         case 'network-request-failed':
-          message = 'Please check your internet connection and try again.';
+          message = _l10n.checkInternet;
           break;
 
         case 'too-many-requests':
-          message = 'Too many attempts. Please try again later.';
+          message = _l10n.tooManyAttempts;
           break;
 
         case 'user-disabled':
-          message = 'This account has been disabled.';
+          message = _l10n.accountDisabled;
           break;
 
         case 'user-not-found':
-          message = 'Your account could not be found. Please sign in again.';
+          message = _l10n.accountNoLongerExists;
           break;
 
         default:
-          message = e.message ?? 'Unable to update your password.';
+          message = e.message ?? _l10n.unableToUpdatePassword;
       }
 
       setState(() {
@@ -355,7 +330,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
 
       setState(() {
         isLoading = false;
-        error = 'Something went wrong. Please try again.';
+        error = _l10n.somethingWentWrong;
       });
     }
   }
@@ -383,7 +358,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
-          'Change Password',
+          _l10n.changePassword,
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w700,
@@ -418,7 +393,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                   // =================================================
 
                   Text(
-                    'Update your password',
+                    _l10n.updateYourPassword,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -430,8 +405,8 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
 
                   Text(
                     googleOnlyAccount
-                        ? 'Your account uses Google Sign-In'
-                        : 'Make sure your new password is secure',
+                        ? _l10n.accountUsesGoogleSignIn
+                        : _l10n.makeNewPasswordSecure,
                     style: TextStyle(
                       fontSize: 14,
                       color: _secondaryTextColor,
@@ -468,9 +443,9 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                             borderRadius: BorderRadius.circular(18),
                           ),
                         ),
-                        child: const Text(
-                          'Back to Settings',
-                          style: TextStyle(
+                        child: Text(
+                          _l10n.backToSettings,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -485,11 +460,9 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                   // =================================================
 
                   else ...[
-                    // CURRENT PASSWORD
-
                     _passwordField(
                       controller: currentController,
-                      hint: 'Current Password',
+                      hint: _l10n.currentPassword,
                       show: showCurrent,
                       toggle: () {
                         setState(() {
@@ -499,11 +472,9 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                       },
                     ),
 
-                    // NEW PASSWORD
-
                     _passwordField(
                       controller: newController,
-                      hint: 'New Password',
+                      hint: _l10n.newPassword,
                       show: showNew,
                       toggle: () {
                         setState(() {
@@ -513,11 +484,9 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                       },
                     ),
 
-                    // CONFIRM PASSWORD
-
                     _passwordField(
                       controller: confirmController,
-                      hint: 'Confirm New Password',
+                      hint: _l10n.confirmNewPassword,
                       show: showConfirm,
                       toggle: () {
                         setState(() {
@@ -538,7 +507,7 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                         bottom: 4,
                       ),
                       child: Text(
-                        'Password must contain at least 6 characters.',
+                        _l10n.passwordMinSixCharacters,
                         style: TextStyle(
                           fontSize: 13,
                           color: _secondaryTextColor,
@@ -615,9 +584,9 @@ class _EditPasswordPageState extends State<EditPasswordPage> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
-                                'Update Password',
-                                style: TextStyle(
+                            : Text(
+                                _l10n.updatePassword,
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -730,6 +699,8 @@ class _GoogleAccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -762,7 +733,7 @@ class _GoogleAccountCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Google Sign-In account',
+                  l10n.googleSignInAccount,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -771,7 +742,7 @@ class _GoogleAccountCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  'Your password is managed by Google, so it cannot be changed from Medelyra.',
+                  l10n.googlePasswordDescription,
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.4,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -30,6 +32,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   // PROFILE DATA
   // ============================================================
 
+  // IMPORTANT:
+  // These values remain in English because they are stored in
+  // Firestore. Only their displayed labels are localized.
   String gender = 'Male';
   String bloodGroup = 'O+';
 
@@ -50,6 +55,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // ============================================================
+  // LOCALIZATION
+  // ============================================================
+
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
 
   // ============================================================
   // COLORS
@@ -219,11 +230,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         emergencyPhoneController.text =
             data['emergencyContactPhone']?.toString() ?? '';
       } else {
-        // --------------------------------------------------------
-        // NO FIRESTORE PROFILE YET
-        // --------------------------------------------------------
-
         nameController.text = user.displayName ?? '';
+
         emailController.text = user.email ?? '';
       }
 
@@ -241,9 +249,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Could not load your profile. Please try again.',
+              _l10n.couldNotLoadYourProfile,
             ),
           ),
         );
@@ -337,9 +345,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'You are not signed in.',
+            _l10n.notSignedIn,
           ),
         ),
       );
@@ -347,9 +355,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     final name = nameController.text.trim();
+
     final phone = phoneController.text.trim();
 
     final emergencyName = emergencyNameController.text.trim();
+
     final emergencyPhone = emergencyPhoneController.text.trim();
 
     // ------------------------------------------------------------
@@ -358,9 +368,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Please enter your full name.',
+            _l10n.pleaseEnterFullName,
           ),
         ),
       );
@@ -369,9 +379,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (phone.isNotEmpty && !RegExp(r'^[0-9]+$').hasMatch(phone)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Phone number can contain numbers only.',
+            _l10n.phoneNumbersOnly,
           ),
         ),
       );
@@ -379,11 +389,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     if (emergencyPhone.isNotEmpty &&
-        !RegExp(r'^[0-9]+$').hasMatch(emergencyPhone)) {
+        !RegExp(r'^[0-9]+$').hasMatch(
+          emergencyPhone,
+        )) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Emergency phone number can contain numbers only.',
+            _l10n.emergencyPhoneNumbersOnly,
           ),
         ),
       );
@@ -432,9 +444,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Profile updated successfully!',
+            _l10n.profileUpdatedSuccessfully,
           ),
         ),
       );
@@ -445,16 +457,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       Navigator.pop(context);
     } catch (e) {
-      debugPrint('ERROR SAVING PROFILE: $e');
+      debugPrint(
+        'ERROR SAVING PROFILE: $e',
+      );
 
       if (!mounted) {
         return;
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Could not save your profile. Please try again.',
+            _l10n.couldNotSaveProfile,
           ),
         ),
       );
@@ -472,23 +486,27 @@ class _EditProfilePageState extends State<EditProfilePage> {
   // ============================================================
 
   String _formattedDate() {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
+    return DateFormat(
+      'd MMMM yyyy',
+      _l10n.localeName,
+    ).format(selectedDate);
+  }
 
-    return '${selectedDate.day} ${months[selectedDate.month - 1]} '
-        '${selectedDate.year}';
+  // ============================================================
+  // LOCALIZED GENDER LABEL
+  // ============================================================
+
+  String _genderLabel(String value) {
+    switch (value) {
+      case 'Male':
+        return _l10n.male;
+
+      case 'Female':
+        return _l10n.female;
+
+      default:
+        return value;
+    }
   }
 
   // ============================================================
@@ -532,7 +550,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
         ),
         title: Text(
-          'Edit Profile',
+          _l10n.editProfile,
           style: TextStyle(
             fontSize: 23,
             fontWeight: FontWeight.w700,
@@ -577,8 +595,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                         _sectionHeader(
                           icon: Icons.person_outline_rounded,
-                          title: 'Personal Information',
-                          subtitle: 'Keep your basic information up to date.',
+                          title: _l10n.personalInformation,
+                          subtitle: _l10n.keepBasicInformationUpdated,
                         ),
 
                         const SizedBox(height: 12),
@@ -587,22 +605,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           children: [
                             _modernInput(
                               controller: nameController,
-                              label: 'Full Name',
+                              label: _l10n.fullName,
                               icon: Icons.person_outline_rounded,
                               textInputAction: TextInputAction.next,
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _modernInput(
                               controller: emailController,
-                              label: 'Email Address',
+                              label: _l10n.emailAddress,
                               icon: Icons.email_outlined,
                               enabled: false,
-                              helperText: 'Email cannot be changed here.',
+                              helperText: _l10n.emailCannotBeChanged,
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _modernInput(
                               controller: phoneController,
-                              label: 'Phone Number',
+                              label: _l10n.phoneNumber,
                               icon: Icons.phone_outlined,
                               keyboardType: TextInputType.phone,
                               inputFormatters: [
@@ -610,16 +632,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               ],
                               textInputAction: TextInputAction.next,
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _buildDateField(),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _buildDropdownField(
-                              label: 'Gender',
+                              label: _l10n.gender,
                               icon: Icons.wc_outlined,
                               value: gender,
                               items: const [
                                 'Male',
                                 'Female',
+                              ],
+                              itemLabels: [
+                                _l10n.male,
+                                _l10n.female,
                               ],
                               onChanged: (value) {
                                 setState(() {
@@ -638,9 +668,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                         _sectionHeader(
                           icon: Icons.favorite_outline_rounded,
-                          title: 'Medical Information',
-                          subtitle:
-                              'Important information for your health profile.',
+                          title: _l10n.medicalInformation,
+                          subtitle: _l10n.importantHealthProfileInformation,
                         ),
 
                         const SizedBox(height: 12),
@@ -648,7 +677,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         _buildSectionCard(
                           children: [
                             _buildDropdownField(
-                              label: 'Blood Group',
+                              label: _l10n.bloodGroup,
                               icon: Icons.bloodtype_outlined,
                               value: bloodGroup,
                               items: const [
@@ -663,9 +692,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 });
                               },
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(
+                              height: 20,
+                            ),
                             Text(
-                              'Allergies',
+                              _l10n.allergies,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
@@ -674,38 +705,46 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Add any medicines or substances you are allergic to.',
+                              _l10n.allergiesDescription,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: _lightTextColor,
                                 height: 1.35,
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(
+                              height: 12,
+                            ),
                             if (allergies.isNotEmpty) ...[
                               Wrap(
                                 spacing: 8,
                                 runSpacing: 8,
-                                children: allergies.map((item) {
-                                  return _buildAllergyChip(
-                                    item,
-                                  );
-                                }).toList(),
+                                children: allergies.map(
+                                  (item) {
+                                    return _buildAllergyChip(
+                                      item,
+                                    );
+                                  },
+                                ).toList(),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(
+                                height: 12,
+                              ),
                             ],
                             Row(
                               children: [
                                 Expanded(
                                   child: _modernInput(
                                     controller: allergyController,
-                                    label: 'Add Allergy',
+                                    label: _l10n.addAllergy,
                                     icon: Icons.add_rounded,
                                     textInputAction: TextInputAction.done,
                                     onSubmitted: (_) => _addAllergy(),
                                   ),
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(
+                                  width: 10,
+                                ),
                                 _buildAddButton(),
                               ],
                             ),
@@ -720,9 +759,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                         _sectionHeader(
                           icon: Icons.emergency_outlined,
-                          title: 'Emergency Contact',
-                          subtitle:
-                              'Someone to contact in case of an emergency.',
+                          title: _l10n.emergencyContact,
+                          subtitle: _l10n.emergencyContactDescription,
                         ),
 
                         const SizedBox(height: 12),
@@ -731,14 +769,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           children: [
                             _modernInput(
                               controller: emergencyNameController,
-                              label: 'Emergency Contact Name',
+                              label: _l10n.emergencyContactName,
                               icon: Icons.person_outline_rounded,
                               textInputAction: TextInputAction.next,
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(
+                              height: 14,
+                            ),
                             _modernInput(
                               controller: emergencyPhoneController,
-                              label: 'Emergency Contact Phone',
+                              label: _l10n.emergencyContactPhone,
                               icon: Icons.phone_outlined,
                               keyboardType: TextInputType.phone,
                               inputFormatters: [
@@ -771,7 +811,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primary,
                               foregroundColor: Colors.white,
-                              disabledBackgroundColor: const Color(0xFF9BBFCC),
+                              disabledBackgroundColor: const Color(
+                                0xFF9BBFCC,
+                              ),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(17),
@@ -786,17 +828,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Row(
+                                : Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(
+                                      const Icon(
                                         Icons.check_rounded,
                                         size: 21,
                                       ),
-                                      SizedBox(width: 8),
+                                      const SizedBox(
+                                        width: 8,
+                                      ),
                                       Text(
-                                        'Save Changes',
-                                        style: TextStyle(
+                                        _l10n.saveChanges,
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -810,7 +854,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                         Center(
                           child: Text(
-                            'Your changes will be saved securely.',
+                            _l10n.changesSavedSecurely,
                             style: TextStyle(
                               fontSize: 12,
                               color: _lightTextColor,
@@ -859,7 +903,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
               boxShadow: [
                 if (!_isDark)
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withOpacity(
+                      0.04,
+                    ),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -877,7 +923,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Your Profile',
+                  _l10n.yourProfile,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -886,7 +932,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Update your information to keep your Medelyra profile accurate.',
+                  _l10n.updateProfileDescription,
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,
@@ -973,7 +1019,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         boxShadow: [
           if (!_isDark)
             BoxShadow(
-              color: Colors.black.withOpacity(0.025),
+              color: Colors.black.withOpacity(
+                0.025,
+              ),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -1041,25 +1089,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
           vertical: 16,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(
+            15,
+          ),
           borderSide: BorderSide(
             color: _borderColor,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(
+            15,
+          ),
           borderSide: BorderSide(
             color: _borderColor,
           ),
         ),
         disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(
+            15,
+          ),
           borderSide: BorderSide(
             color: _borderColor,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(
+            15,
+          ),
           borderSide: const BorderSide(
             color: primary,
             width: 1.4,
@@ -1099,7 +1155,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 height: 40,
                 decoration: BoxDecoration(
                   color: _dateIconBackground,
-                  borderRadius: BorderRadius.circular(11),
+                  borderRadius: BorderRadius.circular(
+                    11,
+                  ),
                 ),
                 child: const Icon(
                   Icons.calendar_month_outlined,
@@ -1113,13 +1171,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Date of Birth',
+                      _l10n.dateOfBirth,
                       style: TextStyle(
                         fontSize: 12,
                         color: _lightTextColor,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(
+                      height: 3,
+                    ),
                   ],
                 ),
               ),
@@ -1153,8 +1213,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
     required IconData icon,
     required String value,
     required List<String> items,
+    List<String>? itemLabels,
     required ValueChanged<String> onChanged,
   }) {
+    final displayLabels = itemLabels ??
+        items.map((item) {
+          if (label == _l10n.gender) {
+            return _genderLabel(item);
+          }
+
+          return item;
+        }).toList();
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
@@ -1174,7 +1244,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
             height: 40,
             decoration: BoxDecoration(
               color: _sectionIconBackground,
-              borderRadius: BorderRadius.circular(11),
+              borderRadius: BorderRadius.circular(
+                11,
+              ),
             ),
             child: Icon(
               icon,
@@ -1188,8 +1260,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
               child: DropdownButton<String>(
                 value: items.contains(value) ? value : items.first,
                 isExpanded: true,
-                borderRadius: BorderRadius.circular(15),
-                dropdownColor: _isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                borderRadius: BorderRadius.circular(
+                  15,
+                ),
+                dropdownColor: _isDark
+                    ? const Color(
+                        0xFF1E1E1E,
+                      )
+                    : Colors.white,
                 icon: const Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: primary,
@@ -1200,7 +1278,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   color: _primaryTextColor,
                 ),
                 selectedItemBuilder: (context) {
-                  return items.map((item) {
+                  return items.asMap().entries.map((entry) {
+                    final index = entry.key;
+
                     return Align(
                       alignment: Alignment.centerLeft,
                       child: Column(
@@ -1214,9 +1294,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               color: _lightTextColor,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(
+                            height: 2,
+                          ),
                           Text(
-                            item,
+                            displayLabels[index],
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -1228,11 +1310,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     );
                   }).toList();
                 },
-                items: items.map((item) {
+                items: items.asMap().entries.map((entry) {
+                  final index = entry.key;
+
                   return DropdownMenuItem<String>(
-                    value: item,
+                    value: entry.value,
                     child: Text(
-                      item,
+                      displayLabels[index],
                       style: TextStyle(
                         color: _primaryTextColor,
                       ),
@@ -1256,7 +1340,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   // ALLERGY CHIP
   // ============================================================
 
-  Widget _buildAllergyChip(String item) {
+  Widget _buildAllergyChip(
+    String item,
+  ) {
     return Container(
       padding: const EdgeInsets.only(
         left: 12,
@@ -1291,9 +1377,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
           const SizedBox(width: 3),
           InkWell(
             onTap: () => _removeAllergy(item),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(
+              20,
+            ),
             child: Padding(
-              padding: const EdgeInsets.all(3),
+              padding: const EdgeInsets.all(
+                3,
+              ),
               child: Icon(
                 Icons.close_rounded,
                 size: 17,
@@ -1322,7 +1412,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           elevation: 0,
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(
+              15,
+            ),
           ),
         ),
         child: const Icon(
@@ -1361,7 +1453,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Your profile information is securely stored and used to personalize your Medelyra experience.',
+              _l10n.yourProfileSecurelyStored,
               style: TextStyle(
                 fontSize: 11.5,
                 height: 1.4,

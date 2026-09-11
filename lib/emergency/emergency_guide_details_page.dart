@@ -264,7 +264,7 @@ class _EmergencyGuideDetailsPageState extends State<EmergencyGuideDetailsPage> {
           // -------------------------------------------------------------------
 
           if (steps.isEmpty)
-            _NoStepsState()
+            const _NoStepsState()
           else
             ...List.generate(
               steps.length,

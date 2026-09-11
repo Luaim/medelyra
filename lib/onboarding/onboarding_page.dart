@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -29,23 +30,26 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Color get _secondaryTextColorForTheme =>
       _isDark ? const Color(0xFFBDBDBD) : _secondaryTextColor;
 
-  static const List<_OnboardingItem> _pages = [
-    _OnboardingItem(
-      title: 'Welcome to Medelyra',
-      description:
-          'Your simple companion for staying organized and prepared for your health.',
-    ),
-    _OnboardingItem(
-      title: 'Stay on track',
-      description:
-          'Keep your medications and appointments organized with reminders that fit into your day.',
-    ),
-    _OnboardingItem(
-      title: 'Tools for your health',
-      description:
-          'Use helpful health tools and access emergency guidance when you need it.',
-    ),
-  ];
+  // ==========================================================================
+  // ONBOARDING DATA
+  // ==========================================================================
+
+  List<_OnboardingItem> _getPages(AppLocalizations l10n) {
+    return [
+      _OnboardingItem(
+        title: l10n.welcomeToMedelyra,
+        description: l10n.welcomeToMedelyraDescription,
+      ),
+      _OnboardingItem(
+        title: l10n.stayOnTrack,
+        description: l10n.stayOnTrackDescription,
+      ),
+      _OnboardingItem(
+        title: l10n.toolsForYourHealth,
+        description: l10n.toolsForYourHealthDescription,
+      ),
+    ];
+  }
 
   @override
   void dispose() {
@@ -57,8 +61,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
   // NEXT PAGE
   // ==========================================================================
 
-  void _nextPage() {
-    if (_currentPage < _pages.length - 1) {
+  void _nextPage(int pageCount) {
+    if (_currentPage < pageCount - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
@@ -88,6 +92,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final pages = _getPages(l10n);
+
     final screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = screenHeight < 700;
 
@@ -106,7 +113,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: _currentPage < _pages.length - 1
+                  child: _currentPage < pages.length - 1
                       ? TextButton(
                           onPressed: _finishOnboarding,
                           style: TextButton.styleFrom(
@@ -117,7 +124,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             ),
                           ),
                           child: Text(
-                            'Skip',
+                            l10n.skip,
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
@@ -137,7 +144,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 onPageChanged: (index) {
                   setState(() {
                     _currentPage = index;
@@ -145,9 +152,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 },
                 itemBuilder: (context, index) {
                   return _OnboardingContent(
-                    page: _pages[index],
+                    page: pages[index],
                     pageIndex: index,
                     isSmallScreen: isSmallScreen,
+                    l10n: l10n,
                   );
                 },
               ),
@@ -173,7 +181,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      _pages.length,
+                      pages.length,
                       (index) {
                         final selected = index == _currentPage;
 
@@ -205,7 +213,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     width: double.infinity,
                     height: 54,
                     child: ElevatedButton(
-                      onPressed: _nextPage,
+                      onPressed: () => _nextPage(pages.length),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _primaryColor,
                         foregroundColor: Colors.white,
@@ -215,9 +223,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         ),
                       ),
                       child: Text(
-                        _currentPage == _pages.length - 1
-                            ? 'Get Started'
-                            : 'Next',
+                        _currentPage == pages.length - 1
+                            ? l10n.getStarted
+                            : l10n.next,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -244,11 +252,13 @@ class _OnboardingContent extends StatelessWidget {
   final _OnboardingItem page;
   final int pageIndex;
   final bool isSmallScreen;
+  final AppLocalizations l10n;
 
   const _OnboardingContent({
     required this.page,
     required this.pageIndex,
     required this.isSmallScreen,
+    required this.l10n,
   });
 
   @override
@@ -339,26 +349,26 @@ class _OnboardingContent extends StatelessWidget {
                       ),
 
                       if (pageIndex == 1) ...[
-                        const _FeatureRow(
+                        _FeatureRow(
                           icon: Icons.alarm_outlined,
-                          text: 'Medication reminders',
+                          text: l10n.medicationReminders,
                         ),
                         const SizedBox(height: 14),
-                        const _FeatureRow(
+                        _FeatureRow(
                           icon: Icons.calendar_today_outlined,
-                          text: 'Appointment reminders',
+                          text: l10n.appointmentReminders,
                         ),
                       ],
 
                       if (pageIndex == 2) ...[
-                        const _FeatureRow(
+                        _FeatureRow(
                           icon: Icons.health_and_safety_outlined,
-                          text: 'Helpful health tools',
+                          text: l10n.helpfulHealthTools,
                         ),
                         const SizedBox(height: 14),
-                        const _FeatureRow(
+                        _FeatureRow(
                           icon: Icons.medical_services_outlined,
-                          text: 'Emergency guidance',
+                          text: l10n.emergencyGuidance,
                         ),
                       ],
                     ],
@@ -442,10 +452,10 @@ class _FeatureRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(
-          Icons.alarm_outlined,
+        Icon(
+          icon,
           size: 22,
-          color: Color(0xFF3D84A8),
+          color: const Color(0xFF3D84A8),
         ),
         const SizedBox(width: 10),
         Text(
