@@ -888,6 +888,9 @@
   "privacyBottomNote": "تهدف سياسة الخصوصية هذه إلى توضيح كيفية تعامل Medelyra مع المعلومات داخل التطبيق."
 
   ,
-  "home": "الرئيسية",
-  "reminders": "التذكيرات"
+  "navHome": "الرئيسية",
+  "navReminders": "التذكيرات",
+  "navHealth": "الصحة",
+  "navSos": "SOS",
+  "navProfile": "الملف الشخصي"
 }

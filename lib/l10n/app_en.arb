@@ -840,6 +840,9 @@
   "privacyBottomNote": "This Privacy Policy is intended to explain how Medelyra handles information within the application."
 
   ,
-  "home": "Home",
-  "reminders": "Reminders"
+  "navHome": "Home",
+  "navReminders": "Reminders",
+  "navHealth": "Health",
+  "navSos": "SOS",
+  "navProfile": "Profile"
 }

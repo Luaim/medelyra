@@ -33,23 +33,23 @@ class CustomBottomNavBar extends StatelessWidget {
     final items = [
       _NavItem(
         icon: Icons.home_rounded,
-        label: l10n.home,
+        label: l10n.navHome,
       ),
       _NavItem(
         icon: Icons.alarm_outlined,
-        label: l10n.reminders,
+        label: l10n.navReminders,
       ),
       _NavItem(
         icon: Icons.health_and_safety_outlined,
-        label: l10n.healthTools,
+        label: l10n.navHealth,
       ),
       _NavItem(
         icon: Icons.medical_services_outlined,
-        label: l10n.emergencyGuide,
+        label: l10n.navSos,
       ),
       _NavItem(
         icon: Icons.person_outline_rounded,
-        label: l10n.profile,
+        label: l10n.navProfile,
       ),
     ];
 
