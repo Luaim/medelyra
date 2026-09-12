@@ -1205,8 +1205,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   // ============================================================
-  // DROPDOWN FIELD
-  // ============================================================
+// DROPDOWN FIELD
+// ============================================================
 
   Widget _buildDropdownField({
     required String label,
@@ -1244,9 +1244,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             height: 40,
             decoration: BoxDecoration(
               color: _sectionIconBackground,
-              borderRadius: BorderRadius.circular(
-                11,
-              ),
+              borderRadius: BorderRadius.circular(11),
             ),
             child: Icon(
               icon,
@@ -1260,14 +1258,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
               child: DropdownButton<String>(
                 value: items.contains(value) ? value : items.first,
                 isExpanded: true,
-                borderRadius: BorderRadius.circular(
-                  15,
-                ),
-                dropdownColor: _isDark
-                    ? const Color(
-                        0xFF1E1E1E,
-                      )
-                    : Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                dropdownColor: _isDark ? const Color(0xFF1E1E1E) : Colors.white,
                 icon: const Icon(
                   Icons.keyboard_arrow_down_rounded,
                   color: primary,
@@ -1277,39 +1269,52 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   fontWeight: FontWeight.w600,
                   color: _primaryTextColor,
                 ),
+
+                // ------------------------------------------------
+                // SELECTED ITEM
+                // ------------------------------------------------
                 selectedItemBuilder: (context) {
                   return items.asMap().entries.map((entry) {
                     final index = entry.key;
 
                     return Align(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            label,
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: _lightTextColor,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${label}\n',
+                              style: TextStyle(
+                                fontSize: 11,
+                                height: 0.9,
+                                color: _lightTextColor,
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 2,
-                          ),
-                          Text(
-                            displayLabels[index],
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: _primaryTextColor,
+                            TextSpan(
+                              text: displayLabels[index],
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 0.9,
+                                fontWeight: FontWeight.w600,
+                                color: _primaryTextColor,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.clip,
+                        textHeightBehavior: const TextHeightBehavior(
+                          applyHeightToFirstAscent: false,
+                          applyHeightToLastDescent: false,
+                        ),
                       ),
                     );
                   }).toList();
                 },
+
+                // ------------------------------------------------
+                // DROPDOWN OPTIONS
+                // ------------------------------------------------
                 items: items.asMap().entries.map((entry) {
                   final index = entry.key;
 
@@ -1323,6 +1328,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   );
                 }).toList(),
+
+                // ------------------------------------------------
+                // VALUE CHANGED
+                // ------------------------------------------------
                 onChanged: (value) {
                   if (value != null) {
                     onChanged(value);
@@ -1335,7 +1344,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     );
   }
-
   // ============================================================
   // ALLERGY CHIP
   // ============================================================

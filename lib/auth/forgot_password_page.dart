@@ -440,9 +440,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             // BACK ARROW
             // ======================================================
 
-            Positioned(
+            PositionedDirectional(
               top: 4,
-              left: 12,
+              start: 12,
               child: IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(

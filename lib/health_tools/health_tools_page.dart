@@ -640,7 +640,7 @@ class _HealthToolCard extends StatelessWidget {
               // =================================================================
 
               Align(
-                alignment: Alignment.bottomRight,
+                alignment: AlignmentDirectional.bottomEnd,
                 child: Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 14,

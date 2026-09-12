@@ -117,9 +117,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
     return Scaffold(
       backgroundColor: _pageBackground,
 
-      // =====================================================================
+      // =========================================================================
       // APP BAR
-      // =====================================================================
+      // =========================================================================
 
       appBar: AppBar(
         backgroundColor: _pageBackground,
@@ -146,9 +146,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
         ),
       ),
 
-      // =====================================================================
+      // =========================================================================
       // BODY
-      // =====================================================================
+      // =========================================================================
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -167,17 +167,17 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ===========================================================
+                  // =================================================================
                   // HERO
-                  // ===========================================================
+                  // =================================================================
 
                   _buildHeroCard(),
 
                   const SizedBox(height: 26),
 
-                  // ===========================================================
+                  // =================================================================
                   // FAQ HEADER
-                  // ===========================================================
+                  // =================================================================
 
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -205,8 +205,6 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                           ],
                         ),
                       ),
-
-                      // Small FAQ indicator
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
@@ -230,9 +228,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
 
                   const SizedBox(height: 13),
 
-                  // ===========================================================
+                  // =================================================================
                   // FAQ LIST
-                  // ===========================================================
+                  // =================================================================
 
                   ...List.generate(
                     faqs.length,
@@ -248,17 +246,17 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
 
                   const SizedBox(height: 18),
 
-                  // ===========================================================
+                  // =================================================================
                   // SUPPORT CARD
-                  // ===========================================================
+                  // =================================================================
 
                   _buildSupportCard(),
 
                   const SizedBox(height: 18),
 
-                  // ===========================================================
+                  // =================================================================
                   // APP INFORMATION
-                  // ===========================================================
+                  // =================================================================
 
                   Center(
                     child: Column(
@@ -326,7 +324,6 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Icon container
           Container(
             width: 58,
             height: 58,
@@ -348,10 +345,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
               size: 31,
             ),
           ),
-
           const SizedBox(width: 16),
-
-          // Text
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -428,14 +422,13 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
             padding: const EdgeInsets.all(14),
             child: Column(
               children: [
-                // -------------------------------------------------------------
+                // -----------------------------------------------------------------
                 // QUESTION ROW
-                // -------------------------------------------------------------
+                // -----------------------------------------------------------------
 
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Question icon
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 220),
                       width: 40,
@@ -452,10 +445,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                             : (_isDark ? const Color(0xFF8FC7DA) : darkBlue),
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
-                    // Question
                     Expanded(
                       child: Text(
                         question,
@@ -467,10 +457,7 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 8),
-
-                    // Arrow
                     AnimatedRotation(
                       turns: isOpen ? 0.5 : 0,
                       duration: const Duration(milliseconds: 220),
@@ -483,9 +470,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
                   ],
                 ),
 
-                // -------------------------------------------------------------
+                // -----------------------------------------------------------------
                 // ANSWER
-                // -------------------------------------------------------------
+                // -----------------------------------------------------------------
 
                 AnimatedCrossFade(
                   duration: const Duration(milliseconds: 220),
@@ -543,9 +530,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ---------------------------------------------------------------
+          // -------------------------------------------------------------------
           // HEADER
-          // ---------------------------------------------------------------
+          // -------------------------------------------------------------------
 
           Row(
             children: [
@@ -578,6 +565,10 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
 
           const SizedBox(height: 13),
 
+          // -------------------------------------------------------------------
+          // DESCRIPTION
+          // -------------------------------------------------------------------
+
           Text(
             _l10n.moreHelpDescription,
             style: const TextStyle(
@@ -589,9 +580,9 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
 
           const SizedBox(height: 18),
 
-          // ---------------------------------------------------------------
+          // -------------------------------------------------------------------
           // EMAIL
-          // ---------------------------------------------------------------
+          // -------------------------------------------------------------------
 
           Container(
             width: double.infinity,
@@ -637,45 +628,6 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
               ],
             ),
           ),
-
-          const SizedBox(height: 14),
-
-          // ---------------------------------------------------------------
-          // CONTACT BUTTON
-          // ---------------------------------------------------------------
-
-          SizedBox(
-            width: double.infinity,
-            height: 46,
-            child: ElevatedButton(
-              onPressed: _showContactDialog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: darkBlue,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.mail_outline_rounded,
-                    size: 19,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _l10n.contactSupport,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -703,183 +655,5 @@ class _HelpSupportPageState extends State<HelpSupportPage> {
           duration: const Duration(seconds: 2),
         ),
       );
-  }
-
-  // ===========================================================================
-  // CONTACT DIALOG
-  // ===========================================================================
-
-  void _showContactDialog() {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(
-            horizontal: 24,
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              color: _cardBackground,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                if (!_isDark)
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 18,
-                    offset: const Offset(0, 7),
-                  ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // -----------------------------------------------------------
-                // ICON
-                // -----------------------------------------------------------
-
-                Container(
-                  width: 58,
-                  height: 58,
-                  decoration: BoxDecoration(
-                    color: _lightBlueBackground,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Icon(
-                    Icons.email_outlined,
-                    size: 30,
-                    color: _isDark ? const Color(0xFF8FC7DA) : darkBlue,
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                // -----------------------------------------------------------
-                // TITLE
-                // -----------------------------------------------------------
-
-                Text(
-                  _l10n.contactMedelyraSupport,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w700,
-                    color: _primaryTextColor,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                Text(
-                  _l10n.contactSupportDescription,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    height: 1.45,
-                    color: _secondaryTextColor,
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                // -----------------------------------------------------------
-                // EMAIL
-                // -----------------------------------------------------------
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _pageBackground,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'support@medelyra.app',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: _isDark ? const Color(0xFF8FC7DA) : darkBlue,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                // -----------------------------------------------------------
-                // COPY BUTTON
-                // -----------------------------------------------------------
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 44,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Clipboard.setData(
-                        const ClipboardData(
-                          text: 'support@medelyra.app',
-                        ),
-                      );
-
-                      Navigator.pop(dialogContext);
-
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar()
-                        ..showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              _l10n.supportEmailCopied,
-                            ),
-                            behavior: SnackBarBehavior.floating,
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryBlue,
-                      foregroundColor: Colors.white,
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(13),
-                      ),
-                    ),
-                    child: Text(
-                      _l10n.copyEmailAddress,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                // -----------------------------------------------------------
-                // CLOSE
-                // -----------------------------------------------------------
-
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(dialogContext);
-                  },
-                  child: Text(
-                    _l10n.close,
-                    style: TextStyle(
-                      color: _mutedTextColor,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 }

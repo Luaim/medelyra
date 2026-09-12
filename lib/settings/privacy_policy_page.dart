@@ -530,9 +530,9 @@ class PrivacyPolicyPage extends StatelessWidget {
                     Container(
                       width: 5,
                       height: 5,
-                      margin: const EdgeInsets.only(
+                      margin: const EdgeInsetsDirectional.only(
                         top: 7,
-                        right: 10,
+                        end: 10,
                       ),
                       decoration: BoxDecoration(
                         color: accentColor,

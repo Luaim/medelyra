@@ -629,15 +629,13 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // ============================================================
-  // HEADER CARD
-  // ============================================================
+// ============================================================
+// HEADER CARD
+// ============================================================
 
   Widget _buildHeaderCard(
     String name,
   ) {
-    final l10n = AppLocalizations.of(context)!;
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
@@ -714,44 +712,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     fontWeight: FontWeight.w700,
                     color: _isDark ? Colors.white : const Color(0xFF222222),
                   ),
-                ),
-                const SizedBox(
-                  height: 6,
-                ),
-                Text(
-                  l10n.medelyraUser,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: _isDark
-                        ? const Color(0xFFBDBDBD)
-                        : const Color(0xFF4D4D4D),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.verified_user_outlined,
-                      size: 18,
-                      color: Color(0xFF2F7B95),
-                    ),
-                    const SizedBox(
-                      width: 6,
-                    ),
-                    Flexible(
-                      child: Text(
-                        l10n.healthProfileActive,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF2F7B95),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
