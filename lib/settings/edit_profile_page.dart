@@ -1283,7 +1283,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         TextSpan(
                           children: [
                             TextSpan(
-                              text: '${label}\n',
+                              text: '$label\n',
                               style: TextStyle(
                                 fontSize: 11,
                                 height: 0.9,

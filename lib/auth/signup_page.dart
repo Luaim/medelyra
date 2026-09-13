@@ -1013,13 +1013,17 @@ class _SignUpPageState extends State<SignUpPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        l10n.alreadyHaveAccount,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: _bodyTextColor,
+                      Flexible(
+                        child: Text(
+                          l10n.alreadyHaveAccount,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: _bodyTextColor,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 4),
                       GestureDetector(
                         onTap: busy
                             ? null

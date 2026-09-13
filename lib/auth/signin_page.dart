@@ -555,15 +555,19 @@ class _SignInPageState extends State<SignInPage>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          l10n.dontHaveAccount,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDark
-                                ? const Color(0xFFBDBDBD)
-                                : Colors.black87,
+                        Flexible(
+                          child: Text(
+                            l10n.dontHaveAccount,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDark
+                                  ? const Color(0xFFBDBDBD)
+                                  : Colors.black87,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 4),
                         GestureDetector(
                           onTap: busy
                               ? null
@@ -577,8 +581,8 @@ class _SignInPageState extends State<SignInPage>
                             l10n.signUp,
                             style: const TextStyle(
                               color: Color(0xFF9B1C1C),
-                              fontSize: 14,
                               fontWeight: FontWeight.w600,
+                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -740,17 +744,22 @@ class _SignInPageState extends State<SignInPage>
                       children: [
                         Image.asset(
                           'assets/google.png',
-                          width: 23,
-                          height: 23,
+                          width: 22,
+                          height: 22,
                         ),
                         const SizedBox(width: 10),
-                        Text(
-                          googleText,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color:
-                                isDark ? Colors.white : const Color(0xFF333333),
+                        Flexible(
+                          child: Text(
+                            AppLocalizations.of(context)!.continueWithGoogle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF333333),
+                            ),
                           ),
                         ),
                       ],
