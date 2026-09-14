@@ -234,18 +234,18 @@ class _SettingsPageState extends State<SettingsPage> {
 
       await _reauthenticateUserIfNeeded(user);
 
-      // Delete the user's local medical data.
+// Delete the user's Firestore profile.
+      await firestore.collection('users').doc(uid).delete();
+
+// Delete the Firebase Authentication account.
+      await user.delete();
+
+// The remote account deletion succeeded, so clean up local data.
       await LocalDatabaseService.instance.deleteAllMedicines(uid);
       await LocalAppointmentService.instance.deleteAllAppointments(uid);
 
-      // Cancel all locally scheduled notifications.
+// Cancel all locally scheduled notifications.
       await NotificationService.instance.cancelAll();
-
-      // Delete the user's Firestore profile.
-      await firestore.collection('users').doc(uid).delete();
-
-      // Delete the Firebase Authentication account.
-      await user.delete();
 
       await auth.signOut();
 
