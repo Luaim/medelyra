@@ -6,6 +6,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:medelyra/services/theme_service.dart';
 import 'package:medelyra/services/language_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:medelyra/services/local_database_service.dart';
+import 'package:medelyra/services/local_appointment_service.dart';
+import 'package:medelyra/services/notification_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -231,8 +234,17 @@ class _SettingsPageState extends State<SettingsPage> {
 
       await _reauthenticateUserIfNeeded(user);
 
+      // Delete the user's local medical data.
+      await LocalDatabaseService.instance.deleteAllMedicines(uid);
+      await LocalAppointmentService.instance.deleteAllAppointments(uid);
+
+      // Cancel all locally scheduled notifications.
+      await NotificationService.instance.cancelAll();
+
+      // Delete the user's Firestore profile.
       await firestore.collection('users').doc(uid).delete();
 
+      // Delete the Firebase Authentication account.
       await user.delete();
 
       await auth.signOut();

@@ -575,12 +575,29 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
     final String id = item['id'].toString();
 
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _l10n.pleaseSignInAgain,
+          ),
+        ),
+      );
+
+      return;
+    }
+
     try {
       final now = DateTime.now().toIso8601String();
 
       if (collection == 'medicines') {
         await LocalDatabaseService.instance.updateMedicine(
           id,
+          user.uid,
           {
             'active': value ? 1 : 0,
             'updatedAt': now,
@@ -739,6 +756,12 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       final String id = item['id'].toString();
 
+      final user = _auth.currentUser;
+
+      if (user == null) {
+        throw Exception('No authenticated user found.');
+      }
+
       if (collection == 'medicines') {
         await _cancelMedicineNotifications(
           medicineId: id,
@@ -747,7 +770,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           ),
         );
 
-        await LocalDatabaseService.instance.deleteMedicine(id);
+        await LocalDatabaseService.instance.deleteMedicine(
+          id,
+          user.uid,
+        );
       } else {
         await NotificationService.instance.cancel(
           id.hashCode.abs(),
@@ -1296,8 +1322,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       final now = DateTime.now();
 
+      final user = _auth.currentUser;
+
+      if (user == null) {
+        throw Exception('No authenticated user found.');
+      }
+
       await LocalDatabaseService.instance.updateMedicine(
         item['id'],
+        user.uid,
         {
           'medicineName': nameController.text.trim(),
           'medicineType': medicineType,

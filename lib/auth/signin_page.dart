@@ -77,15 +77,9 @@ class _SignInPageState extends State<SignInPage>
 
       switch (e.code) {
         case 'invalid-credential':
-          message = l10n.incorrectEmailOrPassword;
-          break;
-
         case 'user-not-found':
-          message = l10n.noAccountFound;
-          break;
-
         case 'wrong-password':
-          message = l10n.incorrectPassword;
+          message = l10n.incorrectEmailOrPassword;
           break;
 
         case 'invalid-email':
@@ -105,7 +99,7 @@ class _SignInPageState extends State<SignInPage>
           break;
 
         default:
-          message = e.message ?? l10n.unableToSignIn;
+          message = l10n.unableToSignIn;
       }
 
       _showMessage(message);

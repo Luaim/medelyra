@@ -176,13 +176,14 @@ class LocalDatabaseService {
 
   Future<Map<String, dynamic>?> getMedicine(
     String id,
+    String userId,
   ) async {
     final db = await database;
 
     final results = await db.query(
       'medicines',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'id = ? AND userId = ?',
+      whereArgs: [id, userId],
       limit: 1,
     );
 
@@ -195,6 +196,7 @@ class LocalDatabaseService {
 
   Future<int> updateMedicine(
     String id,
+    String userId,
     Map<String, dynamic> medicine,
   ) async {
     final db = await database;
@@ -202,12 +204,15 @@ class LocalDatabaseService {
     return await db.update(
       'medicines',
       medicine,
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'id = ? AND userId = ?',
+      whereArgs: [id, userId],
     );
   }
 
-  Future<int> deleteMedicine(String id) async {
+  Future<int> deleteMedicine(
+    String id,
+    String userId,
+  ) async {
     final db = await database;
 
     await db.delete(
@@ -218,8 +223,8 @@ class LocalDatabaseService {
 
     return await db.delete(
       'medicines',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'id = ? AND userId = ?',
+      whereArgs: [id, userId],
     );
   }
 
@@ -247,7 +252,6 @@ class LocalDatabaseService {
       whereArgs: [userId],
     );
   }
-
   // ============================================================
   // DOSE STATUS
   // ============================================================
@@ -279,6 +283,7 @@ class LocalDatabaseService {
 
   Future<Map<String, dynamic>?> getMedicineDoseStatus({
     required String medicineId,
+    required String userId,
     required String date,
     required String time,
   }) async {
@@ -286,9 +291,10 @@ class LocalDatabaseService {
 
     final results = await db.query(
       'medicine_dose_status',
-      where: 'medicineId = ? AND date = ? AND time = ?',
+      where: 'medicineId = ? AND userId = ? AND date = ? AND time = ?',
       whereArgs: [
         medicineId,
+        userId,
         date,
         time,
       ],
@@ -320,13 +326,14 @@ class LocalDatabaseService {
 
   Future<int> deleteMedicineDoseStatuses(
     String medicineId,
+    String userId,
   ) async {
     final db = await database;
 
     return await db.delete(
       'medicine_dose_status',
-      where: 'medicineId = ?',
-      whereArgs: [medicineId],
+      where: 'medicineId = ? AND userId = ?',
+      whereArgs: [medicineId, userId],
     );
   }
 

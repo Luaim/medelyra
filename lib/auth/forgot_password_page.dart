@@ -127,7 +127,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           break;
 
         case 'user-not-found':
-          message = l10n.noAccountFound;
+          message = l10n.passwordResetEmailSent;
           break;
 
         case 'operation-not-allowed':
