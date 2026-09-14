@@ -2588,7 +2588,7 @@ class _ManagereminderspageState extends State<Managereminderspage> {
       case 2:
         Navigator.pushReplacementNamed(
           context,
-          '/finder',
+          '/health-tools',
         );
         break;
 
