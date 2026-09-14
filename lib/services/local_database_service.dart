@@ -217,10 +217,9 @@ class LocalDatabaseService {
 
     await db.delete(
       'medicine_dose_status',
-      where: 'medicineId = ?',
-      whereArgs: [id],
+      where: 'medicineId = ? AND userId = ?',
+      whereArgs: [id, userId],
     );
-
     return await db.delete(
       'medicines',
       where: 'id = ? AND userId = ?',
@@ -241,8 +240,8 @@ class LocalDatabaseService {
     for (final medicine in medicines) {
       await db.delete(
         'medicine_dose_status',
-        where: 'medicineId = ?',
-        whereArgs: [medicine['id']],
+        where: 'medicineId = ? AND userId = ?',
+        whereArgs: [medicine['id'], userId],
       );
     }
 
