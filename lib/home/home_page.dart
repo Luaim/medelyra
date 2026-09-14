@@ -1030,8 +1030,15 @@ class _HomePageState extends State<HomePage> {
     String appointmentId,
   ) async {
     try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        throw Exception('No authenticated user found.');
+      }
+
       await LocalAppointmentService.instance.markAppointmentCompleted(
         appointmentId,
+        user.uid,
       );
 
       await _loadHomeData();

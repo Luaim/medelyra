@@ -633,8 +633,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           );
         }
       } else {
+        final user = _auth.currentUser;
+
+        if (user == null) {
+          throw Exception('No authenticated user found.');
+        }
+
         await LocalAppointmentService.instance.updateAppointment(
           id,
+          user.uid,
           {
             'active': value ? 1 : 0,
             'updatedAt': now,
@@ -779,7 +786,10 @@ class _ManagereminderspageState extends State<Managereminderspage> {
           id.hashCode.abs(),
         );
 
-        await LocalAppointmentService.instance.deleteAppointment(id);
+        await LocalAppointmentService.instance.deleteAppointment(
+          id,
+          user.uid,
+        );
       }
 
       if (!mounted) return;
@@ -2199,8 +2209,15 @@ class _ManagereminderspageState extends State<Managereminderspage> {
 
       final now = DateTime.now().toIso8601String();
 
+      final user = _auth.currentUser;
+
+      if (user == null) {
+        throw Exception('No authenticated user found.');
+      }
+
       await LocalAppointmentService.instance.updateAppointment(
         item['id'],
+        user.uid,
         {
           'appointmentType': appointmentType,
           'hospital': hospitalController.text.trim(),

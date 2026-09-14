@@ -165,13 +165,14 @@ class LocalAppointmentService {
 
   Future<Map<String, dynamic>?> getAppointment(
     String id,
+    String userId,
   ) async {
     final db = await database;
 
     final results = await db.query(
       'appointments',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'id = ? AND userId = ?',
+      whereArgs: [id, userId],
       limit: 1,
     );
 
@@ -184,6 +185,7 @@ class LocalAppointmentService {
 
   Future<int> updateAppointment(
     String id,
+    String userId,
     Map<String, dynamic> appointment,
   ) async {
     final db = await database;
@@ -191,13 +193,14 @@ class LocalAppointmentService {
     return await db.update(
       'appointments',
       appointment,
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'id = ? AND userId = ?',
+      whereArgs: [id, userId],
     );
   }
 
   Future<int> markAppointmentCompleted(
     String id,
+    String userId,
   ) async {
     final db = await database;
 
@@ -207,18 +210,21 @@ class LocalAppointmentService {
         'completedAt': DateTime.now().toIso8601String(),
         'updatedAt': DateTime.now().toIso8601String(),
       },
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'id = ? AND userId = ?',
+      whereArgs: [id, userId],
     );
   }
 
-  Future<int> deleteAppointment(String id) async {
+  Future<int> deleteAppointment(
+    String id,
+    String userId,
+  ) async {
     final db = await database;
 
     return await db.delete(
       'appointments',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'id = ? AND userId = ?',
+      whereArgs: [id, userId],
     );
   }
 
