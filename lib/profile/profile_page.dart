@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
+import '../services/notification_service.dart';
 import '../widgets/nav_bar.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -288,13 +290,19 @@ class _ProfilePageState extends State<ProfilePage> {
     return allergies.join(', ');
   }
 
-  // ============================================================
-  // LOGOUT
-  // ============================================================
-
   Future<void> _logout() async {
     try {
+      await NotificationService.instance.cancelAll();
+
       await _auth.signOut();
+
+      try {
+        await GoogleSignIn().signOut();
+      } catch (e) {
+        debugPrint(
+          'GOOGLE LOGOUT ERROR: $e',
+        );
+      }
 
       if (!mounted) return;
 

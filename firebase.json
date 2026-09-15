@@ -1,1 +1,25 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"medminder-5218e","appId":"1:61571062947:android:d7e04d2448f5928c85f316","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"medminder-5218e","configurations":{"android":"1:61571062947:android:d7e04d2448f5928c85f316","ios":"1:61571062947:ios:d1edbe5464d6f7f885f316"}}}}}}
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "medminder-5218",
+          "appId": "1:61571062947:android:d7e04d2448f5928c85f316",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "medminder-5218",
+          "configurations": {
+            "android": "1:61571062947:android:d7e04d2448f5928c85f316",
+            "ios": "1:61571062947:ios:d1edbe5464d6f7f885f316"
+          }
+        }
+      }
+    }
+  }
+}

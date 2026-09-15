@@ -230,26 +230,20 @@ class LocalDatabaseService {
   Future<int> deleteAllMedicines(String userId) async {
     final db = await database;
 
-    final medicines = await db.query(
-      'medicines',
-      columns: ['id'],
-      where: 'userId = ?',
-      whereArgs: [userId],
-    );
-
-    for (final medicine in medicines) {
-      await db.delete(
+    return await db.transaction((txn) async {
+      await txn.delete(
         'medicine_dose_status',
-        where: 'medicineId = ? AND userId = ?',
-        whereArgs: [medicine['id'], userId],
+        where: 'userId = ?',
+        whereArgs: [userId],
       );
-    }
 
-    return await db.delete(
-      'medicines',
-      where: 'userId = ?',
-      whereArgs: [userId],
-    );
+      // Remove all medicines belonging to this user.
+      return await txn.delete(
+        'medicines',
+        where: 'userId = ?',
+        whereArgs: [userId],
+      );
+    });
   }
   // ============================================================
   // DOSE STATUS

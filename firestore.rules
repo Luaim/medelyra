@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ================================
+    // USER PROFILE
+    // ================================
+    match /users/{userId} {
+
+      allow read, write:
+        if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+
+    // ================================
+    // MEDICINES / REMINDERS
+    // ================================
+    match /medicines/{medicineId} {
+
+      // Creating a new medicine
+      allow create:
+        if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+
+      // Reading an existing medicine
+      allow read:
+        if request.auth != null
+        && request.auth.uid == resource.data.userId;
+
+      // Updating an existing medicine
+      allow update:
+        if request.auth != null
+        && request.auth.uid == resource.data.userId
+        && request.auth.uid == request.resource.data.userId;
+
+      // Deleting an existing medicine
+      allow delete:
+        if request.auth != null
+        && request.auth.uid == resource.data.userId;
+    }
+
+
+    // ================================
+    // APPOINTMENTS
+    // ================================
+    match /appointments/{appointmentId} {
+
+      allow create:
+        if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+
+      allow read:
+        if request.auth != null
+        && request.auth.uid == resource.data.userId;
+
+      allow update:
+        if request.auth != null
+        && request.auth.uid == request.resource.data.userId
+        && request.auth.uid == resource.data.userId;
+
+      allow delete:
+        if request.auth != null
+        && request.auth.uid == resource.data.userId;
+    }
+
+
+    // ================================
+    // EMERGENCY GUIDES
+    // ================================
+    match /emergency_guides/{guideId} {
+
+      // Users can read emergency guides
+      allow read:
+        if request.auth != null;
+    }
+  }
+}
