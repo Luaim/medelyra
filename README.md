@@ -63,7 +63,7 @@ lib/
 ├── onboarding/           First-launch onboarding
 ├── profile/              Profile, settings, and notification preferences
 ├── reminders/            Medication and appointment reminder flows
-├── services/             Firebase-adjacent, local database, notification,
+├── services/             Firebase, local database, notification,
 │                         language, and theme services
 ├── settings/             Profile editing, password, privacy, and support screens
 ├── widgets/              Shared navigation and UI widgets
@@ -99,7 +99,7 @@ flutter pub get
 flutter run
 ```
 
-The repository includes the platform Firebase configuration used by the project. If setting up a different Firebase project, update the platform configuration using the standard FlutterFire setup process without committing private credentials.
+The repository includes the Firebase configuration required by the project. If setting up a different Firebase project, update the configuration using the standard FlutterFire setup process.
 
 ## Building
 
