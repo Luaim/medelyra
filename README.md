@@ -145,17 +145,9 @@ flutter test
 
 ## Demo
 
-Click the preview below to watch the Medelyra walkthrough.
+https://github.com/user-attachments/assets/d15beb43-cc9d-4755-b7d5-97f17a07c012
 
-<a href="assets/demo/Medelyra.mp4">
-  <img src="assets/demo/Medelyra-thumbnail.png" width="720" alt="Watch the Medelyra demo">
-</a>
 
-## Demo
-
-A short walkthrough of Medelyra's main features and workflows.
-
-[Watch the Medelyra demo](assets/demo/Medelyra.mp4)
 
 ## Project Status
 
