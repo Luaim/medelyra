@@ -125,11 +125,39 @@ flutter test
 
 ## Screenshots
 
-Screenshots can be added here in a future update.
+### Home
+
+![Home](assets/screenshots/Home.png)
+
+### Reminders
+
+![Reminders](assets/screenshots/Reminders.png)
+
+### Health Tools
+
+![Health Tools](assets/screenshots/Health_Tool.png)
+
+### Emergency Guide
+
+![Emergency Guide](assets/screenshots/Emergency.png)
+
+### Profile
+
+![Profile](assets/screenshots/Profile.png)
+
+### Sign In
+
+![Sign In](assets/screenshots/Sign%20In.png)
+
+## Demo
+
+A short walkthrough of Medelyra's main features and workflows.
+
+[Watch the Medelyra demo](assets/demo/Medelyra.mp4)
 
 ## Project Status
 
-Medelyra V1 is feature-complete and currently prepared as a portfolio and release project.
+Medelyra V1 is feature-complete and is maintained as a portfolio project.
 
 ## License
 
