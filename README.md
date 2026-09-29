@@ -125,29 +125,31 @@ flutter test
 
 ## Screenshots
 
-### Home
+<table>
+  <tr>
+    <td><img src="assets/screenshots/Home.png" width="250"></td>
+    <td><img src="assets/screenshots/Reminders.png" width="250"></td>
+    <td><img src="assets/screenshots/Health_Tool.png" width="250"></td>
+  </tr>
+  <tr>
+    <td><img src="assets/screenshots/Emergency.png" width="250"></td>
+    <td><img src="assets/screenshots/Profile.png" width="250"></td>
+    <td><img src="assets/screenshots/Sign In.png" width="250"></td>
+  </tr>
+  <tr>
+    <td><img src="assets/screenshots/Home2.png" width="250"></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
 
-![Home](assets/screenshots/Home.png)
+## Demo
 
-### Reminders
+Click the preview below to watch the Medelyra walkthrough.
 
-![Reminders](assets/screenshots/Reminders.png)
-
-### Health Tools
-
-![Health Tools](assets/screenshots/Health_Tool.png)
-
-### Emergency Guide
-
-![Emergency Guide](assets/screenshots/Emergency.png)
-
-### Profile
-
-![Profile](assets/screenshots/Profile.png)
-
-### Sign In
-
-![Sign In](assets/screenshots/Sign%20In.png)
+<a href="assets/demo/Medelyra.mp4">
+  <img src="assets/demo/Medelyra-thumbnail.png" width="720" alt="Watch the Medelyra demo">
+</a>
 
 ## Demo
 
